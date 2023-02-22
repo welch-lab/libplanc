@@ -6,8 +6,8 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "common/tensor.hpp"
-#include "common/utils.h"
+#include "tensor.hpp"
+#include "utils.h"
 
 namespace planc {
 class NumPyArray {

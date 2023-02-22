@@ -4,8 +4,8 @@
 #define COMMON_NCPFACTORS_HPP_
 
 #include <cassert>
-#include "common/tensor.hpp"
-#include "common/utils.h"
+#include "tensor.hpp"
+#include "utils.h"
 #ifdef MPI_DISTNTF
 #include <mpi.h>
 #endif

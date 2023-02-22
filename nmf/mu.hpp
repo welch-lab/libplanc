@@ -3,7 +3,7 @@
 #ifndef NMF_MU_HPP_
 #define NMF_MU_HPP_
 
-#include "common/nmf.hpp"
+#include "nmf.hpp"
 
 namespace planc {
 

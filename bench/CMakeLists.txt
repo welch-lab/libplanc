@@ -1,13 +1,7 @@
-#Copyright 2016 Ramakrishnan Kannan
-
 cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
-
-
-set(ARMA_USE_WRAPPER true)
 include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
 # the settings below will be automatically configured by the rest of this script
-
 include_directories(${NMFLIB_COMMON} ${NNLS_SRC}
   ${ARMADILLO_INCLUDE_DIR}
   ${ARMADILLO_INCLUDE_DIRS}
@@ -15,15 +9,11 @@ include_directories(${NMFLIB_COMMON} ${NNLS_SRC}
   ${MKL_INCLUDE_DIR}
   ${OPENBLAS_INCLUDE_DIR}
   ${SUPERLU_INCLUDES})
-if(CMAKE_BUILD_SPARSE)
-  set(DENSE_OR_SPARSE sparse)
-else()
-  set(DENSE_OR_SPARSE dense)
-endif()
-add_executable(${DENSE_OR_SPARSE}_nmf nmf.cpp)
+add_executable(planc_bench planc_bench.cpp)
 
-target_link_libraries(${DENSE_OR_SPARSE}_nmf ${NMFLIB_LIBS})
-install(TARGETS ${DENSE_OR_SPARSE}_nmf
+target_link_libraries(planc_bench ${NMFLIB_LIBS})
+
+install(TARGETS planc_bench
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )

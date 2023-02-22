@@ -3,7 +3,7 @@
 #define COMMON_NMF_HPP_
 #include <assert.h>
 #include <string>
-#include "common/utils.hpp"
+#include "utils.hpp"
 
 // #ifndef _VERBOSE
 // #define _VERBOSE 1;

@@ -10,7 +10,7 @@
 #include <stack>
 #include <typeinfo>
 #include <vector>
-#include "common/utils.h"
+#include "utils.h"
 #include <random>
 
 #ifdef MKL_FOUND
@@ -45,7 +45,7 @@ inline void tic() { tictoc_stack.push(std::chrono::steady_clock::now()); }
 
 /***
  * Returns the time taken between the most recent tic() to itself.
- * @return time in seconds.  
+ * @return time in seconds.
 */
 inline double toc() {
   std::chrono::duration<double> time_span =
@@ -287,10 +287,10 @@ void cblas_sgemm(const MAT &A, const MAT &B, double *C) {
 }
 
 /**
- * Generates the same low rank matrix. Matrix columns are seeded to 
+ * Generates the same low rank matrix. Matrix columns are seeded to
  * easily create different row slices of the matrix. The lowrank matrix
  * X is expected to be of size n x k where k << n.
- * 
+ *
  * @param[in] row_start is the starting row of the block to be generated
  * @param[in] nrows is the number of rows to be generated
  * @param[in] k is the lowrank (length of each row vector)
@@ -298,12 +298,12 @@ void cblas_sgemm(const MAT &A, const MAT &B, double *C) {
  * @param[in] trans is a flag to indicate that Xt is sent in.
  * @param[in] mseed is the seed for the first column of the matrix
  */
-void gen_discard(int row_start, int nrows, int k, 
+void gen_discard(int row_start, int nrows, int k,
         MAT &X, bool trans, int mseed=7907) {
   for(int j = 0; j < k; ++j) {
     std::mt19937 gen(mseed + j);
     gen.discard(row_start);
-    for(int i = 0; i < nrows; ++i) { 
+    for(int i = 0; i < nrows; ++i) {
       if (trans) {
           X(j, i) =  ((double)gen()) / gen.max();
       } else {
@@ -330,7 +330,7 @@ void read_input_matrix(SP_MAT &A, std::string fname) {
 /*
  * Generate random dense matrix
  */
-void generate_rand_matrix(MAT &A, std::string rtype, 
+void generate_rand_matrix(MAT &A, std::string rtype,
         UWORD m, UWORD n, UWORD k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 1, int kbeta = 0) {
   if (rtype == "uniform") {
@@ -377,7 +377,7 @@ void generate_rand_matrix(MAT &A, std::string rtype,
 /*
  * Generate random sparse matrix
  */
-void generate_rand_matrix(SP_MAT &A, std::string rtype, 
+void generate_rand_matrix(SP_MAT &A, std::string rtype,
         UWORD m, UWORD n, UWORD k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 5, int kbeta = 10) {
   if (rtype == "uniform") {

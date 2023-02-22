@@ -7,12 +7,12 @@ set(PLANC_MAJOR_VERSION 0)
 set(PLANC_MINOR_VERSION 8)
 set(PLANC_PATCH_VERSION 1)
 set(PLANC_VERSION "${PLANC_MAJOR_VERSION}.${PLANC_MINOR_VERSION}.${PLANC_PATCH_VERSION}")
-
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
 cmake_host_system_information(RESULT _host_name QUERY FQDN)
 
 message(STATUS, "host name = ${_host_name}")
@@ -40,16 +40,23 @@ set(DISTNMF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/distnmf)
 set(DISTNTF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/distntf)
 set(HIERNMF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hiernmf)
 
-set(DENSEDIRS nmf distnmf distntf hiernmf)
-set(SPARSEDIRS nmf distnmf hiernmf)
+set(DENSEDIRS nmf)
+set(SPARSEDIRS nmf)
+
+set(NMFLIB_COMMON ${PROJECT_SOURCE_DIR}/common)
+set(NNLS_SRC ${PROJECT_SOURCE_DIR}/nnls)
+message(STATUS "NMF_SOURCE_DIR =  ${NMF_SOURCE_DIR}")
+message(STATUS "NMFLIB_COMMON =  ${NMFLIB_COMMON}")
+
 
 set(CMAKE_BUILD_SPARSE 0)
 foreach (DENSEDIR ${DENSEDIRS})
   add_subdirectory(${DENSEDIR} dense_${DENSEDIR})
 endforeach()
-  
+
 set(CMAKE_BUILD_SPARSE 1)
 set(CMAKE_BUILD_CUDA 0)
 foreach (SPARSEDIR ${SPARSEDIRS})
   add_subdirectory(${SPARSEDIR} sparse_${SPARSEDIR})
 endforeach()
+add_subdirectory(bench)

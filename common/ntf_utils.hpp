@@ -3,8 +3,8 @@
 #ifndef COMMON_NTF_UTILS_HPP_
 #define COMMON_NTF_UTILS_HPP_
 
-#include "common/ncpfactors.hpp"
-#include "common/tensor.hpp"
+#include "ncpfactors.hpp"
+#include "tensor.hpp"
 
 /**
  * Returns the khatri-rao product between two matrices.

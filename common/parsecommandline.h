@@ -4,7 +4,7 @@
 #define COMMON_PARSECOMMANDLINE_H_
 
 #include <getopt.h>
-#include "common/utils.h"
+#include "utils.h"
 
 // usage scenarios
 // NMFLibrary algotype lowrank AfileName numIteration

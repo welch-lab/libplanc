@@ -1,13 +1,13 @@
-#include "common/nmf.hpp"
+#include "nmf.hpp"
 #include <stdio.h>
 #include <string>
-#include "common/parsecommandline.hpp"
-#include "common/utils.hpp"
-#include "nmf/aoadmm.hpp"
-#include "nmf/bppnmf.hpp"
-#include "nmf/hals.hpp"
-#include "nmf/mu.hpp"
-#include "nmf/gnsym.hpp"
+#include "parsecommandline.hpp"
+#include "utils.hpp"
+#include "aoadmm.hpp"
+#include "bppnmf.hpp"
+#include "hals.hpp"
+#include "mu.hpp"
+#include "gnsym.hpp"
 
 namespace planc {
 

@@ -4,9 +4,9 @@
 
 #include <mpi.h>
 #include <string>
-#include "common/distutils.h"
-#include "common/utils.h"
-#include "common/utils.hpp"
+#include "distutils.h"
+#include "utils.h"
+#include "utils.hpp"
 
 using namespace std;
 

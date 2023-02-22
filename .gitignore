@@ -3,3 +3,5 @@
 *.md5
 *.dpth
 *.dep
+.vs/*
+out/*

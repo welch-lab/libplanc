@@ -3,7 +3,7 @@
 #ifndef NMF_GNSYM_HPP_
 #define NMF_GNSYM_HPP_
 
-#include "common/nmf.hpp"
+#include "nmf.hpp"
 
 namespace planc {
 
