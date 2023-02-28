@@ -9,9 +9,18 @@ include_directories(${NMFLIB_COMMON} ${NNLS_SRC}
   ${MKL_INCLUDE_DIR}
   ${OPENBLAS_INCLUDE_DIR}
   ${SUPERLU_INCLUDES})
+
+include(FetchContent)
+FetchContent_Declare(
+        fast_matrix_market
+        GIT_REPOSITORY https://github.com/alugowski/fast_matrix_market
+        GIT_TAG main
+        GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(fast_matrix_market)
 add_executable(planc_bench planc_bench.cpp)
 
-target_link_libraries(planc_bench ${NMFLIB_LIBS})
+target_link_libraries(planc_bench ${NMFLIB_LIBS} fast_matrix_market::fast_matrix_market)
 
 install(TARGETS planc_bench
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

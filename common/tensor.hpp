@@ -243,7 +243,7 @@ class Tensor {
    * @param[out] o_mttkrp pointer to the mttkrp matrix.
    */
 
-  void mttkrp(const int i_n, const MAT &i_krp, MAT *o_mttkrp) const {
+  void mttkrp(const int i_n, const AMAT &i_krp, AMAT *o_mttkrp) const {
     (*o_mttkrp).zeros();
     if (i_n == 0) {
       // if n == 1

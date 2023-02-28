@@ -13,23 +13,23 @@ class AOADMMNMF : public NMF<T> {
   // Not happy with this design. However to avoid computing At again and again
   // making this as private variable.
   T At;
-  MAT WtW;
-  MAT HtH;
-  MAT WtA;
-  MAT AH;
+  AMAT WtW;
+  AMAT HtH;
+  AMAT WtA;
+  AMAT AH;
 
   // Dual Variables
-  MAT U;
-  MAT V;
+  AMAT U;
+  AMAT V;
 
   // Auxiliary/Temporary Variables
-  MAT Htaux;
-  MAT tempHtaux;
-  MAT H0;
-  MAT Wtaux;
-  MAT tempWtaux;
-  MAT W0;
-  MAT L;
+  AMAT Htaux;
+  AMAT tempHtaux;
+  AMAT H0;
+  AMAT Wtaux;
+  AMAT tempWtaux;
+  AMAT W0;
+  AMAT L;
 
   // Hyperparameters
   double alpha, beta, tolerance;
@@ -40,10 +40,10 @@ class AOADMMNMF : public NMF<T> {
    * iteration Htime Wtime totaltime normH normW densityH densityW relError
    */
   void allocateMatrices() {
-    WtW = arma::zeros<MAT>(this->k, this->k);
-    HtH = arma::zeros<MAT>(this->k, this->k);
-    WtA = arma::zeros<MAT>(this->n, this->k);
-    AH = arma::zeros<MAT>(this->m, this->k);
+    WtW = arma::zeros<AMAT>(this->k, this->k);
+    HtH = arma::zeros<AMAT>(this->k, this->k);
+    WtA = arma::zeros<AMAT>(this->n, this->k);
+    AH = arma::zeros<AMAT>(this->m, this->k);
 
     // Dual Variables
     U.zeros(size(this->W));
@@ -77,7 +77,7 @@ class AOADMMNMF : public NMF<T> {
     this->normalize_by_W();
     allocateMatrices();
   }
-  AOADMMNMF(const T &A, const MAT &llf, const MAT &rlf) : NMF<T>(A, llf, rlf) {
+  AOADMMNMF(const T &A, const AMAT &llf, const AMAT &rlf) : NMF<T>(A, llf, rlf) {
     this->normalize_by_W();
     allocateMatrices();
   }
@@ -114,10 +114,10 @@ class AOADMMNMF : public NMF<T> {
 
         this->H = Htaux.t();
         // Uncomment if numerical issues are seen
-        // fixNumericalError<MAT>(&(this->H), EPSILON_1EMINUS16, 0.0);
+        // fixNumericalError<AMAT>(&(this->H), EPSILON_1EMINUS16, 0.0);
         this->H = this->H - V;
         this->H.for_each(
-            [](MAT::elem_type &val) { val = val > 0.0 ? val : 0.0; });
+            [](AMAT::elem_type &val) { val = val > 0.0 ? val : 0.0; });
         V = V + this->H - Htaux.t();
 
         // Check stopping criteria
@@ -160,10 +160,10 @@ class AOADMMNMF : public NMF<T> {
 
         this->W = Wtaux.t();
         // Uncomment if numerical issues are seen
-        // fixNumericalError<MAT>(&(this->W), EPSILON_1EMINUS16, 0.0);
+        // fixNumericalError<AMAT>(&(this->W), EPSILON_1EMINUS16, 0.0);
         this->W = this->W - U;
         this->W.for_each(
-            [](MAT::elem_type &val) { val = val > 0.0 ? val : 0.0; });
+            [](AMAT::elem_type &val) { val = val > 0.0 ? val : 0.0; });
 
         U = U + this->W - Wtaux.t();
 

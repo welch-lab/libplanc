@@ -60,8 +60,8 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
     /**
      * This is the implementation of Algorithm 2 at Page 8 of the paper
      * http:// www.cc.gatech.edu/~hpark/papers/SISC_082117RR_Kim_Park.pdf.
-     * 
-     * Based on the nnlsm_blockpivot subroutine from the MATLAB code 
+     *
+     * Based on the nnlsm_blockpivot subroutine from the MATLAB code
      * associated with the paper.
      */
     int solveNNLSMultipleRHS() {
@@ -87,8 +87,8 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
 
         UWORD numNonOptCols = arma::accu(NotOptCols);
 #ifdef _VERBOSE
-        INFO << "Rank : " << arma::rank(this->AtA) << endl;
-        INFO << "Condition : " << cond(this->AtA) << endl;
+        INFO << "Rank : " << arma::rank(this->AtA) << std::endl;
+        INFO << "Condition : " << cond(this->AtA) << std::endl;
         INFO << "numNonOptCols : " << numNonOptCols;
 #endif
         // Temporaries needed in loop
@@ -196,7 +196,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
      * Fast algorithm for the solution of large-scale non-negativity-constrained least squares problems
      * M. H. Van Benthem and M. R. Keenan, J. Chemometrics 2004; 18: 441-450
      * Motivated out of implementation from Jingu's solveNormalEqComb.m
-     * 
+     *
      * @param[in] LHS of the system of size \f$n \times n\f$
      * @param[in] RHS of the system of size \f$n \times nrhs\f$
      * @param[in] Binary matrix of size \f$n \times nrhs\f$ representing the Passive Set
@@ -262,7 +262,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
     * Passset is a binary matrix where every column represents
     * one datapoint. The objective is to returns a low triangular
     * correlation matrix with 1 if the strings are equal. Zero otherwise
-    * 
+    *
     * @param[in] The binary matrix being grouped
     * @param[in] Reference to the array containing lexicographically sorted
     *            columns of the binary matrix

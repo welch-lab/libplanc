@@ -63,7 +63,9 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "armadillo": "cpp"
+        "armadillo": "cpp",
+        "charconv": "cpp",
+        "future": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

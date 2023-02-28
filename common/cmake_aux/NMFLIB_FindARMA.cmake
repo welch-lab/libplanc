@@ -1,5 +1,7 @@
 # Copyright 2016 Ramakrishnan Kannan
-# Find Armadillo, BLAS and LAPACK. 
+# Find Armadillo, BLAS and LAPACK.
+
+#include(${PROJECT_SOURCE_DIR}/common/cmake_aux/FindSuperLU.cmake)
 
 find_path(ARMADILLO_INCLUDE_DIR
   NAMES armadillo
@@ -31,7 +33,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set (CMAKE_CXX_EXTENSIONS OFF) # use -std=c++11 instead of -std=gnu++11
 
 #while exception get the stack trace
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic -g3 -O0 ")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic -g3 -O0 ")
 
 set(CMAKE_MODULE_PATH ${ARMADILLO_INCLUDE_DIR}/../cmake_aux/Modules/)
 message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}" )
@@ -48,6 +50,7 @@ set(ARMADILLO_INCLUDE_DIRS ${ARMADILLO_INCLUDE_DIR}/../)
 set(ARMADILLO_LIBRARY_DIRS ${ARMADILLO_INCLUDE_DIR}/../)
 
 # for cray wrapper required is failing
+
 find_package(BLAS)
 find_package(LAPACK)
 
@@ -62,7 +65,9 @@ endif()
 if(LAPACK_FOUND)
   set(NMFLIB_LIBS ${NMFLIB_LIBS} ${LAPACK_LIBRARIES})
 endif()
-
+if(SUPERLU_FOUND)
+  set(NMFLIB_LIBS ${NMFLIB_LIBS} ${SUPERLU_LIBRARIES})
+endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 #if(DEFINED CMAKE_CXX_COMPILER_ID AND DEFINED CMAKE_CXX_COMPILER_VERSION)
@@ -82,10 +87,10 @@ endif()
 message(STATUS " CUDA_FOUND = ${CUDA_FOUND}" )
 if (CUDA_FOUND)
   add_definitions(-DBUILD_CUDA=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp") 
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
   set(NMFLIB_LIBS ${CUDA_LIBRARIES} ${NMFLIB_LIBS})
   set(NMFLIB_LIBS ${CUDA_CUBLAS_LIBRARIES} ${NMFLIB_LIBS})
-  find_library(CUDA_NVBLAS_LIBRARY 
+  find_library(CUDA_NVBLAS_LIBRARY
                 NAMES nvblas
                 PATHS ${CUDA_TOOLKIT_ROOT_DIR}
                 PATH_SUFFIXES lib64

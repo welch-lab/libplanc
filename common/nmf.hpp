@@ -19,23 +19,23 @@
 
 namespace planc {
 
-// T must be a either an instance of MAT or sp_MAT
+// T must be a either an instance of AMAT or sp_MAT
 template <class T>
 class NMF {
  protected:
   const T &A;       /// input matrix of size mxn
-  MAT W, H;  /// left and low rank factors of size mxk and nxk respectively
-  MAT Winit, Hinit;
+  AMAT W, H;  /// left and low rank factors of size mxk and nxk respectively
+  AMAT Winit, Hinit;
   UINT m, n, k;  /// rows, columns and lowrank
 
   /*
    * Collected statistics are
    * iteration Htime Wtime totaltime normH normW densityH densityW relError
    */
-  MAT stats;
-  double objective_err, fit_err_sq;  /// objective and fit error at any particular iteration
-  double normA, normW, normH, l1normW, l1normH;  /// norms of input and factor matrices
-  double symmdiff;  /// difference between factors for symmetric regularization
+  AMAT stats;
+  double objective_err, fit_err_sq; /// objective and fit error at any particular iteration
+  double normA, normW, normH, l1normW, l1normH; /// norms of input and factor matrices
+  double symmdiff;                              /// difference between factors for symmetric regularization
   double densityW, densityH;
   bool cleared;
   double m_symm_reg;              /// Symmetric Regularization parameter
@@ -43,7 +43,7 @@ class NMF {
   double m_tolerance; // error tolerance
   std::string input_file_name;
   algotype m_updalgo; // Update algorithm type
-  MAT errMtx;       // used for error computation.
+  AMAT errMtx;       // used for error computation.
   T A_err_sub_mtx;  // used for error computation.
   /// The regularization is a vector of two values. The first value specifies
   /// L2 regularization values and the second is L1 regularization.
@@ -73,17 +73,17 @@ class NMF {
    * param[in] regularization as a vector
    * param[out] Gram matrix
    */
-  void applyReg(const FVEC &reg, MAT *AtA) {
+  void applyReg(const FVEC &reg, AMAT *AtA) {
     // Frobenius norm regularization
     if (reg(0) > 0) {
-      MAT identity = arma::eye<MAT>(this->k, this->k);
+      AMAT identity = arma::eye<AMAT>(this->k, this->k);
       float lambda_l2 = reg(0);
       (*AtA) = (*AtA) + (lambda_l2 * identity);
     }
 
     // L1 - norm regularization
     if (reg(1) > 0) {
-      MAT onematrix = arma::ones<MAT>(this->k, this->k);
+      AMAT onematrix = arma::ones<AMAT>(this->k, this->k);
       float lambda_l1 = reg(1);
       (*AtA) = (*AtA) + (lambda_l1 * onematrix);
     }
@@ -122,7 +122,7 @@ class NMF {
    */
   void applySymmetricReg(double sym_reg, MAT *lhs, MAT *fac, MAT *rhs) {
     if (sym_reg > 0) {
-      MAT identity = arma::eye<MAT>(this->k, this->k);
+      arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
       (*lhs) = (*lhs) + (sym_reg * identity);
       (*rhs) = (*rhs) + (sym_reg * (*fac));
     }
@@ -139,7 +139,7 @@ class NMF {
    */
   void removeSymmetricReg(double sym_reg, MAT *lhs, MAT *fac, MAT *rhs) {
     if (sym_reg > 0) {
-      MAT identity = arma::eye<MAT>(this->k, this->k);
+      arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
       (*lhs) = (*lhs) - (sym_reg * identity);
       (*rhs) = (*rhs) - (sym_reg * (*fac));
     }
@@ -150,7 +150,7 @@ class NMF {
    */
 
   void normalize_by_W() {
-    MAT W_square = arma::pow(this->W, 2);
+    AMAT W_square = arma::pow(this->W, 2);
     ROWVEC norm2 = arma::sqrt(arma::sum(W_square, 0));
     for (unsigned int i = 0; i < this->k; i++) {
       if (norm2(i) > 0) {
@@ -183,17 +183,17 @@ class NMF {
     this->k = rank;
     // prime number closer to W.
     arma::arma_rng::set_seed(89);
-    this->W = arma::randu<MAT>(m, k);
+    this->W = arma::randu<AMAT>(m, k);
     // prime number close to H
     arma::arma_rng::set_seed(73);
-    this->H = arma::randu<MAT>(n, k);
+    this->H = arma::randu<AMAT>(n, k);
     this->m_regW = arma::zeros<FVEC>(2);
     this->m_regH = arma::zeros<FVEC>(2);
     normalize_by_W();
 
     // make the random MATrix positive
-    // absMAT<MAT>(W);
-    // absMAT<MAT>(H);
+    // absMAT<AMAT>(W);
+    // absMAT<AMAT>(H);
     // other intializations
     this->otherInitializations();
   }
@@ -203,8 +203,8 @@ class NMF {
    * the same initialization
    */
 
-  NMF(const T &input, const MAT &leftlowrankfactor,
-      const MAT &rightlowrankfactor): A(input) {
+  NMF(const T &input, const AMAT &leftlowrankfactor,
+      const AMAT &rightlowrankfactor): A(input) {
     assert(leftlowrankfactor.n_cols == rightlowrankfactor.n_cols);
     // this->A = input;
     this->W = leftlowrankfactor;
@@ -224,9 +224,9 @@ class NMF {
   virtual void computeNMF() = 0;
 
   /// Returns the left low rank factor matrix W
-  MAT getLeftLowRankFactor() { return W; }
+  AMAT getLeftLowRankFactor() { return W; }
   /// Returns the right low rank factor matrix H
-  MAT getRightLowRankFactor() { return H; }
+  AMAT getRightLowRankFactor() { return H; }
 
   /*
    * A is mxn
@@ -250,11 +250,11 @@ class NMF {
         tic();
         float nnzsse = 0;
         float nnzwh  = 0;
-        MAT  Rw(this->k, this->k);
-        MAT  Rh(this->k, this->k);
-        MAT  Qw(this->m, this->k);
-        MAT  Qh(this->n, this->k);
-        MAT  RwRh(this->k, this->k);
+        AMAT  Rw(this->k, this->k);
+        AMAT  Rh(this->k, this->k);
+        AMAT  Qw(this->m, this->k);
+        AMAT  Qh(this->n, this->k);
+        AMAT  RwRh(this->k, this->k);
 
         // #pragma omp parallel for reduction (+ : nnzsse,nnzwh)
         for (UWORD jj = 1; jj <= this->A.n_cols; jj++) {
@@ -298,9 +298,9 @@ class NMF {
   // Removing blk error calculations as default method
   void computeObjectiveError_blk() {
     // (init.norm_A)^2 - 2*trace(H'*(A'*W))+trace((W'*W)*(H*H'))
-    // MAT WtW = this->W.t() * this->W;
-    // MAT HtH = this->H.t() * this->H;
-    // MAT AtW = this->A.t() * this->W;
+    // AMAT WtW = this->W.t() * this->W;
+    // AMAT HtH = this->H.t() * this->H;
+    // AMAT AtW = this->A.t() * this->W;
 
     // double sqnormA  = this->normA * this->normA;
     // double TrHtAtW  = arma::trace(this->H.t() * AtW);
@@ -324,7 +324,7 @@ class NMF {
     bool colSplit = true;
     // if (this->A.n_rows > PER_SPLIT || this->A.n_cols > PER_SPLIT) {
     uint numSplits = 1;
-    MAT Ht = this->H.t();
+    AMAT Ht = this->H.t();
     if (this->A.n_cols > PER_SPLIT) {
       // if (this->A.n_cols < this->A.n_rows)
       //     colSplit = false;
@@ -345,10 +345,10 @@ class NMF {
     VEC splitErr = arma::zeros<VEC>(numSplits + 1);
     // allocate one and never allocate again.
     if (colSplit && errMtx.n_rows == 0 && errMtx.n_cols == 0) {
-      errMtx = arma::zeros<MAT>(A.n_rows, PER_SPLIT);
+      errMtx = arma::zeros<AMAT>(A.n_rows, PER_SPLIT);
       A_err_sub_mtx = arma::zeros<T>(A.n_rows, PER_SPLIT);
     } else {
-      errMtx = arma::zeros<MAT>(PER_SPLIT, A.n_cols);
+      errMtx = arma::zeros<AMAT>(PER_SPLIT, A.n_cols);
       A_err_sub_mtx = arma::zeros<T>(PER_SPLIT, A.n_cols);
     }
     for (unsigned int i = 0; i <= numSplits; i++) {
@@ -388,9 +388,9 @@ class NMF {
   }
 
   void computeObjectiveError() {
-    MAT AtW = this->A.t() * this->W;
-    MAT WtW = this->W.t() * this->W;
-    MAT HtH = this->H.t() * this->H;
+    AMAT AtW = this->A.t() * this->W;
+    AMAT WtW = this->W.t() * this->W;
+    AMAT HtH = this->H.t() * this->H;
 
     double sqnormA = this->normA * this->normA;
     double TrHtAtW = arma::trace(this->H.t() * AtW);
@@ -423,8 +423,8 @@ class NMF {
         + l1_W_obj + l1_H_obj + sym_obj;
   }
 #endif  // ifdef BUILD_SPARSE
-  void computeObjectiveError(const T &At, const MAT &WtW, const MAT &HtH) {
-    MAT AtW = At * this->W;
+  void computeObjectiveError(const T &At, const AMAT &WtW, const AMAT &HtH) {
+    AMAT AtW = At * this->W;
 
     double sqnormA = this->normA * this->normA;
     double TrHtAtW = arma::trace(this->H.t() * AtW);
@@ -460,18 +460,18 @@ class NMF {
   /// Print out the objective stats
   void printObjective(const int itr) {
     double err = (this->fit_err_sq > 0)? sqrt(this->fit_err_sq) : this->normA;
-    INFO << "Completed it = " << itr 
+    INFO << "Completed it = " << itr
          << "::algo::" << this->m_updalgo << "::k::" << this->k << std::endl;
-    INFO << "objective::" << this->objective_err 
-         << "::squared error::" << this->fit_err_sq << std::endl 
-         << "error::" << err 
+    INFO << "objective::" << this->objective_err
+         << "::squared error::" << this->fit_err_sq << std::endl
+         << "error::" << err
          << "::relative error::" << err / this->normA << std::endl;
-    INFO << "W frobenius norm::" << this->normW 
+    INFO << "W frobenius norm::" << this->normW
          << "::W L_12 norm::" << this->l1normW << std::endl
-         << "H frobenius norm::" << this->normH 
+         << "H frobenius norm::" << this->normH
          << "::H L_12 norm::" << this->l1normH << std::endl;
     if (this->m_symm_reg > 0) {
-      INFO << "symmdiff::" << this->symmdiff 
+      INFO << "symmdiff::" << this->symmdiff
            << "::relative symmdiff::" << this->symmdiff / this->normW
            << std::endl;
     }

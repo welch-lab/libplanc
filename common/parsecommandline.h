@@ -83,6 +83,7 @@ struct option plancopts[] = {
     {"dimensions", required_argument, 0, 'd'},
     {"error", required_argument, 0, 'e'},
     {"input", required_argument, 0, 'i'},
+    {"input2", required_argument, 0, 'j'},
     {"lowrank", required_argument, 0, 'k'},
     {"output", required_argument, 0, 'o'},
     {"processors", required_argument, 0, 'p'},

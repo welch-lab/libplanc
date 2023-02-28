@@ -2,6 +2,9 @@
 #include <string>
 #include "planc_bench.hpp"
 #include "bppnnls.hpp"
+#include <fast_matrix_market/fast_matrix_market.hpp>
+#include <iostream>
+#include <vector>
 #include "nmf.hpp"
 #include <omp.h>
 #define ONE_THREAD_MATRIX_SIZE 2000
@@ -12,8 +15,8 @@ class planc_bench
 {
 private:
     /* data */
-    int m_argc;
-    char **m_argv;
+    int p_argc;
+    char **p_argv;
     int m_k;
     UWORD m_m, m_n;
     int m_num_it;
@@ -27,20 +30,29 @@ private:
     template<class NNLSTYPE>
     void callNNLS() {
         #ifdef BUILD_SPARSE
-        SP_MAT A;
-        #else
-        MAT A;
-        #endif
-        MAT B;
-        // Read data matrices
         double t2;
         tic();
-        #ifdef BUILD_SPARSE
-        A.load(this->m_Afile_name, arma::coord_ascii);
+        fast_matrix_market::matrix_market_header headerA;
+        std::ifstream ifsA(this->m_Afile_name);
+        std::vector<UWORD> rowA;
+        std::vector<UWORD> colA;
+        std::vector<double> valueA;
+        fast_matrix_market::read_matrix_market_triplet(ifsA, headerA, rowA, colA, valueA);
+        arma::uvec urowa(rowA);
+        arma::uvec ucola(colA);
+        arma::umat ucoo = join_rows(urowa, ucola).t();
+        arma::Col uvala(valueA);
+        SP_MAT A(ucoo, uvala, headerA.nrows, headerA.ncols);
         #else
-        A.load(this->m_Afile_name);
+        AMAT A;
         #endif
-        B.load(this->m_Bfile_name);
+        // Read data matrices
+        fast_matrix_market::matrix_market_header headerB;
+        std::ifstream ifs(this->m_Bfile_name);
+        std::vector<double> Bmem;
+        fast_matrix_market::read_matrix_market_array(ifs, headerB, Bmem);
+        AMAT B(Bmem);
+        B.reshape(headerB.nrows, headerB.ncols);
         t2 = toc();
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
              << "(" << t2 << " s)" << std::endl;
@@ -57,10 +69,10 @@ private:
                 spanEnd = m_n - 1;
             }
 
-            BPPNNLS<MAT, VEC> solveProblem(B, (MAT)A.cols(spanStart, spanEnd), false);
+            BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd), false);
             solveProblem.solveNNLS();
             #ifdef _VERBOSE
-            INFO << "completed " << worh << " start=" << spanStart
+            INFO << " start=" << spanStart
                  << ", end=" << spanEnd
                  // << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
                  << " time taken=" << t2 << std::endl;
@@ -69,26 +81,25 @@ private:
     }
         void nnlsParseCommandLine()
         {
-            NnlsParseCommandLine pc(this->m_argc, this->m_argv);
-            pc.parseplancopts();
-            this->m_k = pc.lowrankk();
-            this->m_Afile_name = pc.input_file_name();
-            this->m_sparsity = pc.sparsity();
-            this->m_num_it = pc.iterations();
-            this->m_compute_error = pc.compute_error();
-            pc.printConfig();
+            NnlsParseCommandLine npc(p_argc, p_argv);
+            npc.parseplancopts();
+            this->m_k = npc.lowrankk();
+            this->m_Afile_name = npc.input_file_name();
+            this->m_Bfile_name = npc.input_file_name_2();
+            this->m_num_it = npc.iterations();
+            this->m_compute_error = npc.compute_error();
 #ifdef BUILD_SPARSE
-            callNNLS<BPPNNLS<SP_MAT, MAT>>();
+            callNNLS<BPPNNLS<SP_MAT, AMAT>>();
 #else // ifdef BUILD_SPARSE
-            callNNLS<BPPNNLS<MAT, MAT>>();
+            callNNLS<BPPNNLS<AMAT, AMAT>>();
 #endif
         }
 
     public:
         planc_bench(int argc, char *argv[])
         {
-            this->m_argc = argc;
-            this->m_argv = argv;
+            this->p_argc = argc;
+            this->p_argv = argv;
             this->nnlsParseCommandLine();
         }
     };

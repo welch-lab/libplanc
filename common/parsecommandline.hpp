@@ -12,7 +12,7 @@
 
 namespace planc {
 class ParseCommandLine {
- private:
+ protected:
   int m_argc;
   char **m_argv;
 
@@ -118,11 +118,11 @@ class ParseCommandLine {
 
  public:
   /**
-   * Constructor that takes the number of arguments and the 
+   * Constructor that takes the number of arguments and the
    * command line parameters.
    * @param[in] argc - number of arguments
    * @param[in] **argv - command line parameters.
-   */ 
+   */
   ParseCommandLine(int argc, char **argv) : m_argc(argc), m_argv(argv) {
     this->m_num_modes = 0;
     this->m_pr = 1;
@@ -245,7 +245,7 @@ class ParseCommandLine {
             // for clarity...
             if(!s_den.empty()){break;}
           }
-          this->feat_type = atoi(s_den.c_str()); 
+          this->feat_type = atoi(s_den.c_str());
           while(getline(ss_den, s_den, ' ')){
             if(!s_den.empty()){break;}
           }
@@ -305,16 +305,16 @@ class ParseCommandLine {
     switch (opt) {
       case JOINTNMF:
         INFO << "a::" << this->m_lucalgo << "::i::" << this->m_Afile_name
-             << "::c::" << this->m_Sfile_name 
+             << "::c::" << this->m_Sfile_name
              << "::o::" << this->m_outputfile_name
-             << "::m::" << this->m_globalm << "::n::" << this->m_globaln 
+             << "::m::" << this->m_globalm << "::n::" << this->m_globaln
              << "::t::" << this->m_num_it
-             << "::error::" << this->m_compute_error  
+             << "::error::" << this->m_compute_error
              << "::tol::" << this->m_tolerance
              << "::regW::" << this->m_regW << "::regH::" << this->m_regH
              << "::sparsity::" << this->m_sparsity
              << "::input normalization::" << this->m_input_normalization
-             << "::num_k_blocks::" << m_num_k_blocks 
+             << "::num_k_blocks::" << m_num_k_blocks
              << "::adj_rand::" << this->m_adj_rand
              << "::initseed::" << this->m_initseed
              << "::alpha::" << this->alpha << "::beta::" << this->beta
@@ -322,16 +322,16 @@ class ParseCommandLine {
         break;
       case DISTJOINTNMF:
         INFO << "a::" << this->m_lucalgo << "::i::" << this->m_Afile_name
-             << "::c::" << this->m_Sfile_name 
+             << "::c::" << this->m_Sfile_name
              << "::o::" << this->m_outputfile_name
-             << "::m::" << this->m_globalm << "::n::" << this->m_globaln 
+             << "::m::" << this->m_globalm << "::n::" << this->m_globaln
              << "::t::" << this->m_num_it
-             << "::error::" << this->m_compute_error  
+             << "::error::" << this->m_compute_error
              << "::tol::" << this->m_tolerance
              << "::regW::" << this->m_regW << "::regH::" << this->m_regH
              << "::sparsity::" << this->m_sparsity
              << "::input normalization::" << this->m_input_normalization
-             << "::num_k_blocks::" << m_num_k_blocks 
+             << "::num_k_blocks::" << m_num_k_blocks
              << "::adj_rand::" << this->m_adj_rand
              << "::initseed::" << this->m_initseed
              << "::alpha::" << this->alpha << "::beta::" << this->beta
@@ -407,7 +407,7 @@ class ParseCommandLine {
             << "algorithm codes 2-ANLSBPP2D, 9-PGD, 10-PGNCG"
             << std::endl
             << "for array arguments like -r use quotes"
-            << ", eg -r \"0.5 0.3 0.0 0.1\"" 
+            << ", eg -r \"0.5 0.3 0.0 0.1\""
             << std::endl
             << "specify features matrix via -i and connections matrix via -c"
             << std::endl
@@ -426,12 +426,12 @@ class ParseCommandLine {
             << "-d \"150 300\" -p \"2 4\" -t 10 --alpha 0.5 --momentum 0.9 " << std::endl;
         // ANLS with differing matrix types and double grid
         INFO << "Usage 2: mpirun -np 16 ./distjointnmf -a 16 -k 15 -i rand_normal -c rand_uniform"
-            << "-d \"150 300\" -t 10 --alpha 0.5 --mat_type \"0 1\" " 
+            << "-d \"150 300\" -t 10 --alpha 0.5 --mat_type \"0 1\" "
             << "-p \"2 8\" --conn_grid \"4 4\" --sparsity 0.05" << std::endl;
         // PGNCG with reading input files
         INFO << "Usage 2: mpirun -np 2 ./distjointnmf -a 10 -k 15 -i feat.mtx -c conns.mtx"
             << "-d \"1024 2300\" -t 10 --alpha 0.5 --mat_type \"0 0\" "
-            << "-p \"1 2\" --unpartitioned 1" << std::endl; 
+            << "-p \"1 2\" --unpartitioned 1" << std::endl;
         break;
       default:
         INFO << std::endl;
@@ -512,7 +512,7 @@ class ParseCommandLine {
         /* Only keeping -p option (deprecated)
         INFO << "\t-m matrix_rows" << std::endl
             << "\t\t Number of rows of synthetic input matrix"
-            << " (use -d instead)." << std::endl;    
+            << " (use -d instead)." << std::endl;
         INFO << "\t-m matrix_cols" << std::endl
             << "\t\t Number of columns of synthetic input matrix."
             << " (use -d instead)." << std::endl;
@@ -587,8 +587,8 @@ class ParseCommandLine {
             << "\t\t Random seed for factor matrix initialization."
             << " WARNING: Only repeatable for running with the same grid size."
             << std::endl;
-        INFO << "\t--unpartitioned 0/1" << std::endl 
-            << "\t\tspecify whether sparse matrix is already unpartitioned via" 
+        INFO << "\t--unpartitioned 0/1" << std::endl
+            << "\t\tspecify whether sparse matrix is already unpartitioned via"
             << "--unpartitioned 1 and --unpartitioned 0 if not unpartitioned"
             << std::endl;
     }
@@ -600,21 +600,21 @@ class ParseCommandLine {
   //// returns the global columns. Passed as parameter -d
   UWORD globaln() { return m_globaln; }
   /**
-   * L2 regularization as the first parameter and L1 as second 
-   * for left lowrank factor W. Passed as parameter --regularizer 
+   * L2 regularization as the first parameter and L1 as second
+   * for left lowrank factor W. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
-   */  
+   */
   FVEC regW() { return m_regW; }
   /**
-   * L2 regularization as the first parameter and L1 as second 
-   * for right lowrank factor H. Passed as parameter --regularizer 
+   * L2 regularization as the first parameter and L1 as second
+   * for right lowrank factor H. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
-   */  
+   */
   FVEC regH() { return m_regH; }
   /// Returns the NMF algorithm to run. Passed as parameter --algo or -a
   algotype lucalgo() { return m_lucalgo; }
   /**
-   *  Returns the process grid configuration. 
+   *  Returns the process grid configuration.
    * Passed as parameter --processors or -p
    */
 
@@ -622,7 +622,7 @@ class ParseCommandLine {
   /**
    * Returns the vector regularizers for all the modes.
    * It will 2 times the mode values. The first entry is
-   * L2 regularization and second value is L1 for every mode. 
+   * L2 regularization and second value is L1 for every mode.
    * Passed as parameter --regularizers "L2 L1" for every mode.
    */
   FVEC regularizers() { return m_regularizers; }
@@ -645,18 +645,18 @@ class ParseCommandLine {
   /// Returns connection file name. Passed as -c or --connection_matrix
   std::string conn_file_name() { return m_Sfile_name; }
   /**
-   * Returns output file name. Passed as -o or --output. 
-   * Every mode will appended as _mode. 
+   * Returns output file name. Passed as -o or --output.
+   * Every mode will appended as _mode.
    */
   std::string output_file_name() { return m_outputfile_name; }
   /**
-   * Returns the number of processor rows. 
-   * Used for distributed NMF. The first parameter of -p. 
+   * Returns the number of processor rows.
+   * Used for distributed NMF. The first parameter of -p.
    */
   int pr() { return m_pr; }
     /**
-   * Returns the number of processor columns. 
-   * Used for distributed NMF. The second parameter of -p. 
+   * Returns the number of processor columns.
+   * Used for distributed NMF. The second parameter of -p.
    */
   int pc() { return m_pc; }
   /// Getter functions for the second grid (JointNMF)

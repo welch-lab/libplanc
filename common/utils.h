@@ -3,9 +3,9 @@
 #ifndef COMMON_UTILS_H_
 #define COMMON_UTILS_H_
 
-// #ifndef _VERBOSE
-// #define _VERBOSE 1
-// #endif
+#ifndef _VERBOSE
+#define _VERBOSE 1
+#endif
 
 enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM, 
         NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
@@ -55,7 +55,7 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
 // defines for namespace confusion
 #define FMAT arma::fmat
-#define MAT arma::mat
+#define AMAT arma::mat
 #define UMAT arma::umat
 #define FROWVEC arma::frowvec
 #define ROWVEC arma::rowvec

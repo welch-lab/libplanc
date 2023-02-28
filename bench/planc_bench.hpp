@@ -7,7 +7,15 @@
 #endif
 #include "parsecommandline.hpp"
 #include <string>
+#include <vector>
 namespace planc{
+
+template <typename VT>
+struct array_matrix {
+    UWORD nrows = 0, ncols = 0;
+    std::vector<VT> vals;
+};
+
 class NnlsParseCommandLine: public planc::ParseCommandLine
 {
     private:
@@ -19,25 +27,33 @@ class NnlsParseCommandLine: public planc::ParseCommandLine
     std::string m_Afile_name;
     std::string m_Bfile_name;
     std::string m_outputfile_name;
-    bool m_compute_error;
-    int m_num_k_blocks;
-    float m_sparsity;
-    algotype m_lucalgo;
+    bool nm_compute_error;
+
+protected:
+    NnlsParseCommandLine() : ParseCommandLine(m_argc, m_argv) {}
 
 public:
-    using planc::ParseCommandLine::ParseCommandLine;
+    virtual std::string input_file_name() { return m_Afile_name; };
+    virtual std::string output_file_name() { return m_outputfile_name; };
+    std::string input_file_name_2() { return m_Bfile_name; };
+    NnlsParseCommandLine(int argc, char **argv) : ParseCommandLine(m_argc, m_argv)
+    {
+        this->m_argc = argc;
+        this->m_argv = argv;
+        this->m_k = 20;
+        this->m_num_it = 20;
+        this->m_compute_error = 0;
+    }
     void parseplancopts()
     {
+
         int opt, long_index;
         while ((opt = getopt_long(this->m_argc, this->m_argv,
-                                  "a:e:i:j:k:o:p:s:t:h:n", plancopts,
+                                  "e:i:j:k:o:p:s:t:h:n", plancopts,
                                   &long_index)) != -1)
         {
             switch (opt)
             {
-            case 'a':
-                this->m_lucalgo = static_cast<algotype>(atoi(optarg));
-                break;
             case 'e':
                 this->m_compute_error = atoi(optarg);
                 break;
@@ -62,17 +78,11 @@ public:
                 this->m_outputfile_name = temp;
                 break;
             }
-            case 's':
-                this->m_sparsity = atof(optarg);
-                break;
             case 't':
                 this->m_num_it = atoi(optarg);
                 break;
             case 'n':
                 this->m_num_nodes = atoi(optarg);
-                break;
-            case NUMKBLOCKS:
-                this->m_num_k_blocks = atoi(optarg);
                 break;
             case 'h': // fall through intentionally
                 print_usage();

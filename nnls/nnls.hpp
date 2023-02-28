@@ -23,10 +23,10 @@ class NNLS {
 
  public:
   /**
-   * Public constructor for NNLS solver via Normal Equations with single RHS. 
+   * Public constructor for NNLS solver via Normal Equations with single RHS.
    * Base class for solving,
-   * \f$|| Ax - b ||_F^2\f$ with \f$x >= 0\f$ via \f$A^TA x= A^Tb\f$.
-   * 
+   * \f$|| AX - b ||_F^2\f$ with \f$X >= 0\f$ via \f$A^TA X = A^Tb\f$.
+   *
    * @param[in] lhs of the normal equation. Sent as either A of size \f$m \times n\f$
    *            or AtA of size \f$n \times n\f$ depending on prodSent
    * @param[in] rhs of the normal equation for a single RHS. Sent as either
@@ -48,16 +48,16 @@ class NNLS {
         this->k = 1;
         x.zeros(this->n);
 #ifdef _VERBOSE
-        INFO << "NNLS::Constructor with RHS vector" <<  endl;
+        INFO << "NNLS::Constructor with RHS vector" <<  std::endl;
 #endif
         this->cleared = false;
     }
 
 /**
-   * Public constructor for NNLS solver via Normal Equations with single RHS. 
+   * Public constructor for NNLS solver via Normal Equations with single RHS.
    * Base class for solving,
-   * \f$|| Ax - b ||_F^2\f$ with \f$X >= 0\f$ via \f$A^TA x = A^Tb\f$.
-   * 
+   * \f$|| AX - b ||_F^2\f$ with \f$X >= 0\f$ via \f$A^TA X = A^Tb\f$.
+   *
    * @param[in] lhs of the normal equation. Sent as either A of size \f$m \times n\f$
    *            or AtA of size \f$n \times n\f$ depending on prodSent
    * @param[in] rhs of the normal equation for a single RHS. Sent as either
@@ -81,16 +81,16 @@ class NNLS {
         this->k = 1;
         x = initx;
 #ifdef _VERBOSE
-        INFO << "NNLS::Constructor with RHS vector" <<  endl;
+        INFO << "NNLS::Constructor with RHS vector" <<  std::endl;
 #endif
         this->cleared = false;
     }
 
   /**
-   * Public constructor for NNLS solver via Normal Equations with multiple RHS. 
+   * Public constructor for NNLS solver via Normal Equations with multiple RHS.
    * Base class for solving,
    * \f$|| AX - B ||_F^2\f$ with \f$X >= 0\f$ via \f$A^TA X = A^TB\f$.
-   * 
+   *
    * @param[in] lhs of the normal equation. Sent as either A of size \f$m \times n\f$
    *            or AtA of size \f$n \times n\f$ depending on prodSent
    * @param[in] rhs of the normal equation for multiple RHS. Sent as either
@@ -131,10 +131,10 @@ class NNLS {
     }
 
   /**
-   * Public constructor for NNLS solver via Normal Equations with multiple RHS. 
+   * Public constructor for NNLS solver via Normal Equations with multiple RHS.
    * Base class for solving,
    * \f$|| AX - B ||_F^2\f$ with \f$X >= 0\f$ via \f$A^TA X = A^TB\f$.
-   * 
+   *
    * @param[in] lhs of the normal equation. Sent as either A of size \f$m \times n\f$
    *            or AtA of size \f$n \times n\f$ depending on prodSent
    * @param[in] rhs of the normal equation for multiple RHS. Sent as either

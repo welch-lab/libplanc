@@ -149,11 +149,11 @@ void randNMF(const UWORD m, const UWORD n, const UWORD k, const double sparsity,
   A = &temp;
 #else
   srand(RAND_SEED);
-  MAT W = 10 * arma::randu<MAT>(m, k);
-  MAT H = 10 * arma::randu<MAT>(n, k);
+  AMAT W = 10 * arma::randu<AMAT>(m, k);
+  AMAT H = 10 * arma::randu<AMAT>(n, k);
   if (sparsity < 1) {
-    makeSparse<MAT>(sparsity, &W);
-    makeSparse<MAT>(sparsity, &H);
+    makeSparse<AMAT>(sparsity, &W);
+    makeSparse<AMAT>(sparsity, &H);
   }
   T temp = ceil(W * trans(H));
   A = &temp;
@@ -248,13 +248,13 @@ double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
  * Once you receive Ct, transpose again to print
  * C using arma
  */
-void ARMAMKLSCSCMM(const SP_MAT &mklMat, char transa, const MAT &Bt,
+void ARMAMKLSCSCMM(const SP_MAT &mklMat, char transa, const AMAT &Bt,
                    double *Ct) {
   MKL_INT m, k, n, nnz;
   m = static_cast<MKL_INT>(mklMat.n_rows);
   k = static_cast<MKL_INT>(mklMat.n_cols);
   n = static_cast<MKL_INT>(Bt.n_rows);
-  // MAT B = B.t();
+  // AMAT B = B.t();
   // C = alpha * A * B + beta * C;
   // mkl_?cscmm - https://software.MKL_INTel.com/en-us/node/468598
   // char transa = 'N';
@@ -276,7 +276,7 @@ void ARMAMKLSCSCMM(const SP_MAT &mklMat, char transa, const MAT &Bt,
  * Something is going crazy with armadillo
  */
 
-void cblas_sgemm(const MAT &A, const MAT &B, double *C) {
+void cblas_sgemm(const AMAT &A, const AMAT &B, double *C) {
   UWORD m = A.n_rows;
   UWORD n = B.n_cols;
   UWORD k = A.n_cols;

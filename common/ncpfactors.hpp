@@ -20,7 +20,7 @@
 namespace planc {
 
 class NCPFactors {
-  MAT *ncp_factors;   /// Array of factors .One factor for every mode.
+  AMAT *ncp_factors;   /// Array of factors .One factor for every mode.
   unsigned int m_modes;        /// Number of modes in tensor
   unsigned int m_k;            /// Low rank
   UVEC m_dimensions;  /// Vector of dimensions for every mode
@@ -41,18 +41,18 @@ class NCPFactors {
   NCPFactors(const UVEC &i_dimensions, const int &i_k, bool trans) {
     this->m_dimensions = i_dimensions;
     this->m_modes = i_dimensions.n_rows;
-    ncp_factors = new MAT[this->m_modes];
+    ncp_factors = new AMAT[this->m_modes];
     this->m_k = i_k;
     arma::arma_rng::set_seed(103);
     for (unsigned int i = 0; i < this->m_modes; i++) {
-      // ncp_factors[i] = arma::randu<MAT>(i_dimensions[i], this->m_k);
+      // ncp_factors[i] = arma::randu<AMAT>(i_dimensions[i], this->m_k);
       int rsize = (i_dimensions[i] > 0) ? i_dimensions[i] : 1;
       if (trans) {
-        ncp_factors[i] = arma::randu<MAT>(this->m_k, rsize);
+        ncp_factors[i] = arma::randu<AMAT>(this->m_k, rsize);
       } else {
-        // ncp_factors[i] = arma::randi<MAT>(i_dimensions[i], this->m_k,
+        // ncp_factors[i] = arma::randi<AMAT>(i_dimensions[i], this->m_k,
         //                                   arma::distr_param(0, numel));
-        ncp_factors[i] = arma::randu<MAT>(rsize, this->m_k);
+        ncp_factors[i] = arma::randu<AMAT>(rsize, this->m_k);
       }
     }
     m_lambda = arma::ones<VEC>(this->m_k);
@@ -66,15 +66,15 @@ m_modes = src.modes();
 m_lambda = src.lambda();
 m_k = src.rank();
 if (ncp_factors == NULL) {
-    ncp_factors = new MAT[this->m_modes];
+    ncp_factors = new AMAT[this->m_modes];
     for (int i = 0; i < this->m_modes; i++) {
-        ncp_factors[i] = arma::randu<MAT>(this->m_dimensions[i],
+        ncp_factors[i] = arma::randu<AMAT>(this->m_dimensions[i],
                                           this->m_k);
     }
 }
 for (int i = 0; i < this->m_modes; i++) {
     if (ncp_factors[i].n_elem == 0) {
-        ncp_factors[i] = arma::zeros<MAT>(src.factor(i).n_rows,
+        ncp_factors[i] = arma::zeros<AMAT>(src.factor(i).n_rows,
             src.factor(i).n_cols);
     }
     ncp_factors[i] = src.factor(i);
@@ -97,7 +97,7 @@ ncp_factors[i].clear();
   /// dimensions of every mode
   UVEC dimensions() const { return m_dimensions; }
   /// factor matrix of a mode i_n
-  MAT &factor(const int i_n) const { return ncp_factors[i_n]; }
+  AMAT &factor(const int i_n) const { return ncp_factors[i_n]; }
   /// returns number of modes
   int modes() const { return m_modes; }
   /// returns the lambda vector
@@ -109,7 +109,7 @@ ncp_factors[i].clear();
    * @param[in] i_n mode for which given factor matrix will be updated
    * @param[in] i_factor factor matrix
    */
-  void set(const int i_n, const MAT &i_factor) {
+  void set(const int i_n, const AMAT &i_factor) {
     assert(i_factor.size() == this->ncp_factors[i_n].size());
     this->ncp_factors[i_n] = i_factor;
   }
@@ -120,8 +120,8 @@ ncp_factors[i].clear();
    * Return the hadamard of the factor grams
    * @param[out] UtU is a kxk matrix
    */
-  void gram(MAT *o_UtU) {
-    MAT currentGram(this->m_k, this->m_k);
+  void gram(AMAT *o_UtU) {
+    AMAT currentGram(this->m_k, this->m_k);
     for (unsigned int i = 0; i < this->m_modes; i++) {
       currentGram = ncp_factors[i].t() * ncp_factors[i];
       (*o_UtU) = (*o_UtU) % currentGram;
@@ -136,9 +136,9 @@ ncp_factors[i].clear();
    * @param[out] UtU is a kxk matrix
    */
 
-  void gram_leave_out_one(const unsigned int i_n, MAT *o_UtU) {
-    MAT currentGram(this->m_k, this->m_k);
-    (*o_UtU) = arma::ones<MAT>(this->m_k, this->m_k);
+  void gram_leave_out_one(const unsigned int i_n, AMAT *o_UtU) {
+    AMAT currentGram(this->m_k, this->m_k);
+    (*o_UtU) = arma::ones<AMAT>(this->m_k, this->m_k);
     for (unsigned int i = 0; i < this->m_modes; i++) {
       if (i != i_n) {
         currentGram = ncp_factors[i].t() * ncp_factors[i];
@@ -149,12 +149,12 @@ ncp_factors[i].clear();
   /**
    * KRP leaving out the mode i_n
    * @param[in] mode i_n
-   * @return MAT of size product of dimensions except i_n by k
+   * @return AMAT of size product of dimensions except i_n by k
    */
-  MAT krp_leave_out_one(const unsigned int i_n) {
+  AMAT krp_leave_out_one(const unsigned int i_n) {
     UWORD krpsize = arma::prod(this->m_dimensions);
     krpsize /= this->m_dimensions[i_n];
-    MAT krp(krpsize, this->m_k);
+    AMAT krp(krpsize, this->m_k);
     krp_leave_out_one(i_n, &krp);
     return krp;
   }
@@ -168,7 +168,7 @@ ncp_factors[i].clear();
    * @param[in] i_n mode that will be excluded
    * @param[out] m_dimensions[i_n]xk
    */
-  void krp_leave_out_one(const unsigned int i_n, MAT *o_krp) {
+  void krp_leave_out_one(const unsigned int i_n, AMAT *o_krp) {
     // matorder = length(A):-1:1;
     // Always krp for mttkrp is computed in
     // reverse. Hence assuming the same.
@@ -198,7 +198,7 @@ for (int i = 1; i < this->m_modes - 1; i++) {
 // prev_nrows = current_nrows;
 // rightkrp.n_rows;
 // we are populating column by column
-MAT& rightkrp = ncp_factors[matorder[i]];
+AMAT& rightkrp = ncp_factors[matorder[i]];
 for (int j = 0; j < this->m_k; j++) {
 VEC krpcol = (*o_krp)(arma::span(0, current_nrows), j);
 // krpcol.each_rows*rightkrp.col(i);
@@ -221,7 +221,7 @@ current_nrows *= rightkrp.n_rows;
     //     P(:,n) = ab(:);
     // end
     for (unsigned int n = 0; n < this->m_k; n++) {
-      MAT ab = ncp_factors[matorder[0]].col(n);
+      AMAT ab = ncp_factors[matorder[0]].col(n);
       for (unsigned int i = 1; i < this->m_modes - 1; i++) {
         VEC oldabvec = arma::vectorise(ab);
         VEC currentvec = ncp_factors[matorder[i]].col(n);
@@ -236,11 +236,11 @@ current_nrows *= rightkrp.n_rows;
    * @param[in] Subset of modes
    * @param[out] KRP of product of dimensions of the given modes by k
    */
-  void krp(const UVEC i_modes, MAT *o_krp) {
+  void krp(const UVEC i_modes, AMAT *o_krp) {
     // matorder = length(A):-1:1;
     // Always krp for mttkrp is computed in
     // reverse. Hence assuming the same.
-    UVEC matorder = arma::zeros<UVEC>(i_modes.n_rows - 1);    
+    UVEC matorder = arma::zeros<UVEC>(i_modes.n_rows - 1);
     int j = 0;
     for (int i = i_modes.n_rows - 1; i >= 0; i--) {
       matorder(j++) = i_modes[i];
@@ -251,7 +251,7 @@ current_nrows *= rightkrp.n_rows;
 #endif
     (*o_krp).zeros();
     for (unsigned int n = 0; n < this->m_k; n++) {
-      MAT ab = ncp_factors[matorder[0]].col(n);
+      AMAT ab = ncp_factors[matorder[0]].col(n);
       for (unsigned int i = 1; i < i_modes.n_rows - 1; i++) {
         VEC oldabvec = arma::vectorise(ab);
         VEC currentvec = ncp_factors[matorder[i]].col(n);
@@ -266,9 +266,9 @@ current_nrows *= rightkrp.n_rows;
   // Tensor rankk_tensor() {
   //     UWORD krpsize = arma::prod(this->m_dimensions);
   //     krpsize /= this->m_dimensions[0];
-  //     MAT krpleavingzero = arma::zeros<MAT>(krpsize, this->m_k);
+  //     AMAT krpleavingzero = arma::zeros<AMAT>(krpsize, this->m_k);
   //     krp_leave_out_one(0, &krpleavingzero);
-  //     MAT lowranktensor(this->m_dimensions[0], krpsize);
+  //     AMAT lowranktensor(this->m_dimensions[0], krpsize);
   //     lowranktensor = this->ncp_factors[0] * krpleavingzero.t();
   //     Tensor rc(this->m_dimensions, lowranktensor.memptr());
   //     return rc;
@@ -282,9 +282,9 @@ current_nrows *= rightkrp.n_rows;
   void rankk_tensor(Tensor &out) {
     UWORD krpsize = arma::prod(this->m_dimensions);
     krpsize /= this->m_dimensions[0];
-    MAT krpleavingzero = arma::zeros<MAT>(krpsize, this->m_k);
+    AMAT krpleavingzero = arma::zeros<AMAT>(krpsize, this->m_k);
     krp_leave_out_one(0, &krpleavingzero);
-    MAT lowranktensor(this->m_dimensions[0], krpsize);
+    AMAT lowranktensor(this->m_dimensions[0], krpsize);
     lowranktensor = this->ncp_factors[0] * krpleavingzero.t();
     Tensor rc(this->m_dimensions, lowranktensor.memptr());
     out = rc;

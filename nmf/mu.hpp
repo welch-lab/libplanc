@@ -13,20 +13,20 @@ class MUNMF : public NMF<T> {
   // Not happy with this design. However to avoid computing At again and again
   // making this as private variable.
   T At;
-  MAT WtW;
-  MAT HtH;
-  MAT AtW;
-  MAT AH;
+  AMAT WtW;
+  AMAT HtH;
+  AMAT AtW;
+  AMAT AH;
 
   /*
    * Collected statistics are
    * iteration Htime Wtime totaltime normH normW densityH densityW relError
    */
   void allocateMatrices() {
-    WtW = arma::zeros<MAT>(this->k, this->k);
-    HtH = arma::zeros<MAT>(this->k, this->k);
-    AtW = arma::zeros<MAT>(this->n, this->k);
-    AH = arma::zeros<MAT>(this->m, this->k);
+    WtW = arma::zeros<AMAT>(this->k, this->k);
+    HtH = arma::zeros<AMAT>(this->k, this->k);
+    AtW = arma::zeros<AMAT>(this->n, this->k);
+    AH = arma::zeros<AMAT>(this->m, this->k);
   }
   void freeMatrices() {
     this->At.clear();
@@ -41,7 +41,7 @@ class MUNMF : public NMF<T> {
     allocateMatrices();
     this->At = this->A.t();
   }
-  MUNMF(const T &A, const MAT &llf, const MAT &rlf) : NMF<T>(A, llf, rlf) {
+  MUNMF(const T &A, const AMAT &llf, const AMAT &rlf) : NMF<T>(A, llf, rlf) {
     allocateMatrices();
     this->At = this->A.t();
   }

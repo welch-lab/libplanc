@@ -21,24 +21,24 @@ template <class T>
 class BPPNMF : public NMF<T> {
  private:
   T At;
-  MAT giventGiven;
+  AMAT giventGiven;
   // designed as if W is given and H is found.
   // The transpose is the other problem.
-  void updateOtherGivenOneMultipleRHS(const T &input, const MAT &given,
-                                      char worh, MAT *othermat, FVEC reg) {
+  void updateOtherGivenOneMultipleRHS(const T &input, const AMAT &given,
+                                      char worh, AMAT *othermat, FVEC reg) {
     double t2;
     UINT numChunks = input.n_cols / ONE_THREAD_MATRIX_SIZE;
     if (numChunks * ONE_THREAD_MATRIX_SIZE < input.n_cols) numChunks++;
 
     tic();
-    MAT giventInput(this->k, input.n_cols);
+    AMAT giventInput(this->k, input.n_cols);
     // This is WtW
     giventGiven = given.t() * given;
     this->applyReg(reg, &giventGiven);
     // This is WtA
     giventInput = given.t() * input;
     if (this->symm_reg() > 0) {
-      MAT fac = given.t();
+      AMAT fac = given.t();
       this->applySymmetricReg(this->symm_reg(), &giventGiven, &fac,
                               &giventInput);
     }
@@ -61,8 +61,8 @@ class BPPNMF : public NMF<T> {
         spanEnd = input.n_cols - 1;
       }
 
-      BPPNNLS<MAT, VEC> subProblem(giventGiven,
-                              (MAT)giventInput.cols(spanStart, spanEnd), true);
+      BPPNNLS<AMAT, VEC> subProblem(giventGiven,
+                              (AMAT)giventInput.cols(spanStart, spanEnd), true);
 #ifdef _VERBOSE
       // #pragma omp critical
       {
@@ -73,7 +73,7 @@ class BPPNMF : public NMF<T> {
              << "LHS ::" << std::endl
              << giventGiven << std::endl
              << "RHS ::" << std::endl
-             << (MAT)giventInput.cols(spanStart, spanEnd) << std::endl;
+             << (AMAT)giventInput.cols(spanStart, spanEnd) << std::endl;
       }
 #endif
 
@@ -95,10 +95,10 @@ class BPPNMF : public NMF<T> {
 
  public:
   BPPNMF(const T &A, int lowrank) : NMF<T>(A, lowrank) {
-    giventGiven = arma::zeros<MAT>(lowrank, lowrank);
+    giventGiven = arma::zeros<AMAT>(lowrank, lowrank);
     this->At = A.t();
   }
-  BPPNMF(const T &A, const MAT &llf, const MAT &rlf) : NMF<T>(A, llf, rlf) {
+  BPPNMF(const T &A, const AMAT &llf, const AMAT &rlf) : NMF<T>(A, llf, rlf) {
     this->At = A.t();
   }
   void computeNMFSingleRHS() {
@@ -111,16 +111,16 @@ class BPPNMF : public NMF<T> {
       this->collectStats(currentIteration);
 #endif
       // solve for H given W;
-      MAT Wt = this->W.t();
-      MAT WtW = Wt * this->W;
+      AMAT Wt = this->W.t();
+      AMAT WtW = Wt * this->W;
       this->applyReg(this->regH(), &this->WtW);
-      MAT WtA = Wt * this->A;
+      AMAT WtA = Wt * this->A;
       Wt.clear();
       {
 // #pragma omp parallel for
         for (UINT i = 0; i < this->n; i++) {
-          BPPNNLS<MAT, VEC> *subProblemforH =
-              new BPPNNLS<MAT, VEC>(WtW, (VEC)WtA.col(i), true);
+          BPPNNLS<AMAT, VEC> *subProblemforH =
+              new BPPNNLS<AMAT, VEC>(WtW, (VEC)WtA.col(i), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "H(" << i << "/" << this->n << ")";
@@ -145,16 +145,16 @@ class BPPNMF : public NMF<T> {
         // clear previous allocations.
         WtW.clear();
         WtA.clear();
-        MAT Ht = this->H.t();
-        MAT HtH = Ht * this->H;
+        AMAT Ht = this->H.t();
+        AMAT HtH = Ht * this->H;
         this->applyReg(this->regW(), &this->HtH);
-        MAT HtAt = Ht * At;
+        AMAT HtAt = Ht * At;
         Ht.clear();
 // solve for W given H;
 // #pragma omp parallel for
         for (UINT i = 0; i < this->m; i++) {
-          BPPNNLS<MAT, VEC> *subProblemforW =
-              new BPPNNLS<MAT, VEC>(HtH, (VEC)HtAt.col(i), true);
+          BPPNNLS<AMAT, VEC> *subProblemforW =
+              new BPPNNLS<AMAT, VEC>(HtH, (VEC)HtAt.col(i), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "W(" << i << "/" << this->m << ")";
@@ -247,7 +247,7 @@ class BPPNMF : public NMF<T> {
    * in BPPNNLS.hpp. It will take some time to refactor this.
    * Given, A and W, solve for H.
    */
-  MAT solveScalableNNLS() {
+  AMAT solveScalableNNLS() {
     updateOtherGivenOneMultipleRHS(this->A, this->W, 'H', &(this->H));
     return this->H;
   }

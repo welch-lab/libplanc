@@ -12,7 +12,7 @@
  * @param[in]  B is of size n x k
  * @param[out] Returns C of size mn x k
  */
-void khatrirao(const MAT &i_A, const MAT &i_B, MAT *o_C) {
+void khatrirao(const AMAT &i_A, const AMAT &i_B, AMAT *o_C) {
   assert(i_A.n_cols == i_B.n_cols);
   VEC acol = arma::zeros<VEC>(i_A.n_rows);
   VEC bcol = arma::zeros<VEC>(i_B.n_rows);
@@ -43,12 +43,12 @@ inline void kronecker(const VEC &i_acol, const VEC &i_bcol, VEC *o_c) {
  * @param[in] mode i_n
  * @param[in] Tensor X
  * @param[in] NCPFactors
- * @param[out] MTTKRP of factor mode i_n 
+ * @param[out] MTTKRP of factor mode i_n
  */
 
 void mttkrp(const int i_n, const planc::Tensor &X, planc::NCPFactors &i_F,
-            MAT *o_mttkrp) {
-  MAT krp = i_F.krp_leave_out_one(i_n);
+            AMAT *o_mttkrp) {
+  AMAT krp = i_F.krp_leave_out_one(i_n);
   X.mttkrp(i_n, krp, o_mttkrp);
 }
 
