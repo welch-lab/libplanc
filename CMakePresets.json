@@ -12,7 +12,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_COMPILER": "/usr/bin/g++",
         "CMAKE_C_COMPILER": "/usr/bin/gcc",
-        "CMAKE_CXX_FLAGS": "-Wpedantic"
+        "CMAKE_CXX_FLAGS": "-march=native"
       },
       "condition": {
         "type": "equals",

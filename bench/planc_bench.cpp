@@ -31,6 +31,8 @@ private:
     void callNNLS() {
         #ifdef BUILD_SPARSE
         double t2;
+        double tben;
+        double titer;
         tic();
         fast_matrix_market::matrix_market_header headerA;
         std::ifstream ifsA(this->m_Afile_name);
@@ -59,8 +61,8 @@ private:
         this->m_m = A.n_rows;
         this->m_n = A.n_cols;
         UINT numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
-        // #pragma omp parallel for schedule(dynamic)
-        for (UINT i = 0; i < numChunks; i++)
+        #pragma omp parallel for schedule(dynamic) private(tictoc_stack)
+        for (UINT i = 0; i < numChunks; i++)\
         {
             UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
             UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
@@ -68,15 +70,17 @@ private:
             {
                 spanEnd = m_n - 1;
             }
-
+            #pragma omp critical
+            tic();
             BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd), false);
             solveProblem.solveNNLS();
-            #ifdef _VERBOSE
+            titer = toc();
+            //#ifdef _VERBOSE
             INFO << " start=" << spanStart
                  << ", end=" << spanEnd
-                 // << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
-                 << " time taken=" << t2 << std::endl;
-            #endif
+                 << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
+                 << " time taken=" << titer << std::endl;
+            //#endif
         };
     }
         void nnlsParseCommandLine()

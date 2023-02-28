@@ -3,9 +3,9 @@
 #ifndef COMMON_UTILS_H_
 #define COMMON_UTILS_H_
 
-#ifndef _VERBOSE
-#define _VERBOSE 1
-#endif
+// #ifndef _VERBOSE
+// #define _VERBOSE 1
+// #endif
 
 enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM, 
         NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
