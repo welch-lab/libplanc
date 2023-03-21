@@ -323,7 +323,7 @@ class NMF {
     // always
     bool colSplit = true;
     // if (this->A.n_rows > PER_SPLIT || this->A.n_cols > PER_SPLIT) {
-    uint numSplits = 1;
+    unsigned int numSplits = 1;
     AMAT Ht = this->H.t();
     if (this->A.n_cols > PER_SPLIT) {
       // if (this->A.n_cols < this->A.n_rows)

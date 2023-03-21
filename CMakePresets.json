@@ -59,19 +59,28 @@
       "hidden": true,
       "generator": "MinGW Makefiles",
       "environment": {
-        "PATH": "C:/msys64/ucrt64/bin;C:/msys64/usr/bin;$penv{PATH}"
+        "PATH": "C:/msys64/ucrt64/bin;C:/msys64/usr/bin;$penv{PATH}",
+        "MINGW64_ROOT": "C:/msys64/ucrt64",
+        "INCLUDE": "$penv{INCLUDE};C:/msys64/ucrt64/include"
       },
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
+      "cmakeExecutable": "C:/msys64/ucrt64/bin/cmake.exe",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "C:/msys64/mingw64/bin/gcc.exe",
-        "CMAKE_CXX_COMPILER": "C:/msys64/mingw64/bin/g++.exe",
-        "CMAKE_CXX_FLAGS": "-Wno-narrowing"
+        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe",
+        "CMAKE_CXX_FLAGS":  "-flto",
+        "CMAKE_MAKE_PROGRAM": "C:/msys64/ucrt64/bin/mingw32-make.exe"
+
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+        }
       }
     },
     {
@@ -79,9 +88,6 @@
       "displayName": "x64 Debug",
       "description": "Target Windows (64-bit) with the Visual Studio development environment. (Debug)",
       "inherits": "windows-base",
-      "architecture": {
-        "value": "x64"
-      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -116,23 +122,6 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
-    },
-    {
-      "name": "cygwin-gcc-x64-ninja-debug",
-      "displayName": "Cygwin GCC x64 (Ninja) Debug",
-      "description": "Using GCC x64 compiler with \"Ninja\" geneartor on Cygwin - Debug",
-      "generator": "Ninja",
-      "environment": {
-        "PATH": "C:\\cygwin64\\bin;$penv{PATH}"
-      },
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/install/${presetName}",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc.exe",
-        "CMAKE_CXX_COMPILER": "g++.exe",
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
     }
-
   ]
 }

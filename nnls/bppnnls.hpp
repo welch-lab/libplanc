@@ -274,10 +274,10 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         SortBooleanMatrix<UMAT> sbm(PassSet);
         sortedIdx = sbm.sortIndex();
         BooleanArrayComparator<UMAT> bac(PassSet);
-        uint beginIdx = 0;
+        unsigned int beginIdx = 0;
         beginIndex.clear();
         beginIndex.push_back(beginIdx);
-        for (uint i = 0; i < sortedIdx.size(); i++) {
+        for (unsigned int i = 0; i < sortedIdx.size(); i++) {
             if (i == sortedIdx.size() - 1 ||
                     bac(sortedIdx[i], sortedIdx[i + 1]) == true) {
                 beginIdx = i + 1;

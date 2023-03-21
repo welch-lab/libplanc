@@ -17,7 +17,7 @@ class BooleanArrayComparator {
     * if idxi >= idxj return false;
     */
     bool operator() (UWORD idxi, UWORD idxj) {
-        for (uint i = 0; i < X.n_rows; i++) {
+        for (unsigned int i = 0; i < X.n_rows; i++) {
             if (this->X(i, idxi) < this->X(i, idxj))
                 return true;
             else if (this->X(i, idxi) > this->X(i, idxj))
@@ -33,7 +33,7 @@ class SortBooleanMatrix {
     std::vector<UWORD> idxs;
  public:
     explicit SortBooleanMatrix(const T &input) : X(input), idxs(X.n_cols) {
-        for (uint i = 0; i < X.n_cols; i++) {
+        for (unsigned int i = 0; i < X.n_cols; i++) {
             idxs[i] = i;
         }
     }

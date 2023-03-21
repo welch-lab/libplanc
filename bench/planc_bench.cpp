@@ -7,7 +7,7 @@
 #include <vector>
 #include "nmf.hpp"
 #include <omp.h>
-#define ONE_THREAD_MATRIX_SIZE 2000
+#include <string>
 
 namespace planc {
 
@@ -27,12 +27,49 @@ private:
     bool m_compute_error;
     int m_num_k_blocks;
     float m_sparsity;
+    PAIRMAT loadedPair;
+    AMAT outmat;
+    AMAT* outmatptr;
     template<class NNLSTYPE>
     void callNNLS() {
+        double tben;
+        #ifdef BUILD_SPARSE
+        SP_MAT A = std::get<0>(loadedPair);
+        #else // ifdef BUILD_SPARSE
+        AMAT A = std::get<0>(loadedPair);
+        #endif
+        AMAT B = std::get<1>(loadedPair);
+        UINT numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
+        double start = omp_get_wtime();
+        #pragma omp parallel for schedule(auto)
+        for (UINT i = 0; i < numChunks; i++)
+        {
+            UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
+            UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
+            if (spanEnd > m_n - 1)
+            {
+                spanEnd = m_n - 1;
+            }
+            // double start = omp_get_wtime();
+            BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd));
+            solveProblem.solveNNLS();
+            // double end = omp_get_wtime();
+            // titer = end - start;
+            //#ifdef _VERBOSE
+            // INFO << " start=" << spanStart
+            //     << ", end=" << spanEnd
+            //     << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu() << std::endl;
+            //     // << " time taken=" << titer << std::endl;
+            //#endif
+            (*outmatptr).rows(spanStart, spanEnd) = solveProblem.getSolutionMatrix().t();
+        };
+        double end = omp_get_wtime();
+        tben = end - start;
+        INFO << " total nnls runtime=" << tben << std::endl;
+    }
+    void loadNNLS() {
         #ifdef BUILD_SPARSE
         double t2;
-        double tben;
-        double titer;
         tic();
         fast_matrix_market::matrix_market_header headerA;
         std::ifstream ifsA(this->m_Afile_name);
@@ -57,36 +94,13 @@ private:
         B.reshape(headerB.nrows, headerB.ncols);
         t2 = toc();
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
-             << "(" << t2 << " s)" << std::endl;
-        this->m_m = A.n_rows;
-        this->m_n = A.n_cols;
-        UINT numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
-        double start = omp_get_wtime();
-        #pragma omp parallel for schedule(auto)
-        for (UINT i = 0; i < numChunks; i++)\
-        {
-            UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
-            UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
-            if (spanEnd > m_n - 1)
-            {
-                spanEnd = m_n - 1;
-            }
-            // double start = omp_get_wtime();
-            BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd), false);
-            solveProblem.solveNNLS();
-            // double end = omp_get_wtime();
-            // titer = end - start;
-            //#ifdef _VERBOSE
-            // INFO << " start=" << spanStart
-            //     << ", end=" << spanEnd
-            //     << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu() << std::endl;
-            //     // << " time taken=" << titer << std::endl;
-            //#endif
-        };
-        double end = omp_get_wtime();
-        tben = end - start;
-        INFO << " total nnls runtime=" << tben << std::endl;
-    }
+            << "(" << t2 << " s)" << std::endl;
+        this->loadedPair = std::make_pair(A, B);
+        this->m_n = B.n_cols;
+        this->m_m = A.n_cols;
+        this->m_k = B.n_rows;
+        this->outmat = arma::randu<AMAT>(this->m_m, this->m_k);
+    };
         void nnlsParseCommandLine()
         {
             NnlsParseCommandLine npc(p_argc, p_argv);
@@ -97,28 +111,40 @@ private:
             this->m_num_it = npc.iterations();
             this->m_compute_error = npc.compute_error();
 #ifdef BUILD_SPARSE
-            callNNLS<BPPNNLS<SP_MAT, AMAT>>();
+            loadNNLS();
 #else // ifdef BUILD_SPARSE
             callNNLS<BPPNNLS<AMAT, AMAT>>();
 #endif
         }
 
     public:
-        planc_bench(int argc, char *argv[])
+        void call_NNLS() {
+            callNNLS<BPPNNLS<SP_MAT, AMAT>>();
+        }
+        planc_bench(int argc, char **argv)
         {
             this->p_argc = argc;
             this->p_argv = argv;
             this->nnlsParseCommandLine();
         }
+        planc_bench(std::string input_file, std::string input_file2) {
+            this->m_Afile_name = input_file;
+            this->m_Bfile_name = input_file2;
+            this->loadNNLS();
+        }
     };
 
 
 }
+
+
+
 int main(int argc, char *argv[])
 {
-    try
+   try
     {
         planc::planc_bench dnd(argc, argv);
+        dnd.call_NNLS();
         fflush(stdout);
     }
     catch (const std::exception &e)
@@ -127,4 +153,3 @@ int main(int argc, char *argv[])
         INFO << e.what();
     }
 }
-

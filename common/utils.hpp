@@ -16,7 +16,7 @@
 #ifdef MKL_FOUND
 #include <mkl.h>
 #else
-#include <cblas.h>
+#include "openblas/cblas.h"
 #endif
 
 static ULONG powersof10[16] = {1,

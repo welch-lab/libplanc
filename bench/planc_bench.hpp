@@ -5,6 +5,7 @@
 #ifndef ARMA_DONT_USE_WRAPPER
 #define ARMA_DONT_USE_WRAPPER
 #endif
+#define ONE_THREAD_MATRIX_SIZE 2000
 #include "parsecommandline.hpp"
 #include <string>
 #include <vector>

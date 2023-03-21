@@ -7,7 +7,7 @@
 // #define _VERBOSE 1
 // #endif
 
-enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM, 
+enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM,
         NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
 
 enum normtype { NONE, L2NORM, MAXNORM };
@@ -68,14 +68,19 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #define UWORD arma::uword
 #define VEC arma::vec
 
+#ifdef BUILD_SPARSE
+#define PAIRMAT std::pair<SP_MAT, AMAT>
+#endif
+#ifndef BUILD_SPARSE
+#define PAIRMAT std::pair<AMAT, AMAT>
+#endif
 #define PRINTMATINFO(A) "::" #A "::" << (A).n_rows << "x" << (A).n_cols
 
 #define PRINTMAT(A) PRINTMATINFO((A)) << std::endl << (A)
 
 typedef std::vector<int> STDVEC;
 typedef unsigned int UINT;
-typedef unsigned int uint;
-typedef unsigned long ULONG;
+typedef uint64_t ULONG;
 
 void absmat(const FMAT *X);
 

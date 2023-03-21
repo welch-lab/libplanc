@@ -27,7 +27,7 @@ class NMFDriver {
   bool m_adj_rand;
   algotype m_nmfalgo;
   double m_sparsity;
-  uint m_compute_error;
+  unsigned int m_compute_error;
   normtype m_input_normalization;
   int m_max_luciters;
   int m_initseed;

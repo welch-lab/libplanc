@@ -3,7 +3,6 @@
 cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
 
-set(ARMA_USE_WRAPPER true)
 include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
 # the settings below will be automatically configured by the rest of this script

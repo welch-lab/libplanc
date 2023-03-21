@@ -8,8 +8,9 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/build/linux-debug/bench/planc_bench",
-            "args": ["-i", "${workspaceFolder}/out/build/linux-debug/bench/frontal_10k.h5.mtx", "-j", "${workspaceFolder}/out/build/linux-debug/bench/frontal_10k.h5.dense.mtx"],
+            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
+            "program": "${workspaceFolder}/out/build/x64-debug/bench/planc_bench.exe",
+            "args": ["-i", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.mtx", "-j", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.dense.mtx"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -28,11 +29,11 @@
                 },
                 {
                     "description": "source arma-prettyprint",
-                    "text": "source /home/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_armadillo_printers.py"
+                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_armadillo_printers.py"
                 },
-                                {
+                {
                     "description": "source stdcomplex-prettyprint",
-                    "text": "source /home/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_std_complex_printer.py"
+                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_std_complex_printer.py"
                 }
             ]
         }
