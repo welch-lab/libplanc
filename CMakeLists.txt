@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
 # the settings below will be automatically configured by the rest of this script
 
-project(PLANC CXX)
+project(PLANC C CXX)
 set(PLANC_MAJOR_VERSION 0)
 set(PLANC_MINOR_VERSION 8)
 set(PLANC_PATCH_VERSION 1)
@@ -14,7 +14,9 @@ include(CMakePackageConfigHelpers)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 cmake_host_system_information(RESULT _host_name QUERY FQDN)
-
+if(MINGW)
+  set(IS_MINGW 1)
+endif()
 message(STATUS, "host name = ${_host_name}")
 
 string(FIND ${_host_name} "rhea" RHEA_FOUND)
