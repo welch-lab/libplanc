@@ -11,7 +11,7 @@ set(PLANC_VERSION "${PLANC_MAJOR_VERSION}.${PLANC_MINOR_VERSION}.${PLANC_PATCH_V
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 cmake_host_system_information(RESULT _host_name QUERY FQDN)
 

@@ -8,6 +8,11 @@
 #include "nmf.hpp"
 #include <omp.h>
 #include <string>
+#include <algorithm>
+#include <cstddef>
+#include <vector>
+#include "bm.hpp"
+
 
 namespace planc {
 
@@ -133,18 +138,29 @@ private:
             this->loadNNLS();
         }
     };
-
-
 }
-
-
 
 int main(int argc, char *argv[])
 {
    try
     {
         planc::planc_bench dnd(argc, argv);
-        dnd.call_NNLS();
+
+        const auto session = bm::run<float, std::milli>([&dnd](auto& recorder)
+            {
+                recorder.record("nnlsbench", [&dnd]
+                    {
+                        dnd.call_NNLS();
+                    });
+            }, 100 /* iterations */);
+        for (const auto& record : session.records)
+        {
+            auto name = record.name;
+            auto mean = record.mean();
+            auto variance = record.variance();
+            auto standard_deviation = record.standard_deviation();
+        }
+        session.to_csv("outbench.csv");
         fflush(stdout);
     }
     catch (const std::exception &e)
