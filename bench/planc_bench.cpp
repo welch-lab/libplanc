@@ -140,27 +140,45 @@ private:
     };
 }
 
+const char* prefixes[5] =
+{
+    "frontal_10k",
+    "frontal_50k",
+    "frontal_100k",
+    "frontal_200k",
+    "frontal_250k",
+};
+
 int main(int argc, char *argv[])
 {
    try
     {
-        planc::planc_bench dnd(argc, argv);
-
-        const auto session = bm::run<float, std::milli>([&dnd](auto& recorder)
+        std::vector<class planc::planc_bench> pbvec;
+        for(std::string prefix : prefixes){
+            std::string sparse = prefix + ".h5.mtx";
+            std::string dense = prefix + ".h5.dense.mtx";
+            planc::planc_bench dnd(sparse, dense);
+            pbvec.push_back(dnd);
+        }
+        bm::session<float> mySession;
+        mySession = bm::run<float, std::milli>([&pbvec](auto &recorder)
             {
-                recorder.record("nnlsbench", [&dnd]
-                    {
-                        dnd.call_NNLS();
-                    });
-            }, 100 /* iterations */);
-        for (const auto& record : session.records)
+            for (int i = 0; i < 5; i++)
+            {
+                planc::planc_bench *locpbptr = &pbvec[i];
+                recorder.record(prefixes[i], [&locpbptr]
+                                {locpbptr->call_NNLS();});
+            }},
+                                               100 /* iterations */);
+
+        for (const auto& record : mySession.records)
         {
             auto name = record.name;
             auto mean = record.mean();
             auto variance = record.variance();
             auto standard_deviation = record.standard_deviation();
         }
-        session.to_csv("outbench.csv");
+        mySession.to_csv("outbench.csv");
         fflush(stdout);
     }
     catch (const std::exception &e)
