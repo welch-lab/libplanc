@@ -79,11 +79,11 @@ Examples:
 
 ### 7. Submitting the benchmarks
 
-The executable should have dropped a file in `bench/bench_in` called `outbench.csv`. Send this file along with your system details (CPU Model `e.g. Intel i5-1235U`, RAM, OS, OS version, compiler, compiler version, any extra compiler flags, anything else that seems relevant) to [Andrew Robbins](mailto:robbiand@med.umich.edu)
+The executable should have dropped a file in `bench/bench_in` called `outbench.csv`. Send this file along with your system details (CPU Model `e.g. Intel i5-1235U`, RAM, OS, OS version, compiler, compiler version, any extra compiler flags, anything else that seems relevant) to [Andrew Robbins](mailto:robbiand@med.umich.edu).
 
 ## Troubleshooting
 
-Any issues solved will be written up here. In the meantime, contact me above or message me on [Matrix](matrix:u/andrew:robbinsa.me?action=chat)!
+Any issues solved will be written up here. In the meantime, contact me above or message me on [Matrix](https://matrix.to/#/@andrew:robbinsa.me)!
 
 ## Known good configurations
 
