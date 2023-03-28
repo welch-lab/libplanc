@@ -50,7 +50,7 @@ If there are any errors, see [Troubleshooting](#troubleshooting) below.
 
 ### 5. Preparing the benchmark
 
-From the same shell, change directory to `build/bench_in` and run `zstd -d` on each of the .mtx.zst files. Ensure your computer is under minimal load.
+From the same shell, change directory to `build/bench_in` and run `zstd -d` on each of the .mtx.zst files. If you do not have zstd, you can obtain it from your package manager (brew, pacman, etc). Ensure your computer is under minimal load.
 
 ### 6. Running the benchmark
 
