@@ -16,7 +16,7 @@
 #ifdef MKL_FOUND
 #include <mkl.h>
 #else
-#ifdef IS_MINGW
+#ifdef __MINGW32__
 #include "openblas/cblas.h"
 #else
 #include "cblas.h"
