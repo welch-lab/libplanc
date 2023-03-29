@@ -117,12 +117,17 @@
       "displayName": "x64 Clang Debug",
       "description": "Target Windows with the Clang-based MinGW toolchain. (Debug)",
       "inherits": "windows-base",
+      "environment": {
+        "PATH": "C:/msys64/clang64/bin;C:/msys64/usr/bin;$penv{PATH}",
+        "MINGW64_ROOT": "C:/msys64/clang64",
+        "INCLUDE": "$penv{INCLUDE};C:/msys64/clang64/include"
+      },
+      "cmakeExecutable": "C:/msys64/ucrt64/bin/cmake.exe",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "C:/msys64/clang64/bin/clang.exe",
-        "CMAKE_CXX_COMPILER": "C:/msys64/clang64/bin/clang++.exe"
-
-
+        "CMAKE_CXX_COMPILER": "C:/msys64/clang64/bin/clang++.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/msys64/clang64/bin/mingw32-make.exe"
       }
     },
     {

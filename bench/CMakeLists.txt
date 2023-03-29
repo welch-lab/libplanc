@@ -19,7 +19,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fast_matrix_market)
 add_executable(planc_bench planc_bench.cpp)
-
+set_target_properties(planc_bench PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS ON)
 target_link_libraries(planc_bench ${NMFLIB_LIBS} fast_matrix_market::fast_matrix_market)
 
 install(TARGETS planc_bench

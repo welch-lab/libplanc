@@ -38,7 +38,7 @@ namespace bm
             return std::sqrt(variance());
         }
 
-        constexpr std::string to_string() const
+        std::string to_string() const
         {
             std::ostringstream stream;
             stream.precision(std::numeric_limits<type>::max_digits10);
@@ -48,7 +48,7 @@ namespace bm
             stream << mean() << "," << variance() << "," << standard_deviation();
             return stream.str();
         }
-        constexpr void        to_csv(const std::string& filepath) const
+        void        to_csv(const std::string& filepath) const
         {
             std::ofstream stream(filepath);
             stream << "name,";
