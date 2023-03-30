@@ -1,6 +1,6 @@
 ## This software and its dependencies are provided under various licenses as listed below.
 
-### The C++ code and headers in this folder are copyright (c) 2023 Andrew Robbins under the GPLv2 and any later version.
+### The C++ code and headers in this folder are copyright (c) 2023 Joshua Welch, Andrew Robbins under the GPLv2 and any later version.
 
 GNU GENERAL PUBLIC LICENSE
 Version 2, June 1991
@@ -139,8 +139,8 @@ Subject to the conditions of this License, UT-Battelle, LLC (the “Licensor”)
 
 2. Neither the names of Licensor, the Department of Energy, or their employees may be used to endorse or promote products derived from this Software without their specific prior written permission.
 
-3. If the Software is protected by a proprietary trademark owned by Licensor or the Department of Energy, then derivative works of the Software may not be distributed using the trademark without the prior written approval of the trademark owner. 
-	
+3. If the Software is protected by a proprietary trademark owned by Licensor or the Department of Energy, then derivative works of the Software may not be distributed using the trademark without the prior written approval of the trademark owner.
+
 ****************************************************************************************************************
 DISCLAIMER
 
