@@ -101,10 +101,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         while (numNonOptCols > 0) {
             iter++;
 
-            if ((MAX_ITERATIONS > 0) && (iter > MAX_ITERATIONS)) {
-                success = false;
-                break;
-            }
+            assert(!((MAX_ITERATIONS > 0) && (iter > MAX_ITERATIONS)));
 
             Cols1 = NotOptCols % (NotGood < Ninf);
             Cols2 = NotOptCols % (NotGood >= Ninf) % (P >= 1);
@@ -180,11 +177,6 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             NotGood = arma::sum(NonOptSet) + arma::sum(InfeaSet);
             NotOptCols = (NotGood > 0);
             numNonOptCols = arma::accu(NotOptCols);
-        }
-
-        if (!success) {
-            ERR << "BPP failed" << std::endl;
-            exit(EXIT_FAILURE);
         }
 
         return iter;

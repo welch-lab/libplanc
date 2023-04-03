@@ -2,9 +2,9 @@
 
 #ifndef NMF_BPPNMF_HPP_
 #define NMF_BPPNMF_HPP_
-
+#ifdef _OPENMP
 #include <omp.h>
-
+#endif
 #include "nmf.hpp"
 #include "bppnnls.hpp"
 
@@ -43,9 +43,9 @@ class BPPNMF : public NMF<T> {
                               &giventInput);
     }
     t2 = toc();
+#ifdef _VERBOSE
     INFO << "starting " << worh << ". Prereq for " << worh << " took=" << t2
          << " NumChunks=" << numChunks << std::endl;
-#ifdef _VERBOSE
     INFO << "LHS::" << std::endl
          << giventGiven << std::endl
          << "RHS::" << std::endl
@@ -88,7 +88,9 @@ class BPPNMF : public NMF<T> {
       (*othermat).rows(spanStart, spanEnd) = subProblem.getSolutionMatrix().t();
     }
     double totalH2 = toc();
+#ifdef _VERBOSE
     INFO << worh << " total time taken :" << totalH2 << std::endl;
+#endif
     giventGiven.clear();
     giventInput.clear();
   }
@@ -167,9 +169,11 @@ class BPPNMF : public NMF<T> {
 #endif
 
           this->W.row(i) = subProblemforW->getSolutionVector().t();
+#ifdef _VERBOSE
           INFO << "Comp W(" << i << "/" << this->n
                << ") of it=" << currentIteration << " time taken=" << t2
                << " num_iterations()=" << numIter << std::endl;
+#endif
         }
         HtH.clear();
         HtAt.clear();
@@ -199,12 +203,16 @@ class BPPNMF : public NMF<T> {
     this->W = tempHals.getLeftLowRankFactor();
     this->H = tempHals.getRightLowRankFactor();
 #endif
+#ifdef _VERBOSE
     INFO << PRINTMATINFO(this->At);
+#endif
 #ifdef BUILD_SPARSE
     INFO << " nnz = " << this->At.n_nonzero << std::endl;
 #endif
+#ifdef _VERBOSE
     INFO << "Starting BPP for num_iterations()=" << this->num_iterations()
          << std::endl;
+#endif
     while (currentIteration < this->num_iterations()) {
 #ifdef COLLECTSTATS
       this->collectStats(currentIteration);
@@ -226,11 +234,16 @@ class BPPNMF : public NMF<T> {
 
       this->stats(currentIteration + 1, 3) = totalW2 + totalH2;
 #endif
+#ifdef _VERBOSE
       INFO << "Completed It (" << currentIteration << "/"
            << this->num_iterations() << ")"
            << " time =" << totalW2 + totalH2 << std::endl;
+#endif
       this->computeObjectiveError();
+#ifdef _VERBOSE
       this->printObjective(currentIteration);
+
+#endif
       currentIteration++;
     }
     this->normalize_by_W();
@@ -256,4 +269,5 @@ class BPPNMF : public NMF<T> {
 
 }  // namespace planc
 
-#endif  // NMF_BPPNMF_HPP_
+#endif
+  // NMF_BPPNMF_HPP_

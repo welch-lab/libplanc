@@ -3,7 +3,9 @@
 #ifndef COMMON_UTILS_HPP_
 #define COMMON_UTILS_HPP_
 #include <assert.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif //_OPENMP
 #include <stdio.h>
 #include <chrono>
 #include <ctime>
@@ -239,7 +241,9 @@ double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
   Qw.clear();
   Qh.clear();
   RwRh.clear();
+#ifdef _VERBOSE
   INFO << "error compute time " << toc() << std::endl;
+#endif // _VERBOSE
   double fastErr = sqrt(nnzsse + (normWH * normWH - nnzwh));
   return (fastErr);
 }

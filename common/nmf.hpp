@@ -287,7 +287,9 @@ class NMF {
         Qw.clear();
         Qh.clear();
         RwRh.clear();
+#ifdef _VERBOSE
         INFO << "error compute time " << toc() << std::endl;
+#endif
         float fastErr = sqrt(nnzsse + (normWH * normWH - nnzwh));
         this->objective_err = fastErr;
 
@@ -311,7 +313,7 @@ class NMF {
     INFO << "Entering computeObjectiveError A=" << this->A.n_rows << "x"
          << this->A.n_cols << " W = " << this->W.n_rows << "x" << this->W.n_cols
          << " H=" << this->H.n_rows << "x" << this->H.n_cols << std::endl;
-#endif
+#endif // _VERBOSE
     tic();
     // always restrict the errMtx size to fit it in memory
     // and doesn't occupy much space.
@@ -383,7 +385,9 @@ class NMF {
       splitErr(i) = arma::accu(A_err_sub_mtx);
     }
     double err_time = toc();
+#ifdef _VERBOSE
     INFO << "err compute time::" << err_time << std::endl;
+#endif    
     this->objective_err = arma::sum(splitErr);
   }
 
