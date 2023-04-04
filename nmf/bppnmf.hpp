@@ -205,11 +205,9 @@ class BPPNMF : public NMF<T> {
 #endif
 #ifdef _VERBOSE
     INFO << PRINTMATINFO(this->At);
-#endif
 #ifdef BUILD_SPARSE
     INFO << " nnz = " << this->At.n_nonzero << std::endl;
 #endif
-#ifdef _VERBOSE
     INFO << "Starting BPP for num_iterations()=" << this->num_iterations()
          << std::endl;
 #endif
