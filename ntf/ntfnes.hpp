@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFNES_HPP_
-#define NTF_NTFNES_HPP_
 
 #include "ntf/auntf.hpp"
 
@@ -188,5 +186,3 @@ class NTFNES : public AUNTF {
   }
 };  // class NTFNES
 }  // namespace planc
-
-#endif  // NTF_NTFNES_HPP_

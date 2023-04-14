@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef NMF_GNSYM_HPP_
-#define NMF_GNSYM_HPP_
 
 #include "nmf.hpp"
 
@@ -263,5 +261,3 @@ class GNSYMNMF : public NMF<T> {
 };
 
 }  // namespace planc
-
-#endif  // NMF_GNSYM_HPP_

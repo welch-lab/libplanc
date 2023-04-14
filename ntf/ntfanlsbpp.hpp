@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFANLSBPP_HPP_
-#define NTF_NTFANLSBPP_HPP_
 
 #include "nnls/bppnnls.hpp"
 #include "ntf/auntf.hpp"
@@ -62,5 +60,3 @@ class NTFANLSBPP : public AUNTF {
 };  // class NTFANLSBPP
 
 }  // namespace planc
-
-#endif  // NTF_NTFANLSBPP_HPP_

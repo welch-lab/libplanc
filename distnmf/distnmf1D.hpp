@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTNMF1D_HPP_
-#define DISTNMF_DISTNMF1D_HPP_
 
 #include <string>
 #include "common/distutils.hpp"
@@ -188,5 +186,3 @@ class DistNMF1D {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTNMF1D_HPP_

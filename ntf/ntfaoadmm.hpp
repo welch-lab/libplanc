@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFAOADMM_HPP_
-#define NTF_NTFAOADMM_HPP_
 
 #include "ntf/auntf.hpp"
 
@@ -94,5 +92,3 @@ class NTFAOADMM : public AUNTF {
 };  // class NTFAOADMM
 
 }  // namespace planc
-
-#endif  // NTF_NTFAOADMM_HPP_

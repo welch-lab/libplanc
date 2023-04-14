@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef NMF_MU_HPP_
-#define NMF_MU_HPP_
 
 #include "nmf.hpp"
 
@@ -93,5 +91,3 @@ class MUNMF : public NMF<T> {
 };
 
 }  // namespace planc
-
-#endif  // NMF_MU_HPP_

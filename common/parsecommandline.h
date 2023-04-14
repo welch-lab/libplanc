@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2017 */
 
-#ifndef COMMON_PARSECOMMANDLINE_H_
-#define COMMON_PARSECOMMANDLINE_H_
 
 #include <getopt.h>
 #include "utils.h"
@@ -107,6 +106,3 @@ struct option plancopts[] = {
     {"momentum", required_argument, 0, MOMENTUM},
     {"unpartitioned", required_argument, 0, UNPARTITIONED},
     {0, 0, 0, 0}};
-
-#endif  // COMMON_PARSECOMMANDLINE_H_
-

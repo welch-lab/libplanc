@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTANLSBPP_HPP_
-#define DISTNMF_DISTANLSBPP_HPP_
 
 #include "distnmf/aunmf.hpp"
 #include "nnls/bppnnls.hpp"
@@ -88,7 +86,7 @@ class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
    * WtAij is of size \f$k \times \frac{globaln}{p} \f$
    * this->H is of size \f$ \frac{globaln}{p} \times k \f$
    * this->WtW is of size kxk
-   */  
+   */
   void updateH() {
     updateOtherGivenOneMultipleRHS(this->WtW, this->WtAij, &this->H);
     this->Ht = this->H.t();
@@ -116,5 +114,3 @@ class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
 };  // class DistANLSBPP2D
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTANLSBPP_HPP_

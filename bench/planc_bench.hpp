@@ -1,7 +1,5 @@
-/* Copyright 2016 Ramakrishnan Kannan */
+#pragma once
 
-#ifndef BENCH_PLANC_BENCH_HPP_
-#define BENCH_PLANC_BENCH_HPP_
 #ifndef ARMA_DONT_USE_WRAPPER
 #define ARMA_DONT_USE_WRAPPER
 #endif
@@ -116,4 +114,3 @@ public:
     }
 };
 }
-#endif // BENCH_PLANC_BENCH_HPP_

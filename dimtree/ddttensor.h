@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
 
-#ifndef DIMTREE_DDTTENSOR_H_
-#define DIMTREE_DDTTENSOR_H_
 
 #ifdef MKL_FOUND
 #include <mkl.h>
@@ -241,6 +240,3 @@ void vdMul(long int, double *, double *, double *);
 extern "C" void dgemm_(char *transa, char *transb, int *m, int *n, int *k, double *alpha,
            double *a, int *lda, double *b, int *ldb, double *beta, double *c,
            int *ldc);
-
-
-#endif  // DIMTREE_DDTTENSOR_H_

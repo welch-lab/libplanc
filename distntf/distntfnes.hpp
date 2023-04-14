@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFNES_HPP_
-#define DISTNTF_DISTNTFNES_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -236,5 +234,3 @@ class DistNTFNES : public DistAUNTF {
 };  // class DistNTFNES
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFNES_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFMU_HPP_
-#define NTF_NTFMU_HPP_
 
 #include "ntf/auntf.hpp"
 
@@ -20,5 +18,3 @@ class NTFMU : public AUNTF {
       : AUNTF(i_tensor, i_k, i_algo) {}
 };  // class NTFMU
 }  // namespace planc
-
-#endif  // NTF_NTFMU_HPP_

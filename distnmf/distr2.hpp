@@ -1,5 +1,4 @@
-#ifndef DISTNMF_DISTR2_HPP_
-#define DISTNMF_DISTR2_HPP_
+#pragma once
 #include "distnmf/aunmf.hpp"
 
 /**
@@ -7,7 +6,7 @@
  */
 
 namespace planc {
-  
+
   template <class INPUTMATTYPE>
   class DistR2 : public DistAUNMF<INPUTMATTYPE> {
     private:
@@ -54,7 +53,7 @@ namespace planc {
               b(0) = 0;
             }
           });
-        
+
         G.cols(negs) = uv.cols(negs);
         temp = MPITOC;
         this->reportTime(temp,"UV::");
@@ -65,8 +64,7 @@ namespace planc {
       DistR2(const INPUTMATTYPE& input, const MAT& leftlowrankfactor, const MAT& rightlowrankfactor, const MPICommunicator& communicator, const int numkblks) : DistAUNMF<INPUTMATTYPE>(input, leftlowrankfactor, rightlowrankfactor, communicator, numkblks) {
         Wuv.zeros(2,this->W.n_rows);
         Huv.zeros(2,this->H.n_rows);
-        
+
       }
   };
 }
-#endif

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNTF_DISTNTFMPICOMM_HPP_
-#define DISTNTF_DISTNTFMPICOMM_HPP_
 
 #define MPI_CART_DIMS m_proc_grids.n_rows
 
@@ -193,5 +191,3 @@ class NTFMPICommunicator {
 };
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFMPICOMM_HPP_

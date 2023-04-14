@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTHALS_HPP_
-#define DISTNMF_DISTHALS_HPP_
 
 #include "distnmf/aunmf.hpp"
 /**
@@ -103,5 +101,3 @@ class DistHALS : public DistAUNMF<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTHALS_HPP_

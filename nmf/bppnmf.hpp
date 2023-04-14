@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef NMF_BPPNMF_HPP_
-#define NMF_BPPNMF_HPP_
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -266,6 +265,3 @@ class BPPNMF : public NMF<T> {
 };  // class BPPNMF
 
 }  // namespace planc
-
-#endif
-  // NMF_BPPNMF_HPP_

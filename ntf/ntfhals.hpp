@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFHALS_HPP_
-#define NTF_NTFHALS_HPP_
 
 #include "ntf/auntf.hpp"
 #include "common/utils.hpp"
@@ -34,5 +32,3 @@ class NTFHALS : public AUNTF {
 };  // class NTFHALS
 
 }  // namespace planc
-
-#endif  // NTF_NTFHALS_HPP_

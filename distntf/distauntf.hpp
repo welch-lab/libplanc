@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-#ifndef DISTNTF_DISTAUNTF_HPP_
-#define DISTNTF_DISTAUNTF_HPP_
 
 #include <armadillo>
 #include <string>
@@ -762,4 +761,3 @@ class DistAUNTF {
   }
 };  // class DistAUNTF
 }  // namespace planc
-#endif  // DISTNTF_DISTAUNTF_HPP_

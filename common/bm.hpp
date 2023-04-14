@@ -1,5 +1,4 @@
-#ifndef BM_BENCHMARK_HPP_
-#define BM_BENCHMARK_HPP_
+#pragma once
 
 #include <algorithm>
 #include <chrono>
@@ -221,5 +220,3 @@ namespace bm
     }
 #endif
 }
-
-#endif

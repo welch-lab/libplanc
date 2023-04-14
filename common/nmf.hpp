@@ -1,6 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-#ifndef COMMON_NMF_HPP_
-#define COMMON_NMF_HPP_
+
 #include <assert.h>
 #include <string>
 #include "utils.hpp"
@@ -533,4 +533,3 @@ class NMF {
   }
 };
 }  // namespace planc
-#endif  // COMMON_NMF_HPP_

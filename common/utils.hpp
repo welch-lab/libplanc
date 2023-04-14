@@ -1,7 +1,7 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
-#ifndef COMMON_UTILS_HPP_
-#define COMMON_UTILS_HPP_
+
 #include <assert.h>
 #ifdef _OPENMP
 #include <omp.h>
@@ -452,5 +452,3 @@ int debug_hook(){
   while(i < 1){}
   return 0;
 }
-
-#endif  // COMMON_UTILS_HPP_

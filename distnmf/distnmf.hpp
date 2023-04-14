@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTNMF_HPP_
-#define DISTNMF_DISTNMF_HPP_
 
 #include <string>
 #include "common/nmf.hpp"
@@ -39,7 +37,7 @@ class DistNMF : public NMF<INPUTMATTYPE> {
    * @param[in] right low rank factor H of size \f$\frac{globaln}{p} \times k\f$
    * @param[in] left low rank factor W of size \f$\frac{globalm}{p} \times k\f$
    * @param[in] MPI Communicator for row and column communicators
-   */  
+   */
   DistNMF(const INPUTMATTYPE &input, const MAT &leftlowrankfactor,
           const MAT &rightlowrankfactor, const MPICommunicator &communicator)
       : NMF<INPUTMATTYPE>(input, leftlowrankfactor, rightlowrankfactor),
@@ -129,5 +127,3 @@ class DistNMF : public NMF<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTNMF_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef NMF_HALS_HPP_
-#define NMF_HALS_HPP_
 
 #include "nmf.hpp"
 
@@ -130,5 +128,3 @@ class HALSNMF : public NMF<T> {
 };
 
 }  // namespace planc
-
-#endif  // NMF_HALS_HPP_

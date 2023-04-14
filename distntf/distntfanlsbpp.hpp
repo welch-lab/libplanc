@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFANLSBPP_HPP_
-#define DISTNTF_DISTNTFANLSBPP_HPP_
 
 #include "distntf/distauntf.hpp"
 #include "nnls/bppnnls.hpp"
@@ -14,8 +12,8 @@ class DistNTFANLSBPP : public DistAUNTF {
  protected:
   /**
    * ANLS/BPP update function.
-   * Given the MTTKRP and the hadamard of all the grams, we 
-   * determine the factor matrix to be updated. 
+   * Given the MTTKRP and the hadamard of all the grams, we
+   * determine the factor matrix to be updated.
    * @param[in] Mode of the factor to be updated
    * @returns The new updated factor
    */
@@ -76,5 +74,3 @@ class DistNTFANLSBPP : public DistAUNTF {
 };  // class DistNTFANLSBPP
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFANLSBPP_HPP_

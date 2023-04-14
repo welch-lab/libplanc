@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFCPALS_HPP_
-#define DISTNTF_DISTNTFCPALS_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -36,5 +34,3 @@ class DistNTFCPALS : public DistAUNTF {
 };  // class DistNTFMU
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFCPALS_HPP_

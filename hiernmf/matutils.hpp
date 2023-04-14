@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2020 Lawton Manning */
-#ifndef HIERNMF_MATUTILS_HPP_
-#define HIERNMF_MATUTILS_HPP_
 
 #include <algorithm>
 #include "common/distutils.hpp"
@@ -135,4 +134,3 @@ UVEC maxk_idx(VEC X, int k) {
   return Xi.head(k);
 }
 }  // namespace planc
-#endif  // HIERNMF_MATUTILS_HPP_

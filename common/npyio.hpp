@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2018 Ramakrishnan Kannan */
-#ifndef COMMON_NPYIO_HPP_
-#define COMMON_NPYIO_HPP_
 #include <armadillo>
 #include <cassert>
 #include <cstdio>
@@ -103,5 +102,3 @@ class NumPyArray {
   }
 };
 }  // namespace planc
-
-#endif  // COMMON_NPYIO_HPP_

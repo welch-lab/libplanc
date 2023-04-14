@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef NNLS_SORTBOOLEANMATRIX_HPP_
-#define NNLS_SORTBOOLEANMATRIX_HPP_
 #include <armadillo>
 #include <vector>
 #include <algorithm>
@@ -43,4 +42,3 @@ class SortBooleanMatrix {
         return this->idxs;
     }
 };
-#endif  // NNLS_SORTBOOLEANMATRIX_HPP_

@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2020 Lawton Manning */
-#ifndef HIERNMF_NODE_HPP_
-#define HIERNMF_NODE_HPP_
 #include <queue>
 #include <vector>
 #include "common/parsecommandline.hpp"
@@ -246,4 +245,3 @@ class RootNode : public Node<INPUTMATTYPE> {
   }
 };
 }  // namespace planc
-#endif  // HIERNMF_NODE_HPP_

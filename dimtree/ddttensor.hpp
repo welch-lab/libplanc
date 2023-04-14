@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
-
-#ifndef DIMTREE_DDTTENSOR_HPP_
-#define DIMTREE_DDTTENSOR_HPP_
 
 #include "dimtree/ddttensor.h"
 
@@ -1443,5 +1441,3 @@ direction opposite_direction(direction D) {
     return ::direction::left;
   }
 }
-
-#endif  // DIMTREE_DDTTENSOR_HPP_

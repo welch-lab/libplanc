@@ -1,13 +1,7 @@
+#pragma once
 /* Copyright 2017 Ramakrishnan Kannan */
 
-#ifndef COMMON_TENSOR_HPP_
-#define COMMON_TENSOR_HPP_
-
-#ifdef MKL_FOUND
-#include <mkl.h>
-#else
 #include <cblas.h>
-#endif
 #include <armadillo>
 #include <fstream>
 #include <ios>
@@ -522,5 +516,3 @@ class Tensor {
 }  // namespace planc
 
 void swap(planc::Tensor &x, planc::Tensor &y) { x.swap(y); }
-
-#endif  // COMMON_TENSOR_HPP_

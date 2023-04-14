@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef NNLS_NNLS_HPP_
-#define NNLS_NNLS_HPP_
 #include "utils.hpp"
 
 // #ifndef _VERBOSE
@@ -198,4 +196,3 @@ class NNLS {
         }
     }
 };
-#endif  // NNLS_NNLS_HPP_

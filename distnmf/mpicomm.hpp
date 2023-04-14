@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_MPICOMM_HPP_
-#define DISTNMF_MPICOMM_HPP_
 
 #include <mpi.h>
 #include <vector>
@@ -132,5 +130,3 @@ class MPICommunicator {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_MPICOMM_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2017 */
-
-#ifndef COMMON_PARSECOMMANDLINE_HPP_
-#define COMMON_PARSECOMMANDLINE_HPP_
 
 #include <getopt.h>
 #include <armadillo>
@@ -696,5 +694,3 @@ class ParseCommandLine {
 
 };  // ParseCommandLine
 }  // namespace planc
-
-#endif  // COMMON_PARSECOMMANDLINE_HPP_

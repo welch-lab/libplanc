@@ -1,7 +1,5 @@
+#pragma once
 /*Copyright 2016 Ramakrishnan Kannan*/
-
-#ifndef NNLS_BPPNNLS_HPP_
-#define NNLS_BPPNNLS_HPP_
 
 #include <assert.h>
 #include "nnls.hpp"
@@ -278,5 +276,3 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         }
     }
 };
-
-#endif  // NNLS_BPPNNLS_HPP_

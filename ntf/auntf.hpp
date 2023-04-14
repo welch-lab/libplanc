@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2017 */
-
-#ifndef NTF_AUNTF_HPP_
-#define NTF_AUNTF_HPP_
 
 #define MPITIC tic();
 #define MPITOC toc();
@@ -250,5 +248,3 @@ class AUNTF {
   }
 };  // class AUNTF
 }  // namespace planc
-
-#endif  // NTF_AUNTF_HPP_

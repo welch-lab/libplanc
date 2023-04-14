@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
-#ifndef COMMON_UTILS_H_
-#define COMMON_UTILS_H_
 
 // #ifndef _VERBOSE
 // #define _VERBOSE 1
@@ -95,5 +94,3 @@ inline void fillVector(const FVT value, std::vector<FVT> *a) {
     (*a)[ii] = value;
   }
 }
-
-#endif  // COMMON_UTILS_H_

@@ -1,14 +1,12 @@
+#pragma once
 /* Copyright 2020 Srinivas Eswar */
-
-#ifndef DISTNMF_DISTGNSYMNMF_HPP_
-#define DISTNMF_DISTGNSYMNMF_HPP_
 
 /**
  * Provides the update algorithm for the
  * distributed Gauss-Newton algorithm for SymNMF (SymGNCG).
- * 
+ *
  * The algorithm is implemented according to the details
- * found in the paper: 
+ * found in the paper:
  * "Distribued-Memory Parallel Symmetric Nonnegative Matrix
  *  Factorization" from SC 2020.
  */
@@ -115,11 +113,11 @@ class DistGNSym : public DistAUNMF<INPUTMATTYPE> {
 
   /**
    * Computes XtH for 1-D distributed matrices X and Y
-   * @param[in] reference to local matrix X of 
+   * @param[in] reference to local matrix X of
    *            size \f$k \times \frac{globaln}{p} \f$
-   * @param[in] reference to local matrix Y of 
+   * @param[in] reference to local matrix Y of
    *            size \f$k \times \frac{globaln}{p} \f$
-   * @param[in] reference to output matrix XY of 
+   * @param[in] reference to output matrix XY of
    *            size \f$k \times k \f$
    * used to compute XtH
    */
@@ -196,7 +194,7 @@ class DistGNSym : public DistAUNMF<INPUTMATTYPE> {
   }
 
   /**
-   * Applies approximate Hessian as shown in algorithm 4 
+   * Applies approximate Hessian as shown in algorithm 4
    * using the vectorized formula,
    * \f$Y = 2*(XHtH - H(XtH))\f$
    * Y is stored in this->WtAij
@@ -225,7 +223,7 @@ class DistGNSym : public DistAUNMF<INPUTMATTYPE> {
   }
 
   /**
-   * Computes the dot product of the vectorized form 
+   * Computes the dot product of the vectorized form
    * of matrices X and Y, i.e., vec(X)^T * vec(Y)
    * @param[in] reference to local matrix X
    * @param[in] reference to local matrix Y which is the same size as X
@@ -239,7 +237,7 @@ class DistGNSym : public DistAUNMF<INPUTMATTYPE> {
   }
 
   /**
-   * Modified error calculation to only work with a 
+   * Modified error calculation to only work with a
    * single factor matrix H
    * @param[in] iter is the current iteration number
    */
@@ -434,5 +432,3 @@ class DistGNSym : public DistAUNMF<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTGNSYMNMF_HPP_

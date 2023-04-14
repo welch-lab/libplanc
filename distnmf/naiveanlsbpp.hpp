@@ -1,7 +1,5 @@
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_NAIVE_ANLS_BPP_HPP_
-#define DISTNMF_NAIVE_ANLS_BPP_HPP_
 #pragma once
 #include "distnmf/distnmf1D.hpp"
 #include "nnls/bppnnls.hpp"
@@ -201,5 +199,3 @@ class DistNaiveANLSBPP : public DistNMF1D<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_NAIVE_ANLS_BPP_HPP_

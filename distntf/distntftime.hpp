@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNTF_DISTNTFTIME_HPP_
-#define DISTNTF_DISTNTFTIME_HPP_
 
 namespace planc {
 class DistNTFTime {
@@ -110,5 +108,3 @@ class DistNTFTime {
   }
 };
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFTIME_HPP_

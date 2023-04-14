@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNTF_DISTNTFIO_HPP_
-#define DISTNTF_DISTNTFIO_HPP_
 
 #include <unistd.h>
 #include <armadillo>
@@ -48,7 +46,7 @@ class DistNTFIO {
     // on all the MPI processor.
     NCPFactors global_factors(i_global_dims, i_k, false);
     global_factors.randu(kW_seed_idx);
-    global_factors.normalize();    
+    global_factors.normalize();
     NCPFactors local_factors(i_local_dims, i_k, false);
     UWORD start_row, end_row;
     for (int i = 0; i < local_factors.modes(); i++) {
@@ -394,5 +392,3 @@ class DistNTFIO {
   UVEC global_dims() const { return m_global_dims; }
 };
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFIO_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFAOADMM_HPP_
-#define DISTNTF_DISTNTFAOADMM_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -159,5 +157,3 @@ class DistNTFAOADMM : public DistAUNTF {
 };  // class DistNTFAOADMM
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFAOADMM_HPP_

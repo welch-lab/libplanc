@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_DISTAOADMM_HPP_
-#define DISTNMF_DISTAOADMM_HPP_
 
 #include "distnmf/aunmf.hpp"
 /**
@@ -279,5 +278,3 @@ class DistAOADMM : public DistAUNMF<INPUTMATTYPE> {
 };  // class DistAOADMM2D
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTAOADMM_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFHALS_HPP_
-#define DISTNTF_DISTNTFHALS_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -11,8 +9,8 @@ class DistNTFHALS : public DistAUNTF {
  protected:
    /**
    * This is HALS update function.
-   * Given the MTTKRP and the hadamard of all the grams, we 
-   * determine the factor matrix to be updated. 
+   * Given the MTTKRP and the hadamard of all the grams, we
+   * determine the factor matrix to be updated.
    * @param[in] Mode of the factor to be updated
    * @returns The new updated factor
    */
@@ -52,5 +50,3 @@ class DistNTFHALS : public DistAUNTF {
 };  // class DistNTFHALS
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFHALS_HPP_

@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFMU_HPP_
-#define DISTNTF_DISTNTFMU_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -11,8 +9,8 @@ class DistNTFMU : public DistAUNTF {
  protected:
  /**
    * This is MU update function.
-   * Given the MTTKRP and the hadamard of all the grams, we 
-   * determine the factor matrix to be updated. 
+   * Given the MTTKRP and the hadamard of all the grams, we
+   * determine the factor matrix to be updated.
    * @param[in] Mode of the factor to be updated
    * @returns The new updated factor
    */
@@ -38,5 +36,3 @@ class DistNTFMU : public DistAUNTF {
 };  // class DistNTFMU
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFMU_HPP_

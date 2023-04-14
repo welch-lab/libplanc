@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
-
-#ifndef DIMTREE_DDT_HPP_
-#define DIMTREE_DDT_HPP_
 
 #include "common/ncpfactors.hpp"
 #include "common/tensor.hpp"
@@ -242,5 +240,3 @@ class DenseDimensionTree {
     }
   }
 };
-
-#endif  // DIMTREE_DDT_HPP_

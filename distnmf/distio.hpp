@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTIO_HPP_
-#define DISTNMF_DISTIO_HPP_
 
 #include <unistd.h>
 
@@ -785,5 +783,3 @@ void testDistIO(char argc, char* argv[]) {
   INFO << "Acols:" << mpicomm.rank() << std::endl
        << arma::conv_to<MAT>::from(dio.Acols()) << std::endl;
 }
-
-#endif  // DISTNMF_DISTIO_HPP_

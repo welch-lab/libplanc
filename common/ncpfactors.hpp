@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2017 Ramakrishnan Kannan */
 
-#ifndef COMMON_NCPFACTORS_HPP_
-#define COMMON_NCPFACTORS_HPP_
 
 #include <cassert>
 #include "tensor.hpp"
@@ -445,5 +444,3 @@ current_nrows *= rightkrp.n_rows;
 #endif
 };  // NCPFactors
 }  // namespace planc
-
-#endif  // COMMON_NCPFACTORS_HPP_

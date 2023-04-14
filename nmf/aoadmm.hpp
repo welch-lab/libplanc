@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef NMF_AOADMM_HPP_
-#define NMF_AOADMM_HPP_
 
 #include "nmf.hpp"
 
@@ -193,5 +191,3 @@ class AOADMMNMF : public NMF<T> {
 };
 
 }  // namespace planc
-
-#endif  // NMF_AOADMM_HPP_

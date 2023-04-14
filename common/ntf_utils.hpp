@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2017 Ramakrishnan Kannan */
-
-#ifndef COMMON_NTF_UTILS_HPP_
-#define COMMON_NTF_UTILS_HPP_
 
 #include "ncpfactors.hpp"
 #include "tensor.hpp"
@@ -51,5 +49,3 @@ void mttkrp(const int i_n, const planc::Tensor &X, planc::NCPFactors &i_F,
   AMAT krp = i_F.krp_leave_out_one(i_n);
   X.mttkrp(i_n, krp, o_mttkrp);
 }
-
-#endif // COMMON_NTF_UTILS_HPP_
