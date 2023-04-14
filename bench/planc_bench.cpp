@@ -23,7 +23,7 @@ private:
     int p_argc;
     char **p_argv;
     int m_k;
-    UWORD m_m, m_n;
+    arma::uword m_m, m_n;
     int m_num_it;
     int m_num_nodes;
     std::string m_Afile_name;
@@ -33,30 +33,30 @@ private:
     int m_num_k_blocks;
     float m_sparsity;
     PAIRMAT loadedPair;
-    AMAT outmat;
-    AMAT* outmatptr;
+    arma::mat outmat;
+    arma::mat* outmatptr;
     template<class NNLSTYPE>
     void callNNLS() {
         double tben;
         #ifdef BUILD_SPARSE
-        SP_MAT A = std::get<0>(loadedPair);
+        arma::sp_mat A = std::get<0>(loadedPair);
         #else // ifdef BUILD_SPARSE
-        AMAT A = std::get<0>(loadedPair);
+        arma::mat A = std::get<0>(loadedPair);
         #endif
-        AMAT B = std::get<1>(loadedPair);
-        UINT numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
+        arma::mat B = std::get<1>(loadedPair);
+        unsigned int numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
         double start = omp_get_wtime();
         #pragma omp parallel for schedule(auto)
-        for (UINT i = 0; i < numChunks; i++)
+        for (unsigned int i = 0; i < numChunks; i++)
         {
-            UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
-            UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
+            unsigned int spanStart = i * ONE_THREAD_MATRIX_SIZE;
+            unsigned int spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
             if (spanEnd > m_n - 1)
             {
                 spanEnd = m_n - 1;
             }
             // double start = omp_get_wtime();
-            BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd));
+            BPPNNLS<arma::mat, arma::vec> solveProblem(B.t(), (arma::mat)A.cols(spanStart, spanEnd));
             solveProblem.solveNNLS();
             // double end = omp_get_wtime();
             // titer = end - start;
@@ -78,24 +78,24 @@ private:
         tic();
         fast_matrix_market::matrix_market_header headerA;
         std::ifstream ifsA(this->m_Afile_name);
-        std::vector<UWORD> rowA;
-        std::vector<UWORD> colA;
+        std::vector<arma::uword> rowA;
+        std::vector<arma::uword> colA;
         std::vector<double> valueA;
         fast_matrix_market::read_matrix_market_triplet(ifsA, headerA, rowA, colA, valueA);
         arma::uvec urowa(rowA);
         arma::uvec ucola(colA);
         arma::umat ucoo = join_rows(urowa, ucola).t();
         arma::Col uvala(valueA);
-        SP_MAT A(ucoo, uvala, headerA.nrows, headerA.ncols);
+        arma::sp_mat A(ucoo, uvala, headerA.nrows, headerA.ncols);
         #else
-        AMAT A;
+        arma::mat A;
         #endif
         // Read data matrices
         fast_matrix_market::matrix_market_header headerB;
         std::ifstream ifs(this->m_Bfile_name);
         std::vector<double> Bmem;
         fast_matrix_market::read_matrix_market_array(ifs, headerB, Bmem);
-        AMAT B(Bmem);
+        arma::mat B(Bmem);
         B.reshape(headerB.nrows, headerB.ncols);
         t2 = toc();
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
@@ -104,7 +104,7 @@ private:
         this->m_n = B.n_cols;
         this->m_m = A.n_cols;
         this->m_k = B.n_rows;
-        this->outmat = arma::randu<AMAT>(this->m_m, this->m_k);
+        this->outmat = arma::randu<arma::mat>(this->m_m, this->m_k);
     };
         void nnlsParseCommandLine()
         {
@@ -118,13 +118,13 @@ private:
 #ifdef BUILD_SPARSE
             loadNNLS();
 #else // ifdef BUILD_SPARSE
-            callNNLS<BPPNNLS<AMAT, AMAT>>();
+            callNNLS<BPPNNLS<arma::mat, arma::mat>>();
 #endif
         }
 
     public:
         void call_NNLS() {
-            callNNLS<BPPNNLS<SP_MAT, AMAT>>();
+            callNNLS<BPPNNLS<arma::sp_mat, arma::mat>>();
         }
         planc_bench(int argc, char **argv)
         {

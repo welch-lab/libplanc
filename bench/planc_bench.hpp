@@ -11,7 +11,7 @@ namespace planc{
 
 template <typename VT>
 struct array_matrix {
-    UWORD nrows = 0, ncols = 0;
+    arma::uword nrows = 0, ncols = 0;
     std::vector<VT> vals;
 };
 
@@ -20,7 +20,7 @@ class NnlsParseCommandLine: public planc::ParseCommandLine
     private:
     int m_argc;
     char **m_argv;
-    UWORD m_k;
+    arma::uword m_k;
     int m_num_it;
     int m_num_nodes;
     std::string m_Afile_name;

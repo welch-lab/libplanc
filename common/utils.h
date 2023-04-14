@@ -42,16 +42,15 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #define OUTPUT std::cout
 #endif
 
-#define EPSILON_1EMINUS16 0.00000000000000001
-#define EPSILON_1EMINUS8 0.00000001
-#define EPSILON 0.000001
-#define EPSILON_1EMINUS12 1e-12
-#define NUMBEROF_DECIMAL_PLACES 12
-#define RAND_SEED 100
-#define RAND_SEED_SPARSE 100
-#define WTRUE_SEED 1196089
-#define HTRUE_SEED 1230587
-
+constexpr auto EPSILON_1EMINUS16 = 0.00000000000000001;
+constexpr auto EPSILON_1EMINUS8=0.00000001;
+constexpr auto EPSILON = 0.000001;
+constexpr auto EPSILON_1EMINUS12 = 1e-12;
+constexpr auto NUMBEROF_DECIMAL_PLACES = 12;
+constexpr auto RAND_SEED = 100;
+constexpr auto RAND_SEED_SPARSE = 100;
+constexpr auto WTRUE_SEED=1196089;
+constexpr auto HTRUE_SEED=1230587;
 
 #ifdef BUILD_SPARSE
 typedef std::pair<arma::sp_mat, arma::mat> PAIRMAT;

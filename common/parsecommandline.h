@@ -16,18 +16,18 @@
 // distnmf related defines
 // #define PROCROWS        2002
 // #define PROCCOLS        2003
-#define NUMKBLOCKS 2004
-#define NORMALIZATION 2005
-#define DIMTREE 2006
-#define SYMMETRICREG 2007
-#define ADJRAND 2008
-#define NUMLUCITERS 2009
-#define INITSEED 2010
-#define ALPHAREG 2011
-#define BETAREG 2012
-#define MAT_TYPE 2013
-#define MOMENTUM 2014
-#define UNPARTITIONED 2015
+constexpr auto NUMKBLOCKS = 2004;
+constexpr auto NORMALIZATION = 2005;
+constexpr auto DIMTREE = 2006;
+constexpr auto SYMMETRICREG = 2007;
+constexpr auto ADJRAND = 2008;
+constexpr auto NUMLUCITERS = 2009;
+constexpr auto INITSEED = 2010;
+constexpr auto ALPHAREG=2011;
+constexpr auto BETAREG=2012;
+constexpr auto MAT_TYPE=2013;
+constexpr auto MOMENTUM=2014;
+constexpr auto UNPARTITIONED=2015;
 
 // enum factorizationtype{FT_NMF, FT_DISTNMF, FT_NTF, FT_DISTNTF};
 
