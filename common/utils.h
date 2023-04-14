@@ -52,36 +52,21 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #define WTRUE_SEED 1196089
 #define HTRUE_SEED 1230587
 
-// defines for namespace confusion
-#define FMAT arma::fmat
-#define AMAT arma::mat
-#define UMAT arma::umat
-#define FROWVEC arma::frowvec
-#define ROWVEC arma::rowvec
-#define UROWVEC arma::urowvec
-#define FVEC arma::fvec
-#define SP_FMAT arma::sp_fmat
-#define SP_MAT arma::sp_mat
-#define UVEC arma::uvec
-#define IVEC arma::ivec
-#define UWORD arma::uword
-#define VEC arma::vec
 
 #ifdef BUILD_SPARSE
-#define PAIRMAT std::pair<SP_MAT, AMAT>
+typedef std::pair<arma::sp_mat, arma::mat> PAIRMAT;
 #endif
 #ifndef BUILD_SPARSE
-#define PAIRMAT std::pair<AMAT, AMAT>
+typedef std::pair<arma::mat, arma::mat> PAIRMAT;
 #endif
 #define PRINTMATINFO(A) "::" #A "::" << (A).n_rows << "x" << (A).n_cols
 
 #define PRINTMAT(A) PRINTMATINFO((A)) << std::endl << (A)
 
 typedef std::vector<int> STDVEC;
-typedef unsigned int UINT;
 typedef uint64_t ULONG;
 
-void absmat(const FMAT *X);
+void absmat(const arma::fmat *X);
 
 inline void tic();
 inline double toc();

@@ -11,8 +11,8 @@ class DistNaiveANLSBPP : public DistNMF1D<INPUTMATTYPE> {
   MAT HtH, WtW;
   MAT AcolstW, ArowsH;
   MAT ArowsHt, AcolstWt;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
   void printConfig() {
     PRINTROOT("NAIVEANLSBPP constructor completed::"
@@ -103,7 +103,7 @@ class DistNaiveANLSBPP : public DistNMF1D<INPUTMATTYPE> {
         mpitic();  // nnlsH
         DISTPRINTINFO(PRINTMATINFO(WtW));
         DISTPRINTINFO(PRINTMATINFO(AcolstW));
-        BPPNNLS<MAT, VEC> subProblem2(WtW, AcolstW, true);
+        BPPNNLS<MAT, arma::vec> subProblem2(WtW, AcolstW, true);
         subProblem2.solveNNLS();
         this->m_Ht = subProblem2.getSolutionMatrix();
         fixNumericalError<MAT>(&(this->m_Ht), EPSILON_1EMINUS12, 0.0);
@@ -156,7 +156,7 @@ class DistNaiveANLSBPP : public DistNMF1D<INPUTMATTYPE> {
         this->time_stats.mm_duration(tempTime);
         this->reportTime(tempTime, "::ArowsH::");
         mpitic();  // nnlsW
-        BPPNNLS<MAT, VEC> subProblem1(HtH, ArowsH, true);
+        BPPNNLS<MAT, arma::vec> subProblem1(HtH, ArowsH, true);
         subProblem1.solveNNLS();
         this->m_Wt = subProblem1.getSolutionMatrix();
         fixNumericalError<MAT>(&(this->m_Wt), EPSILON_1EMINUS12, 0.0);

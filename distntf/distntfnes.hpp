@@ -148,7 +148,7 @@ class DistNTFNES : public DistAUNTF {
     m_acc_t.set(mode, Ht);
     modified_gram = this->global_gram;
     MPITIC;
-    VEC eigval = arma::eig_sym(modified_gram);
+    arma::vec eigval = arma::eig_sym(modified_gram);
     eig_time += MPITOC;
     L = eigval.max();
     mu = eigval.min();
@@ -199,8 +199,8 @@ class DistNTFNES : public DistAUNTF {
 
  public:
   DistNTFNES(const Tensor &i_tensor, const int i_k, algotype i_algo,
-             const UVEC &i_global_dims, const UVEC &i_local_dims,
-             const UVEC &i_nls_sizes, const UVEC &i_nls_idxs,
+             const arma::uvec &i_global_dims, const arma::uvec &i_local_dims,
+             const arma::uvec &i_nls_sizes, const arma::uvec &i_nls_idxs,
              const NTFMPICommunicator &i_mpicomm)
       : DistAUNTF(i_tensor, i_k, i_algo, i_global_dims, i_local_dims,
                   i_nls_sizes, i_nls_idxs, i_mpicomm),

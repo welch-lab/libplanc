@@ -17,8 +17,8 @@ class DistAOADMM : public DistAUNMF<INPUTMATTYPE> {
   MAT tempWtW;
   MAT tempAHtij;
   MAT tempWtAij;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
   // Dual Variables
   MAT U;

@@ -26,14 +26,14 @@ class DistNMFDriver {
   int m_argc;
   char **m_argv;
   int m_k;
-  UWORD m_globalm, m_globaln;
+  arma::uword m_globalm, m_globaln;
   std::string m_Afile_name;
   std::string m_outputfile_name;
   int m_num_it;
   int m_pr;
   int m_pc;
-  FVEC m_regW;
-  FVEC m_regH;
+  arma::fvec m_regW;
+  arma::fvec m_regH;
   double m_symm_reg;
   int m_symm_flag;
   bool m_adj_rand;
@@ -112,8 +112,8 @@ class DistNMFDriver {
     std::string rand_prefix("rand_");
     MPICommunicator mpicomm(this->m_argc, this->m_argv);
 #ifdef BUILD_SPARSE
-    SP_MAT A;
-    DistIO<SP_MAT> dio(mpicomm, m_distio, A);
+    arma::sp_mat A;
+    DistIO<arma::sp_mat> dio(mpicomm, m_distio, A);
 #else   // ifdef BUILD_SPARSE
     MAT A;
     DistIO<MAT> dio(mpicomm, m_distio, A);
@@ -130,8 +130,8 @@ class DistNMFDriver {
     // auto A = dio.A();
 
 #ifdef BUILD_SPARSE
-    SP_MAT Arows = dio.Arows();
-    SP_MAT Acols = dio.Acols();
+    arma::sp_mat Arows = dio.Arows();
+    arma::sp_mat Acols = dio.Acols();
 #else   // ifdef BUILD_SPARSE
     MAT Arows = dio.Arows();
     MAT Acols = dio.Acols();
@@ -214,7 +214,7 @@ class DistNMFDriver {
     arma::vec values(ss._idx[0].size());
 
     for (Pacoss_Int i = 0; i < values.size(); i++) values[i] = ss._val[i];
-    SP_MAT A(locations, values);
+    arma::sp_mat A(locations, values);
     A.resize(rowcomm->localRowCount(), colcomm->localRowCount());
 #else  // ifdef USE_PACOSS
 
@@ -225,8 +225,8 @@ class DistNMFDriver {
       MPI_Abort(MPI_COMM_WORLD, 1);
     }
 #ifdef BUILD_SPARSE
-    SP_MAT A;
-    DistIO<SP_MAT> dio(mpicomm, m_distio, A);
+    arma::sp_mat A;
+    DistIO<arma::sp_mat> dio(mpicomm, m_distio, A);
 
     if (mpicomm.rank() == 0) {
       INFO << "sparse case::sparsity::" << this->m_sparsity << std::endl;
@@ -268,7 +268,7 @@ class DistNMFDriver {
 #ifndef USE_PACOSS
 #ifdef BUILD_SPARSE
     if (m_nmfalgo == ANLSBPP && this->m_symm_reg < 0) {
-      DistHALS<SP_MAT> lrinitializer(A, W, H, mpicomm, this->m_num_k_blocks);
+      DistHALS<arma::sp_mat> lrinitializer(A, W, H, mpicomm, this->m_num_k_blocks);
       lrinitializer.num_iterations(4);
       lrinitializer.algorithm(HALS);
       lrinitializer.computeNMF();
@@ -417,56 +417,56 @@ class DistNMFDriver {
     switch (this->m_nmfalgo) {
       case MU:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistMU<SP_MAT> >();
+        callDistNMF2D<DistMU<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistMU<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case HALS:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistHALS<SP_MAT> >();
+        callDistNMF2D<DistHALS<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistHALS<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case ANLSBPP:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistANLSBPP<SP_MAT> >();
+        callDistNMF2D<DistANLSBPP<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistANLSBPP<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case NAIVEANLSBPP:
 #ifdef BUILD_SPARSE
-        callDistNMF1D<DistNaiveANLSBPP<SP_MAT> >();
+        callDistNMF1D<DistNaiveANLSBPP<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF1D<DistNaiveANLSBPP<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case AOADMM:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistAOADMM<SP_MAT> >();
+        callDistNMF2D<DistAOADMM<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistAOADMM<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case CPALS:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistALS<SP_MAT> >();
+        callDistNMF2D<DistALS<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistALS<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case GNSYM:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistGNSym<SP_MAT> >();
+        callDistNMF2D<DistGNSym<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistGNSym<MAT> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case R2:
 #ifdef BUILD_SPARSE
-        callDistNMF2D<DistR2<SP_MAT> >();
+        callDistNMF2D<DistR2<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
         callDistNMF2D<DistR2<MAT> >();
 #endif  // ifdef BUILD_SPARSE

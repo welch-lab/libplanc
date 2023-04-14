@@ -18,16 +18,16 @@ class DistNMF : public NMF<INPUTMATTYPE> {
   Pacoss_Communicator<double> *m_rowcomm;
   Pacoss_Communicator<double> *m_colcomm;
 #endif
-  UWORD m_ownedm;
-  UWORD m_ownedn;
-  UWORD m_globalm;
-  UWORD m_globaln;
+  arma::uword m_ownedm;
+  arma::uword m_ownedn;
+  arma::uword m_globalm;
+  arma::uword m_globaln;
   double m_globalsqnormA;
   DistNMFTime time_stats;
   uint m_compute_error;
   algotype m_algorithm;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
  public:
   /**

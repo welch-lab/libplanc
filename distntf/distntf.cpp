@@ -24,16 +24,16 @@ class DistNTF {
   std::string m_Afile_name;
   std::string m_outputfile_name;
   int m_num_it;
-  UVEC m_proc_grids;
-  FVEC m_regs;
+  arma::uvec m_proc_grids;
+  arma::fvec m_regs;
   algotype m_ntfalgo;
   double m_sparsity;
   uint m_compute_error;
   int m_num_k_blocks;
-  UVEC m_global_dims;
-  UVEC m_factor_local_dims;
-  UVEC m_nls_sizes;
-  UVEC m_nls_idxs;
+  arma::uvec m_global_dims;
+  arma::uvec m_factor_local_dims;
+  arma::uvec m_nls_sizes;
+  arma::uvec m_nls_idxs;
   bool m_enable_dim_tree;
   static const int kprimeoffset = 17;
 
@@ -84,15 +84,15 @@ class DistNTF {
     // TODO(ramkikannan): I was here. Need to modify the reallocations by
     // using localOwnedRowCount instead of m_globalm.
     // DistAUNTF(const Tensor &i_tensor, const int i_k, algotype i_algo,
-    //   const UVEC &i_global_dims,
-    //   const UVEC &i_local_dims,
+    //   const arma::uvec &i_global_dims,
+    //   const arma::uvec &i_local_dims,
     //   const NTFMPICommunicator &i_mpicomm)
     // this->m_factor_local_dims = this->m_global_dims / mpicomm.size();
     this->m_factor_local_dims = A.dimensions();
     int num_modes = A.dimensions().n_rows;
 
-    m_nls_sizes = arma::zeros<UVEC>(num_modes);
-    m_nls_idxs = arma::zeros<UVEC>(num_modes);
+    m_nls_sizes = arma::zeros<arma::uvec>(num_modes);
+    m_nls_idxs = arma::zeros<arma::uvec>(num_modes);
     // Calculate NLS sizes
     for (int i = 0; i < num_modes; i++) {
       int slice_size = mpicomm.slice_size(i);

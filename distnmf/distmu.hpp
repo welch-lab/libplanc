@@ -15,8 +15,8 @@ template <class INPUTMATTYPE>
 class DistMU : public DistAUNMF<INPUTMATTYPE> {
   MAT HWtW;
   MAT WHtH;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
  protected:
   /**

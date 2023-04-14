@@ -57,8 +57,8 @@ double powIter(const INPUTMATTYPE& A, int max_iter, double tol,
   }
 
   // Vector initialization
-  VEC localQ(local_n, arma::fill::randn);
-  VEC globalQ(global_n, arma::fill::zeros);
+  arma::vec localQ(local_n, arma::fill::randn);
+  arma::vec globalQ(global_n, arma::fill::zeros);
   MPITIC;
   MPI_Allgatherv(localQ.memptr(), local_n, MPI_DOUBLE, globalQ.memptr(), counts,
                  displs, MPI_DOUBLE, MPI_COMM_WORLD);
@@ -68,7 +68,7 @@ double powIter(const INPUTMATTYPE& A, int max_iter, double tol,
   timings->normalisation += MPITOC;
 
   // local variables
-  VEC z(local_m);
+  arma::vec z(local_m);
   double sigma = 1;
   double s2 = sigma;
   double epsilon;
@@ -118,16 +118,16 @@ double powIter(const INPUTMATTYPE& A, int max_iter, double tol,
   return sigma;
 }
 
-VEC maxk(VEC X, int k) {
-  VEC Xs = arma::sort(X, "descend");
+arma::vec maxk(arma::vec X, int k) {
+  arma::vec Xs = arma::sort(X, "descend");
   if (X.n_elem <= k) {
     return Xs;
   }
   return Xs.head(k);
 }
 
-UVEC maxk_idx(VEC X, int k) {
-  UVEC Xi = arma::sort_index(X, "descend");
+arma::uvec maxk_idx(arma::vec X, int k) {
+  arma::uvec Xi = arma::sort_index(X, "descend");
   if (X.n_elem <= k) {
     return Xi;
   }

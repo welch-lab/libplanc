@@ -44,9 +44,9 @@ namespace planc {
         auto b0 = sqrt(left(0,0));
         auto b1 = sqrt(left(1,1));
 
-        UVEC negs = find(any(G<0));
+        arma::uvec negs = find(any(G<0));
 
-        uv.each_col( [&,b0,b1](VEC& b) {
+        uv.each_col( [&,b0,b1](arma::vec& b) {
             if (b0*b(0) >= b1*b(1)) {
               b(1) = 0;
             } else {

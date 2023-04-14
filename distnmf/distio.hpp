@@ -46,8 +46,8 @@ class DistIO {
   static const int kalpha = 1;
   static const int kbeta = 0;
 #endif
-  IVEC rcounts;  // vector to hold row counts for uneven splits
-  IVEC ccounts;  // vector to hold column counts for uneven splits
+  arma::ivec rcounts;  // vector to hold row counts for uneven splits
+  arma::ivec ccounts;  // vector to hold column counts for uneven splits
 
   const iodistributions m_distio;
   /**
@@ -122,10 +122,10 @@ class DistIO {
         (*X).sprandn((*X).n_rows, (*X).n_cols, sparsity);
       }
     }
-    SP_MAT::iterator start_it = (*X).begin();
-    SP_MAT::iterator end_it = (*X).end();
+    arma::sp_mat::iterator start_it = (*X).begin();
+    arma::sp_mat::iterator end_it = (*X).end();
     if (adj_rand) {
-      for (SP_MAT::iterator it = start_it; it != end_it; ++it) {
+      for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
         double currentValue = (*it);
         (*it) = ceil(kalpha * currentValue + kbeta);
         if ((*it) < 0) (*it) = kbeta;
@@ -182,8 +182,8 @@ class DistIO {
 #ifndef BUILD_SPARSE
   /* normalization */
   void normalize(normtype i_normtype) {
-    ROWVEC globalnormA = arma::zeros<ROWVEC>(m_A.n_cols);
-    ROWVEC normc = arma::zeros<ROWVEC>(m_A.n_cols);
+    arma::rowvec globalnormA = arma::zeros<arma::rowvec>(m_A.n_cols);
+    arma::rowvec normc = arma::zeros<arma::rowvec>(m_A.n_cols);
     MATTYPE normmat = arma::zeros<MATTYPE>(m_A.n_rows, m_A.n_cols);
     switch (m_distio) {
       case ONED_ROW:
@@ -230,7 +230,7 @@ class DistIO {
    * Uses the pattern from the input matrix X but
    * the value is computed as low rank.
    */
-  void randomLowRank(const UWORD m, const UWORD n, const UWORD k,
+  void randomLowRank(const arma::uword m, const arma::uword n, const arma::uword k,
                      const int symm, const bool adj_rand, MATTYPE* X) {
     uint start_row = 0, start_col = 0;
     uint end_row = 0, end_col = 0;
@@ -291,12 +291,12 @@ class DistIO {
       Hrnd.randu();
     }
 #ifdef BUILD_SPARSE
-    SP_MAT::iterator start_it = (*X).begin();
-    SP_MAT::iterator end_it = (*X).end();
+    arma::sp_mat::iterator start_it = (*X).begin();
+    arma::sp_mat::iterator end_it = (*X).end();
     double tempVal = 0.0;
-    for (SP_MAT::iterator it = start_it; it != end_it; ++it) {
-      VEC Wrndi = vectorise(Wrnd.row(start_row + it.row()));
-      VEC Hrndj = Hrnd.col(start_col + it.col());
+    for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
+      arma::vec Wrndi = vectorise(Wrnd.row(start_row + it.row()));
+      arma::vec Hrndj = Hrnd.col(start_col + it.col());
       tempVal = dot(Wrndi, Hrndj);
       if (adj_rand) {
         (*it) = ceil(kalpha * tempVal + kbeta);
@@ -336,7 +336,7 @@ class DistIO {
     bool last_exist = false;
     double my_min_value = 0.0;
     double overall_min;
-    UWORD my_correct_nnz = 0;
+    arma::uword my_correct_nnz = 0;
     if (A.n_nonzero > 0) {
       my_min_value = A.values[0];
     }
@@ -349,9 +349,9 @@ class DistIO {
     // criteria
     try {
       if (A.n_nonzero > 0) {
-        SP_MAT::iterator start_it = A.begin();
-        SP_MAT::iterator end_it = A.end();
-        for (SP_MAT::iterator it = start_it; it != end_it; ++it) {
+        arma::sp_mat::iterator start_it = A.begin();
+        arma::sp_mat::iterator end_it = A.end();
+        for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
           if (it.row() < max_rows && it.col() < max_cols) {
             my_correct_nnz++;
             if (*it != 0 && my_min_value < *it) {
@@ -373,19 +373,19 @@ class DistIO {
       MPI_Allreduce(&my_min_value, &overall_min, 1, MPI_INT, MPI_MIN,
                     MPI_COMM_WORLD);
       arma::umat locs;
-      VEC vals;
+      arma::vec vals;
       DISTPRINTINFO("max_rows::" << max_rows << "::max_cols::" << max_cols
                                  << "::my_rows::" << my_rows << "::my_cols::"
                                  << my_cols << "::last_exist::" << last_exist
                                  << "::my_nnz::" << A.n_nonzero
                                  << "::my_correct_nnz::" << my_correct_nnz);
       locs = arma::zeros<arma::umat>(2, my_correct_nnz);
-      vals = arma::zeros<VEC>(my_correct_nnz);
+      vals = arma::zeros<arma::vec>(my_correct_nnz);
       if (A.n_nonzero > 0) {
-        SP_MAT::iterator start_it = A.begin();
-        SP_MAT::iterator end_it = A.end();
+        arma::sp_mat::iterator start_it = A.begin();
+        arma::sp_mat::iterator end_it = A.end();
         double idx = 0;
-        for (SP_MAT::iterator it = start_it; it != end_it; ++it) {
+        for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
           if (it.row() < max_rows && it.col() < max_cols) {
             locs(0, idx) = it.row();
             locs(1, idx) = it.col();
@@ -402,7 +402,7 @@ class DistIO {
         locs(1, my_correct_nnz - 1) = max_cols - 1;
         vals(my_correct_nnz - 1) = overall_min;
       }
-      SP_MAT A_new(locs, vals);
+      arma::sp_mat A_new(locs, vals);
       A.clear();
       A = A_new;
     } catch (const std::exception& e) {
@@ -437,8 +437,8 @@ class DistIO {
    * @param[in] adj_rand - Flag to run elementwise scaling on each entry.
    * @param[in] normalization - L2 column normalization of input matrix.
    */
-  void readInput(const std::string file_name, UWORD m = 0, UWORD n = 0,
-                 UWORD k = 0, double sparsity = 0, UWORD pr = 0, UWORD pc = 0,
+  void readInput(const std::string file_name, arma::uword m = 0, arma::uword n = 0,
+                 arma::uword k = 0, double sparsity = 0, arma::uword pr = 0, arma::uword pc = 0,
                  int symm = 0, bool adj_rand = false,
                  normtype i_normalization = NONE, int unpartitioned = 1) {
     // INFO << "readInput::" << file_name << "::" << distio << "::"
@@ -547,20 +547,20 @@ class DistIO {
         int scol = itersplit(n, pc, MPI_COL_RANK);
 #ifdef BUILD_SPARSE
         if(!unpartitioned){
-          MAT temp_ijv;
+          arma::mat temp_ijv;
           temp_ijv.load(sr.str(), arma::raw_ascii);
           if (temp_ijv.n_rows > 0 && temp_ijv.n_cols > 0) {
-            MAT vals(2, temp_ijv.n_rows);
-            MAT idxs_only = temp_ijv.cols(0, 1);
+            arma::mat vals(2, temp_ijv.n_rows);
+            arma::mat idxs_only = temp_ijv.cols(0, 1);
             arma::umat idxs = arma::conv_to<arma::umat>::from(idxs_only);
             arma::umat idxst = idxs.t();
             vals = temp_ijv.col(2);
-            SP_MAT temp_spmat(idxst, vals);
+            arma::sp_mat temp_spmat(idxst, vals);
             m_A = temp_spmat;
           } else {
             arma::umat idxs = arma::zeros<arma::umat>(2, 1);
-            VEC vals = arma::zeros<VEC>(1);
-            SP_MAT temp_spmat(idxs, vals);
+            arma::vec vals = arma::zeros<VEC>(1);
+            arma::sp_mat temp_spmat(idxs, vals);
             m_A = temp_spmat;
           }
           // m_A.load(sr.str(), arma::coord_ascii);
@@ -761,8 +761,8 @@ class DistIO {
   const MATTYPE& Acols() const { return m_Acols; }
   const MATTYPE& A() const { return m_A; }
   const MPICommunicator& mpicomm() const { return m_mpicomm; }
-  const IVEC& row_counts() const { return rcounts; }
-  const IVEC& col_counts() const { return ccounts; }
+  const arma::ivec& row_counts() const { return rcounts; }
+  const arma::ivec& col_counts() const { return ccounts; }
 };
 
 }  // namespace planc
@@ -771,8 +771,8 @@ class DistIO {
 void testDistIO(char argc, char* argv[]) {
   planc::MPICommunicator mpicomm(argc, argv);
 #ifdef BUILD_SPARSE
-  SP_MAT A;
-  planc::DistIO<SP_MAT> dio(mpicomm, ONED_DOUBLE, A);
+  arma::sp_mat A;
+  planc::DistIO<arma::sp_mat> dio(mpicomm, ONED_DOUBLE, A);
 #else
   MAT A;
   planc::DistIO<MAT> dio(mpicomm, ONED_DOUBLE, A);

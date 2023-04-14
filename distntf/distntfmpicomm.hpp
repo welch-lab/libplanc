@@ -11,15 +11,15 @@ class NTFMPICommunicator {
  private:
   unsigned int m_global_rank;
   unsigned int m_num_procs;
-  UVEC m_proc_grids;
+  arma::uvec m_proc_grids;
   MPI_Comm m_cart_comm;
   /// for mode communicators (*,...,p_n,...,*)
   MPI_Comm *m_fiber_comm;
   /// all communicators other than the given mode (p1,p2,..,p_n-1,*,p_n,..,p_M)
   MPI_Comm *m_slice_comm;
-  UVEC m_fiber_ranks;
-  UVEC m_slice_ranks;
-  UVEC m_slice_sizes;
+  arma::uvec m_fiber_ranks;
+  arma::uvec m_slice_ranks;
+  arma::uvec m_slice_sizes;
   std::vector<int> m_coords;
 
  public:
@@ -43,7 +43,7 @@ class NTFMPICommunicator {
         INFO << "Numprocs in fiber " << i << "::" << fiber_size << std::endl;
       }
     }
-    UVEC cooprint(MPI_CART_DIMS);
+    arma::uvec cooprint(MPI_CART_DIMS);
     for (unsigned int ii = 0; ii < MPI_CART_DIMS; ii++) {
       cooprint[ii] = m_coords[ii];
     }
@@ -65,7 +65,7 @@ class NTFMPICommunicator {
   /**
    * Constructor for setting up the nD grid communicators
    */
-  NTFMPICommunicator(int argc, char *argv[], const UVEC &i_dims)
+  NTFMPICommunicator(int argc, char *argv[], const arma::uvec &i_dims)
       : m_proc_grids(i_dims) {
     // Get the number of MPI processes
     MPI_Init(&argc, &argv);
@@ -94,7 +94,7 @@ class NTFMPICommunicator {
     std::vector<int> remainDims(MPI_CART_DIMS);
     for (unsigned int i = 0; i < remainDims.size(); i++) remainDims[i] = 1;
     // initialize the fiber ranks
-    m_slice_ranks = arma::zeros<UVEC>(MPI_CART_DIMS);
+    m_slice_ranks = arma::zeros<arma::uvec>(MPI_CART_DIMS);
     int current_slice_rank;
     for (unsigned int i = 0; i < MPI_CART_DIMS; i++) {
       remainDims[i] = 0;
@@ -104,7 +104,7 @@ class NTFMPICommunicator {
       m_slice_ranks[i] = current_slice_rank;
     }
     for (unsigned int i = 0; i < remainDims.size(); i++) remainDims[i] = 0;
-    m_fiber_ranks = arma::zeros<UVEC>(MPI_CART_DIMS);
+    m_fiber_ranks = arma::zeros<arma::uvec>(MPI_CART_DIMS);
     int current_fiber_rank;
     for (unsigned int i = 0; i < MPI_CART_DIMS; i++) {
       remainDims[i] = 1;
@@ -117,7 +117,7 @@ class NTFMPICommunicator {
     m_coords.resize(MPI_CART_DIMS, 0);
     MPI_Cart_coords(m_cart_comm, m_global_rank, MPI_CART_DIMS, &m_coords[0]);
     // Get the slice size
-    m_slice_sizes = arma::zeros<UVEC>(MPI_CART_DIMS);
+    m_slice_sizes = arma::zeros<arma::uvec>(MPI_CART_DIMS);
     for (unsigned int i = 0; i < MPI_CART_DIMS; i++) {
       m_slice_sizes[i] = m_num_procs / m_proc_grids[i];
     }
@@ -165,7 +165,7 @@ class NTFMPICommunicator {
   /// Returns the slice rank on a particular slice grid.
   int slice_rank(int i) const { return m_slice_ranks[i]; }
   /// Returns the process grid for which the communicators are setup
-  UVEC proc_grids() const { return this->m_proc_grids; }
+  arma::uvec proc_grids() const { return this->m_proc_grids; }
   /// Returns the global rank
   int rank() const { return m_global_rank; }
   int num_slices(int mode) const { return m_proc_grids[mode]; }

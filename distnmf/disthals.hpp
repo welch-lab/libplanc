@@ -25,12 +25,12 @@ class DistHALS : public DistAUNMF<INPUTMATTYPE> {
     for (unsigned int i = 0; i < this->k; i++) {
       // W(:,i) = max(W(:,i) * HHt_reg(i,i) + AHt(:,i) - W *
       // HHt_reg(:,i),epsilon);
-      VEC updWi = this->W.col(i) * this->HtH(i, i) +
+      arma::vec updWi = this->W.col(i) * this->HtH(i, i) +
                   ((this->AHtij.row(i)).t() - this->W * this->HtH.col(i));
 #ifdef MPI_VERBOSE
       DISTPRINTINFO("b4 fixNumericalError::" << endl << updWi);
 #endif  // ifdef MPI_VERBOSE
-      fixNumericalError<VEC>(&updWi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
+      fixNumericalError<arma::vec>(&updWi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
 #ifdef MPI_VERBOSE
       DISTPRINTINFO("after fixNumericalError::" << endl << updWi);
 #endif  // ifdef MPI_VERBOSE
@@ -64,12 +64,12 @@ class DistHALS : public DistAUNMF<INPUTMATTYPE> {
   void updateH() {
     for (unsigned int i = 0; i < this->k; i++) {
       // H(i,:) = max(H(i,:) + WtA(i,:) - WtW_reg(i,:) * H,epsilon);
-      VEC updHi = this->H.col(i) +
+      arma::vec updHi = this->H.col(i) +
                   ((this->WtAij.row(i)).t() - this->H * this->WtW.col(i));
 #ifdef MPI_VERBOSE
       DISTPRINTINFO("b4 fixNumericalError::" << endl << updHi);
 #endif  // ifdef MPI_VERBOSE
-      fixNumericalError<VEC>(&updHi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
+      fixNumericalError<arma::vec>(&updHi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
 #ifdef MPI_VERBOSE
       DISTPRINTINFO("after fixNumericalError::" << endl << updHi);
 #endif  // ifdef MPI_VERBOSE

@@ -14,7 +14,7 @@ class NumPyArray {
   int64_t m_word_size;
   bool m_fortran_order;
   int64_t m_modes;
-  UVEC m_dims;
+  arma::uvec m_dims;
   void parse_npy_header(FILE* fp) {
     char buffer[256];
     int64_t res = fread(buffer, sizeof(char), 11, fp);
@@ -48,7 +48,7 @@ class NumPyArray {
     } else {
       this->m_modes = std::count(str_shape.begin(), str_shape.end(), ',') + 1;
     }
-    this->m_dims = arma::zeros<UVEC>(m_modes);
+    this->m_dims = arma::zeros<arma::uvec>(m_modes);
 
     std::stringstream ss(str_shape);
     std::string s;

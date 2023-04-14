@@ -12,7 +12,7 @@ class NNLS {
     MATTYPE AtA;   // input matrix is mxn. Hence AtA is nxn.
     VECTYPE Atb;   // right hand side vector b is nx1. Hence Atb is nx1.
     MATTYPE AtB;   // multiple RHS B is mxk. Hence AtB is nxk.
-    UINT m, n, k;  // dimension of matrix.
+    unsigned int m, n, k;  // dimension of matrix.
     VECTYPE x;  // solution vector nx1;
     MATTYPE X;  // solution matrix nxk;
     // If true The A matrix is AtA and b vector is Atb.

@@ -33,8 +33,8 @@ class DistAUNTF {
   // communication related variables
   const NTFMPICommunicator &m_mpicomm;
   // NLS solve sizes
-  UVEC m_nls_sizes;
-  UVEC m_nls_idxs;
+  arma::uvec m_nls_sizes;
+  arma::uvec m_nls_idxs;
   // local ncp factors
   NCPFactors m_local_ncp_factors;
   NCPFactors m_local_ncp_factors_t;
@@ -60,11 +60,11 @@ class DistAUNTF {
   const unsigned int m_low_rank_k;
   const unsigned int m_modes;
   const algotype m_updalgo;
-  const UVEC m_global_dims;
-  const UVEC m_factor_local_dims;
+  const arma::uvec m_global_dims;
+  const arma::uvec m_factor_local_dims;
   unsigned int m_num_it;
   unsigned int current_mode;
-  FVEC m_regularizers;
+  arma::fvec m_regularizers;
   bool m_compute_error;
   bool m_enable_dim_tree;
   unsigned int m_current_it;
@@ -331,7 +331,7 @@ class DistAUNTF {
     factor_global_grams = new MAT[m_modes];
     factor_local_grams.zeros(this->m_low_rank_k, this->m_low_rank_k);
     global_gram.ones(this->m_low_rank_k, this->m_low_rank_k);
-    UWORD current_size = 0;
+    arma::uword current_size = 0;
     for (unsigned int i = 0; i < m_modes; i++) {
       current_size = TENSOR_LOCAL_NUMEL / TENSOR_LOCAL_DIM[i];
       if (!m_enable_dim_tree) {
@@ -428,8 +428,8 @@ class DistAUNTF {
 
  public:
   DistAUNTF(const Tensor &i_tensor, const int i_k, algotype i_algo,
-            const UVEC &i_global_dims, const UVEC &i_local_dims,
-            const UVEC &i_nls_sizes, const UVEC &i_nls_idxs,
+            const arma::uvec &i_global_dims, const arma::uvec &i_local_dims,
+            const arma::uvec &i_nls_sizes, const arma::uvec &i_nls_idxs,
             const NTFMPICommunicator &i_mpicomm)
       : m_mpicomm(i_mpicomm),
         m_nls_sizes(i_nls_sizes),
@@ -482,7 +482,7 @@ class DistAUNTF {
   /// Low Rank
   size_t rank() const { return this->m_low_rank_k; }
   /// L1 and L2 Regularization for every mode
-  void regularizers(const FVEC i_regs) { this->m_regularizers = i_regs; }
+  void regularizers(const arma::fvec i_regs) { this->m_regularizers = i_regs; }
   /// Sets whether to compute the error or not
   void compute_error(bool i_error) {
     this->m_compute_error = i_error;
@@ -490,7 +490,7 @@ class DistAUNTF {
         arma::ones<MAT>(this->m_low_rank_k, this->m_low_rank_k);
   }
   /// Returns the lambda of the NCP factors
-  VEC lambda() { return m_local_ncp_factors.lambda(); }
+  arma::vec lambda() { return m_local_ncp_factors.lambda(); }
   /// Returns the current outer iteration of the computeNTF
   int current_it() const { return this->m_current_it; }
   /// Returns the current error
@@ -586,7 +586,7 @@ class DistAUNTF {
       // product of left dimensions \approx product of right dimensions.
       size_t split_criteria = arma::prod(m_input_tensor.dimensions());
       split_criteria = std::round(std::sqrt(split_criteria));
-      UVEC temp_cum_prod = arma::cumprod(m_input_tensor.dimensions());
+      arma::uvec temp_cum_prod = arma::cumprod(m_input_tensor.dimensions());
       int split_mode = 0;
       while (temp_cum_prod(split_mode) < split_criteria) {
         split_mode++;
@@ -686,8 +686,8 @@ class DistAUNTF {
     // lambda - 2 * innerprod(X,F_kten),0))/init.nr_X;
     MPITIC;  // err compute
     hadamard_all_grams = global_gram % factor_global_grams[mode];
-    VEC local_lambda = m_local_ncp_factors.lambda();
-    ROWVEC temp_vec = local_lambda.t() * hadamard_all_grams;
+    arma::vec local_lambda = m_local_ncp_factors.lambda();
+    arma::rowvec temp_vec = local_lambda.t() * hadamard_all_grams;
     double sq_norm_model = arma::dot(temp_vec, local_lambda);
     // double sq_norm_model = arma::norm(hadamard_all_grams, "fro");
     // sum of the element-wise dot product between the local mttkrp and
@@ -735,10 +735,10 @@ class DistAUNTF {
     distmttkrp(mode);
     gram_hadamard(mode);
     hadamard_all_grams = global_gram % factor_global_grams[mode];
-    VEC local_lambda = m_local_ncp_factors.lambda();
+    arma::vec local_lambda = m_local_ncp_factors.lambda();
     MAT unnorm_factor =
         arma::diagmat(local_lambda) * new_factors_t.factor(mode);
-    ROWVEC temp_vec = local_lambda.t() * hadamard_all_grams;
+    arma::rowvec temp_vec = local_lambda.t() * hadamard_all_grams;
     double sq_norm_model = arma::dot(temp_vec, local_lambda);
     // double sq_norm_model = arma::norm(hadamard_all_grams, "fro");
     // sum of the element-wise dot product between the local mttkrp and

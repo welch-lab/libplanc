@@ -125,7 +125,7 @@ class NTFNES : public AUNTF {
     m_acc_t.set(mode, Ht);
     modified_gram = this->gram_without_one;
 
-    VEC eigval = arma::eig_sym(modified_gram);
+    arma::vec eigval = arma::eig_sym(modified_gram);
     L = eigval.max();
     mu = eigval.min();
     lambda = get_lambda(L, mu);

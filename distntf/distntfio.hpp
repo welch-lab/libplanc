@@ -33,22 +33,22 @@ class DistNTFIO {
   static const int kW_seed_idx = 1210873;
   static const int kalpha = 1;
   static const int kbeta = 0;
-  UVEC m_global_dims;
-  UVEC m_local_dims;
+  arma::uvec m_global_dims;
+  arma::uvec m_local_dims;
 
   /*
    * Uses the pattern from the input matrix X but
    * the value is computed as low rank.
    */
-  void randomLowRank(const UVEC i_global_dims, const UVEC i_local_dims,
-                     const UVEC i_start_rows, const UWORD i_k) {
+  void randomLowRank(const arma::uvec i_global_dims, const arma::uvec i_local_dims,
+                     const arma::uvec i_start_rows, const arma::uword i_k) {
     // start with the same seed_idx with the global dimensions
     // on all the MPI processor.
     NCPFactors global_factors(i_global_dims, i_k, false);
     global_factors.randu(kW_seed_idx);
     global_factors.normalize();
     NCPFactors local_factors(i_local_dims, i_k, false);
-    UWORD start_row, end_row;
+    arma::uword start_row, end_row;
     for (int i = 0; i < local_factors.modes(); i++) {
       start_row = i_start_rows(i);
       end_row = start_row + i_local_dims(i) - 1;
@@ -77,8 +77,8 @@ class DistNTFIO {
     // subscripts and extract those data from the global data.
 
     // Local_size = global_size/proc_grids
-    UVEC global_dims = m_A.dimensions();
-    UVEC local_dims = global_dims / this->m_mpicomm.proc_grids();
+    arma::uvec global_dims = m_A.dimensions();
+    arma::uvec local_dims = global_dims / this->m_mpicomm.proc_grids();
     size_t num_modes = m_A.modes();
     std::vector<std::vector<size_t>> idxs_for_mode;
     size_t current_start_idx, current_end_idx, num_idxs_for_mode;
@@ -88,7 +88,7 @@ class DistNTFIO {
       current_start_idx = MPI_FIBER_RANK(i) * local_dims(i);
       // current_end_idx = current_start_idx + local_dims(i);
       // num_idxs_for_mode = current_end_idx -  current_start_idx;
-      // UVEC idxs_current_mode = arma::linspace<UVEC>(current_start_idx,
+      // arma::uvec idxs_current_mode = arma::linspace<arma::uvec>(current_start_idx,
       //                          current_end_idx - 1,
       //                          num_idxs_for_mode);
       std::vector<size_t> idxs_current_mode(local_dims(i));
@@ -101,9 +101,9 @@ class DistNTFIO {
     std::vector<std::vector<size_t>> global_idxs =
         cartesian_product(idxs_for_mode);
     Tensor local_tensor(local_dims);
-    UVEC global_idxs_uvec = arma::zeros<UVEC>(global_idxs[0].size());
+    arma::uvec global_idxs_uvec = arma::zeros<arma::uvec>(global_idxs[0].size());
     for (size_t i = 0; i < global_idxs.size(); i++) {
-      global_idxs_uvec = arma::conv_to<UVEC>::from(global_idxs[i]);
+      global_idxs_uvec = arma::conv_to<arma::uvec>::from(global_idxs[i]);
       local_tensor.m_data[i] = m_A.at(global_idxs_uvec);
     }
     this->m_A = local_tensor;
@@ -157,8 +157,8 @@ class DistNTFIO {
       .bin file will be an mpi io file
       Read distributed tensor
   */
-  UVEC read_dist_tensor(const std::string filename,
-                        UVEC *start_idxs_uvec = NULL) {
+  arma::uvec read_dist_tensor(const std::string filename,
+                        arma::uvec *start_idxs_uvec = NULL) {
     // all processes reading the file_name.info file.
     std::string filename_no_extension =
         filename.substr(0, filename.find_last_of("."));
@@ -171,14 +171,14 @@ class DistNTFIO {
     // write modes
     ifs >> modes;
     // dimension of modes
-    // UVEC global_dims = arma::zeros<UVEC>(this->m_modes);
+    // arma::uvec global_dims = arma::zeros<arma::uvec>(this->m_modes);
     int *global_dims = new int[modes];
     int *local_dims = new int[modes];
     int *start_idxs = new int[modes];
-    this->m_local_dims = arma::zeros<UVEC>(modes);
-    this->m_global_dims = arma::zeros<UVEC>(modes);
-    UVEC tmp_start_idxs_uvec = arma::zeros<UVEC>(modes);
-    UVEC tmp_proc_grids = this->m_mpicomm.proc_grids();
+    this->m_local_dims = arma::zeros<arma::uvec>(modes);
+    this->m_global_dims = arma::zeros<arma::uvec>(modes);
+    arma::uvec tmp_start_idxs_uvec = arma::zeros<arma::uvec>(modes);
+    arma::uvec tmp_proc_grids = this->m_mpicomm.proc_grids();
     for (int i = 0; i < modes; i++) {
       ifs >> global_dims[i];
       this->m_global_dims[i] = global_dims[i];
@@ -257,7 +257,7 @@ class DistNTFIO {
     int *gsizes = new int[modes];
     int *lsizes = new int[modes];
     int *starts = new int[modes];
-    UVEC tmp_proc_grids = this->m_mpicomm.proc_grids();
+    arma::uvec tmp_proc_grids = this->m_mpicomm.proc_grids();
     for (int i = 0; i < modes; i++) {
       lsizes[i] = local_tensor.dimension(i);
       MPI_Allreduce(&lsizes[i], &gsizes[i], 1, MPI_INT, MPI_SUM,
@@ -325,8 +325,8 @@ class DistNTFIO {
    * If we are loading by file name we dont need distio flag.
    *
    */
-  void readInput(const std::string file_name, UVEC i_global_dims,
-                 UVEC i_proc_grids, UWORD k = 0, double sparsity = 0) {
+  void readInput(const std::string file_name, arma::uvec i_global_dims,
+                 arma::uvec i_proc_grids, arma::uword k = 0, double sparsity = 0) {
     // INFO << "readInput::" << file_name << "::" << distio << "::"
     //     << m << "::" << n << "::" << pr << "::" << pc
     //     << "::" << this->MPI_RANK << "::" << this->m_mpicomm.size() <<
@@ -334,8 +334,8 @@ class DistNTFIO {
     this->m_global_dims = i_global_dims;
     std::string rand_prefix("rand_");
     if (!file_name.compare(0, rand_prefix.size(), rand_prefix)) {
-      this->m_local_dims = arma::zeros<UVEC>(i_proc_grids.n_rows);
-      UVEC start_rows = arma::zeros<UVEC>(i_proc_grids.n_rows);
+      this->m_local_dims = arma::zeros<arma::uvec>(i_proc_grids.n_rows);
+      arma::uvec start_rows = arma::zeros<arma::uvec>(i_proc_grids.n_rows);
       // Calculate tensor local dimensions
       for (unsigned int mode = 0; mode < this->m_local_dims.n_rows; mode++) {
         int slice_num = this->m_mpicomm.slice_num(mode);
@@ -389,6 +389,6 @@ class DistNTFIO {
   void writeRandInput() {}
   const Tensor &A() const { return m_A; }
   const NTFMPICommunicator &mpicomm() const { return m_mpicomm; }
-  UVEC global_dims() const { return m_global_dims; }
+  arma::uvec global_dims() const { return m_global_dims; }
 };
 }  // namespace planc

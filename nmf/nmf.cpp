@@ -16,12 +16,12 @@ class NMFDriver {
   int m_argc;
   char **m_argv;
   int m_k;
-  UWORD m_m, m_n;
+  arma::uword m_m, m_n;
   std::string m_Afile_name;
   std::string m_outputfile_name;
   int m_num_it;
-  FVEC m_regW;
-  FVEC m_regH;
+  arma::fvec m_regW;
+  arma::fvec m_regH;
   double m_symm_reg;
   int m_symm_flag;
   bool m_adj_rand;
@@ -46,9 +46,9 @@ class NMFDriver {
   template <class NMFTYPE>
   void callNMF() {
 #ifdef BUILD_SPARSE
-    SP_MAT A;
+    arma::sp_mat A;
 #else
-    AMAT A;
+    arma::mat A;
 #endif
 
     // Generate/Read data matrix
@@ -76,41 +76,41 @@ class NMFDriver {
       if (type == "uniform") {
         if (this->m_symm_flag) {
           double sp = 0.5 * this->m_sparsity;
-          A = arma::sprandu<SP_MAT>(this->m_m, this->m_n, sp);
+          A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n, sp);
           A = 0.5 * (A + A.t());
         } else {
-          A = arma::sprandu<SP_MAT>(this->m_m, this->m_n,
+          A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
               this->m_sparsity);
         }
       } else if (type == "normal") {
         if (this->m_symm_flag) {
           double sp = 0.5 * this->m_sparsity;
-          A = arma::sprandn<SP_MAT>(this->m_m, this->m_n, sp);
+          A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n, sp);
           A = 0.5 * (A + A.t());
         } else {
-          A = arma::sprandn<SP_MAT>(this->m_m, this->m_n,
+          A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n,
               this->m_sparsity);
         }
       } else if (type == "lowrank") {
         if (this->m_symm_flag) {
           double sp = 0.5 * this->m_sparsity;
-          SP_MAT mask = arma::sprandu<SP_MAT>(this->m_m, this->m_n,
+          arma::sp_mat mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
                           sp);
           mask = 0.5 * (mask + mask.t());
           mask = arma::spones(mask);
-          AMAT Wtrue = arma::randu(this->m_m, this->m_k);
-          A = SP_MAT(mask % (Wtrue * Wtrue.t()));
+          arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
+          A = arma::sp_mat(mask % (Wtrue * Wtrue.t()));
 
           // Free auxiliary space
           Wtrue.clear();
           mask.clear();
         } else {
-          SP_MAT mask = arma::sprandu<SP_MAT>(this->m_m, this->m_n,
+          arma::sp_mat mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
                           this->m_sparsity);
           mask = arma::spones(mask);
-          AMAT Wtrue = arma::randu(this->m_m, this->m_k);
-          AMAT Htrue = arma::randu(this->m_k, this->m_n);
-          A = SP_MAT(mask % (Wtrue * Htrue));
+          arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
+          arma::mat Htrue = arma::randu(this->m_k, this->m_n);
+          A = arma::sp_mat(mask % (Wtrue * Htrue));
 
           // Free auxiliary space
           Wtrue.clear();
@@ -119,9 +119,9 @@ class NMFDriver {
         }
       }
       // Adjust and project non-zeros
-      SP_MAT::iterator start_it = A.begin();
-      SP_MAT::iterator end_it = A.end();
-      for (SP_MAT::iterator it = start_it; it != end_it; ++it) {
+      arma::sp_mat::iterator start_it = A.begin();
+      arma::sp_mat::iterator end_it = A.end();
+      for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
         double curVal = (*it);
         if (this->m_adj_rand) {
           (*it) = ceil(kalpha * curVal + kbeta);
@@ -131,29 +131,29 @@ class NMFDriver {
 #else
       if (type == "uniform") {
         if (this->m_symm_flag) {
-          A = arma::randu<AMAT>(this->m_m, this->m_n);
+          A = arma::randu<arma::mat>(this->m_m, this->m_n);
           A = 0.5 * (A + A.t());
         } else {
-          A = arma::randu<AMAT>(this->m_m, this->m_n);
+          A = arma::randu<arma::mat>(this->m_m, this->m_n);
         }
       } else if (type == "normal") {
         if (this->m_symm_flag) {
-          A = arma::randn<AMAT>(this->m_m, this->m_n);
+          A = arma::randn<arma::mat>(this->m_m, this->m_n);
           A = 0.5 * (A + A.t());
         } else {
-          A = arma::randn<AMAT>(this->m_m, this->m_n);
+          A = arma::randn<arma::mat>(this->m_m, this->m_n);
         }
         A.elem(find(A < 0)).zeros();
       } else {
         if (this->m_symm_flag) {
-          AMAT Wtrue = arma::randu<AMAT>(this->m_m, this->m_k);
+          arma::mat Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
           A = Wtrue * Wtrue.t();
 
           // Free auxiliary variables
           Wtrue.clear();
         } else {
-          AMAT Wtrue = arma::randu<AMAT>(this->m_m, this->m_k);
-          AMAT Htrue = arma::randu<AMAT>(this->m_k, this->m_n);
+          arma::mat Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
+          arma::mat Htrue = arma::randu<arma::mat>(this->m_k, this->m_n);
           A = Wtrue * Htrue;
 
           // Free auxiliary variables
@@ -186,8 +186,8 @@ class NMFDriver {
 
     // Set parameters and call NMF
     arma::arma_rng::set_seed(this->m_initseed);
-    AMAT W = arma::randu<AMAT>(this->m_m, this->m_k);
-    AMAT H = arma::randu<AMAT>(this->m_n, this->m_k);
+    arma::mat W = arma::randu<arma::mat>(this->m_m, this->m_k);
+    arma::mat H = arma::randu<arma::mat>(this->m_n, this->m_k);
     if (this->m_symm_flag) {
       double meanA = arma::mean(arma::mean(A));
       H = 2 * std::sqrt(meanA / this->m_k) * H;
@@ -275,37 +275,37 @@ class NMFDriver {
     switch (this->m_nmfalgo) {
       case MU:
 #ifdef BUILD_SPARSE
-        callNMF<MUNMF<SP_MAT> >();
+        callNMF<MUNMF<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
-        callNMF<MUNMF<AMAT> >();
+        callNMF<MUNMF<arma::mat> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case HALS:
 #ifdef BUILD_SPARSE
-        callNMF<HALSNMF<SP_MAT> >();
+        callNMF<HALSNMF<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
-        callNMF<HALSNMF<AMAT> >();
+        callNMF<HALSNMF<arma::mat> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case ANLSBPP:
 #ifdef BUILD_SPARSE
-        callNMF<BPPNMF<SP_MAT> >();
+        callNMF<BPPNMF<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
-        callNMF<BPPNMF<AMAT> >();
+        callNMF<BPPNMF<arma::mat> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case AOADMM:
 #ifdef BUILD_SPARSE
-        callNMF<AOADMMNMF<SP_MAT> >();
+        callNMF<AOADMMNMF<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
-        callNMF<AOADMMNMF<AMAT> >();
+        callNMF<AOADMMNMF<arma::mat> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       case GNSYM:
 #ifdef BUILD_SPARSE
-        callNMF<GNSYMNMF<SP_MAT> >();
+        callNMF<GNSYMNMF<arma::sp_mat> >();
 #else   // ifdef BUILD_SPARSE
-        callNMF<GNSYMNMF<AMAT> >();
+        callNMF<GNSYMNMF<arma::mat> >();
 #endif  // ifdef BUILD_SPARSE
         break;
       default:
