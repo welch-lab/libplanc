@@ -122,7 +122,7 @@
         "MINGW64_ROOT": "C:/msys64/clang64",
         "INCLUDE": "$penv{INCLUDE};C:/msys64/clang64/include"
       },
-      "cmakeExecutable": "C:/msys64/ucrt64/bin/cmake.exe",
+      "cmakeExecutable": "C:/msys64/clang64/bin/cmake.exe",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "C:/msys64/clang64/bin/clang.exe",
