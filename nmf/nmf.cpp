@@ -19,6 +19,8 @@ class NMFDriver {
   arma::uword m_m, m_n;
   std::string m_Afile_name;
   std::string m_outputfile_name;
+  std::string m_w_init_file_name;
+  std::string m_h_init_file_name;
   int m_num_it;
   arma::fvec m_regW;
   arma::fvec m_regH;
@@ -53,8 +55,7 @@ class NMFDriver {
 
     // Generate/Read data matrix
     double t2;
-    if (!this->m_Afile_name.empty() &&
-      !this->m_Afile_name.compare(this->m_Afile_name.size() - 4, 4, "rand")) {
+    if (!this->m_Afile_name.empty() ) {
       tic();
 #ifdef BUILD_SPARSE
       A.load(this->m_Afile_name, arma::coord_ascii);
@@ -186,8 +187,17 @@ class NMFDriver {
 
     // Set parameters and call NMF
     arma::arma_rng::set_seed(this->m_initseed);
-    arma::mat W = arma::randu<arma::mat>(this->m_m, this->m_k);
-    arma::mat H = arma::randu<arma::mat>(this->m_n, this->m_k);
+    arma::mat W;
+    arma::mat H;
+    if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty()) {
+      W.load(m_w_init_file_name, arma::coord_ascii);
+      H.load(m_h_init_file_name, arma::coord_ascii);
+      this->m_k = W.n_cols;
+    }
+    else {
+    W = arma::randu<arma::mat>(this->m_m, this->m_k);
+    H = arma::randu<arma::mat>(this->m_n, this->m_k);
+    }
     if (this->m_symm_flag) {
       double meanA = arma::mean(arma::mean(A));
       H = 2 * std::sqrt(meanA / this->m_k) * H;
@@ -198,7 +208,7 @@ class NMFDriver {
       }
     }
 
-    NMFTYPE nmfAlgorithm(A, W, H);
+    NMFTYPE nmfAlgorithm(A.t(), W, H);
     nmfAlgorithm.num_iterations(this->m_num_it);
     nmfAlgorithm.symm_reg(this->m_symm_reg);
     nmfAlgorithm.updalgo(this->m_nmfalgo);

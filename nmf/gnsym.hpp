@@ -156,7 +156,7 @@ class GNSYMNMF : public NMF<T> {
       stale_matmul = false;
       err_matmuls++;
     }
-    
+
     this->normH = sqrt(arma::trace(HtH));
     double tAHHt = arma::trace(AHt * this->H);
     double tHtHHtH = arma::trace(HtH * HtH);
@@ -167,9 +167,9 @@ class GNSYMNMF : public NMF<T> {
   void printObjective(const int itr) {
     double err = (this->fit_err_sq > 0)? sqrt(this->fit_err_sq) : this->normA;
     INFO << "Completed it = " << itr << std::endl;
-    INFO << "objective::" << this->objective_err 
-         << "::squared error::" << this->fit_err_sq << std::endl 
-         << "error::" << err 
+    INFO << "objective::" << this->objective_err
+         << "::squared error::" << this->fit_err_sq << std::endl
+         << "error::" << err
          << "::relative error::" << err / this->normA << std::endl;
     INFO << "H frobenius norm::" << this->normH << std::endl;
   }
@@ -202,10 +202,10 @@ class GNSYMNMF : public NMF<T> {
       Pk = grad;
       Dt.zeros();
       double rsold = arma::accu(grad % grad);
-
+      #ifdef _VERBOSE
       INFO << "it=" << currentIteration
            << "::CG intial residual::" << rsold << std::endl;
-
+      #endif
       // Enter CG iterations only if residual is large
       if (rsold > cg_tol) {
         // for k = 1,2,...
@@ -224,10 +224,10 @@ class GNSYMNMF : public NMF<T> {
 
           // beta_k = r_{k+1}^T r_{k+1} / r_k^T r_k
           double rsnew = arma::accu(grad % grad);
-
+          #ifdef _VERBOSE
           INFO << "it=" << currentIteration << "::CG iter::" << cgiter
                << "::CG residual::" << rsnew << std::endl;
-
+          #endif
           // Stopping criteria
           if (rsnew < cg_tol)
             break;
@@ -248,12 +248,16 @@ class GNSYMNMF : public NMF<T> {
           [](arma::mat::elem_type &val) { val = val > 0.0 ? val : 0.0; });
       stale_matmul = true;
       stale_gram = true;
-
+      #ifdef _VERBOSE
       INFO << "Completed It (" << currentIteration << "/"
            << this->num_iterations() << ")"
            << " time =" << toc() << std::endl;
+      #endif
       this->computeObjectiveError();
+
+      #ifdef _VERBOSE
       this->printObjective(currentIteration);
+      #endif
       currentIteration++;
     }
   }
