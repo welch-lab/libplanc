@@ -19,7 +19,7 @@ if(CMAKE_BUILD_SPARSE)
 else()
   set(DENSE_OR_SPARSE dense)
 endif()
-add_executable(${DENSE_OR_SPARSE}_nmf nmf.cpp)
+add_executable(${DENSE_OR_SPARSE}_nmf nmf.cpp "inmf.cpp")
 
 target_link_libraries(${DENSE_OR_SPARSE}_nmf ${NMFLIB_LIBS})
 install(TARGETS ${DENSE_OR_SPARSE}_nmf
