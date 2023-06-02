@@ -44,9 +44,9 @@ namespace planc {
 
         T makeB_solveH(int i) { // call in constructor
             T* Eptr = Ei[i].get();
-            arma::sp_mat B_H(2 * this->m, this->ncol_E[i]);
+            T B_H(2 * this->m, this->ncol_E[i]);
             // Copy the values from E to the top half of B_H
-            B_H.rows(0, this->m) = &Eptr;
+            B_H.rows(0, this->m) = *Eptr;
             return B_H;
         }
 
@@ -70,7 +70,7 @@ namespace planc {
             };
             this->lambda = lambda;
             this->sqrtLambda = sqrt(lambda); //TODO
-            //TODO implement
+            //TODO implement common tasks i.e. norm, reg, etc
         }
     };
 
