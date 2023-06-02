@@ -1,6 +1,8 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies": [
     "armadillo",
     "getopt"
-  ]
+  ],
+  "builtin-baseline": "84df5613f71eda8a73ab08dc3041f3af7103a5b2"
 }

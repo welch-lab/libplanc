@@ -59,7 +59,7 @@ namespace planc {
         }
     public:
         INMF(std::vector<std::unique_ptr<T>> &Ei,
-             arma::uword k) {
+             arma::uword k, double lambda) {
             Ei.swap(this->Ei);
             this->k = k;
             this->m = Ei[0]->n_rows;
@@ -68,8 +68,8 @@ namespace planc {
                 arma::mat* E = it->get();
                 this->ncol_E.push_back(E->n_cols);
             };
-            this->lambda = 0; //TODO
-            this->sqrtLambda = 0; //TODO
+            this->lambda = lambda;
+            this->sqrtLambda = sqrt(lambda); //TODO
             //TODO implement
         }
     };
