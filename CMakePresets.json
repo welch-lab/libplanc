@@ -39,8 +39,12 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/g++",
+        "CMAKE_C_COMPILER": "/opt/homebrew/bin/gcc",
+        "CMAKE_CXX_FLAGS": "-flto"
       },
       "condition": {
         "type": "equals",
@@ -58,10 +62,7 @@
       "inherits": "macos-debug",
       "displayName": "macOS Release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/g++",
-        "CMAKE_C_COMPILER": "/opt/homebrew/bin/gcc",
-        "CMAKE_CXX_FLAGS": "-flto"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
