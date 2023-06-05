@@ -5,3 +5,4 @@
 *.dep
 .vs/*
 out/*
+vcpkg_installed/*
