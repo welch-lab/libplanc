@@ -19,6 +19,7 @@ namespace planc {
         std::vector<std::unique_ptr<arma::mat>> Vi;  // each of size mxk
         std::unique_ptr<arma::mat> W;                // mxk
         double lambda, sqrtLambda, objective_err;
+        bool cleared;
         // std::vector<arma::mat> C_solveH;//(2*m, k);
         // T B_solveH;//(2*m, n_i);
         // std::vector<arma::mat> C_solveV;//(2*n_i, k);
@@ -71,13 +72,12 @@ namespace planc {
             C_solveWptr->rows(start, end) = *Hptr;
         }
 
-        void updateB_solveH(int i) { // call in constructor
+        void updateB_solveH(unsigned int i, T* E) { // call in constructor
             // TODO: Whether to take `i` as argument or directly take Ei[i]
-            T* Eptr = Ei[i].get();
             T B_H(2 * this->m, this->ncol_E[i]);
             // Copy the values from E to the top half of B_H
-            B_H.rows(0, this->m) = *Eptr;
-            this->B_solveH.push_back(std::make_unique<T>(B_H));
+            B_H.rows(0, this->m - 1) = *E;
+            B_solveH.push_back(std::make_unique<T>(B_H));
         }
 
         void updateB_solveV(int i) {
@@ -134,23 +134,22 @@ namespace planc {
             this->objective_err = this->objective();
         }
     public:
-        INMF(std::vector<std::unique_ptr<T>> &Ei,
-             arma::uword k, double lambda) {
-            Ei.swap(this->Ei);
+        INMF(std::vector<std::unique_ptr<T>>& Ei,
+            arma::uword k, double lambda) {
             this->k = k;
-            this->m = Ei[0]->n_rows;
+            this->m = Ei[0].get()->n_rows;
             this->nMax = 0;
             this->nSum = 0;
-            for (typename std::vector<std::unique_ptr<T>>::iterator it = Ei.begin(); it != Ei.end(); ++it)
+            for (unsigned int i = 0; i < Ei.size(); ++i)
             {
-                T* E = it->get();
+                T* E = Ei[i].get();
                 this->ncol_E.push_back(E->n_cols);
                 if (E->n_cols > this->nMax) {
                     this->nMax = E->n_cols;
                 }
                 this->nSum += E->n_cols;
                 this->nDatasets++;
-                this->updateB_solveH(it - Ei.begin());
+                updateB_solveH(i, E);
                 // push random initialized H, V, W according to the size of Ei
 
             };
@@ -162,6 +161,30 @@ namespace planc {
             this->C_solveW = arma::zeros(this->nSum, this->k);
             this->B_solveV = arma::zeros<T>(2 * this->nMax, this->m);
             this->B_solveW = arma::zeros<T>(this->nSum, this->m);
+        };
+        ~INMF() { clear(); }
+        void clear() {
+            if (!this->cleared) {
+                this->C_solveH.clear();
+                this->C_solveV.clear();
+                this->C_solveW.clear();
+                this->B_solveW.clear();
+                this->B_solveV.clear();
+                for (unsigned int i = 0; i < B_solveH.size(); ++i) {
+                    B_solveH[i].reset();
+                }
+                for (unsigned int i = 0; i < Ei.size(); ++i) {
+                    Ei[i].reset();
+                }
+                for (unsigned int i = 0; i < Hi.size(); ++i) {
+                    Hi[i].reset();
+                }
+                for (unsigned int i = 0; i < Vi.size(); ++i) {
+                    Vi[i].reset();
+                }
+                this->W.reset();
+            }
+            this->cleared = true;
         }
     };
 

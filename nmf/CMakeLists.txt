@@ -21,6 +21,8 @@ else()
 endif()
 add_executable(${DENSE_OR_SPARSE}_nmf nmf.cpp)
 add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
+target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
+add_compile_options(-O0)
 
 target_link_libraries(${DENSE_OR_SPARSE}_nmf ${NMFLIB_LIBS})
 target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
