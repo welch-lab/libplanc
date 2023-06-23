@@ -73,17 +73,17 @@ class NMF {
    * param[in] regularization as a vector
    * param[out] Gram matrix
    */
-  void applyReg(const FVEC &reg, AMAT *AtA) {
+  void applyReg(const arma::fvec &reg, arma::mat *AtA) {
     // Frobenius norm regularization
     if (reg(0) > 0) {
-      AMAT identity = arma::eye<AMAT>(this->k, this->k);
+      arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
       float lambda_l2 = reg(0);
       (*AtA) = (*AtA) + 2 * lambda_l2 * identity;
     }
 
     // L1 - norm regularization
     if (reg(1) > 0) {
-      AMAT onematrix = arma::ones<AMAT>(this->k, this->k);
+      arma::mat onematrix = arma::ones<arma::mat>(this->k, this->k);
       float lambda_l1 = reg(1);
       (*AtA) = (*AtA) + 2 * lambda_l1 * onematrix;
     }
@@ -109,7 +109,7 @@ class NMF {
     // L1 - norm regularization
     if (reg(1) > 0)
     {
-      arma::mat onematrix = arma::ones<amra::mat>(this->k, this->k);
+      arma::mat onematrix = arma::ones<arma::mat>(this->k, this->k);
       float lambda_l1 = reg(1);
       (*AtA) = (*AtA) - (lambda_l1 * onematrix);
     }
@@ -139,7 +139,8 @@ class NMF {
    * This function removes the regularization for error and objective
    * calculations.
    */
-  void removeSymmetricReg(double sym_reg, MAT *lhs, MAT *fac, MAT *rhs) {
+  void removeSymmetricReg(double sym_reg, arma::mat *lhs, arma::mat *fac, arma::mat *rhs)
+  {
     if (sym_reg > 0) {
       arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
       (*lhs) = (*lhs) - (sym_reg * identity);

@@ -66,7 +66,7 @@ class ParseCommandLine {
 
   // distjointnmf values
   // grid size for the connection matrices (cpr x cpc)
-  UVEC m_conn_grids;
+  arma::uvec m_conn_grids;
   int m_cpr;
   int m_cpc;
 
