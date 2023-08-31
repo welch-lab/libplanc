@@ -7,9 +7,11 @@
 #include <memory>
 #include "utils.hpp"
 
+#define INMF_CHUNK_SIZE 1000
+
 namespace planc {
 
-    template <class T>
+    template <typename T>
     class INMF {
     protected:
         arma::uword m, k, nDatasets, nMax, nSum;
@@ -23,113 +25,196 @@ namespace planc {
         std::unique_ptr<arma::mat> WT;                // kxm
         double lambda, sqrtLambda, objective_err;
         bool cleared;
-        // std::vector<arma::mat> C_solveH;//(2*m, k);
-        arma::mat B_solveH;//(2*m, n_i);
-        // std::vector<arma::mat> C_solveV;//(2*n_i, k);
-        // std::vector<std::unique_ptr<T>> B_solveV; //(2*n_i, m);
-        // arma::mat C_solveW;
-        // T B_solveW;
-        arma::mat C_solveH; //(2*m, k);
-        // std::vector<std::unique_ptr<T>> B_solveH;    //(2*m, n_i);
-        arma::mat C_solveV; //(2*n_max, k);
-        // arma::mat B_solveV;         //(2*n_max, m);
-        arma::mat C_solveW; //(nSum, k)
-        // arma::mat B_solveW;         //(nSum, m)
-        // arma::mat B_solveH_chunk; //(2*m, CHUNK_SIZE);
-// #ifdef CMAKE_BUILD_SPARSE
-//         arma::sp_mat B_solveW_i; //(this->n, this->m);
-// #else
-//         arma::mat B_solveW_i;   //(this->n, this->m); /// At(nxm) - HV(nxm);
-// #endif
 
-        void updateC_solveH(int i) {
-            // Execute in constructor and after each update of W
+        double computeObjectiveError() {
+            tic();
+#ifdef _VERBOSE
+            std::cout << "--calc  obj--  ";
+#endif
+            double obj = 0;
             arma::mat* Wptr = this->W.get();
-            arma::mat* Vptr = this->Vi[i].get();
-            this->C_solveH.rows(0, this->m - 1) = *Wptr + *Vptr;
-            this->C_solveH.rows(this->m, 2 * this->m - 1) = sqrtLambda * *Vptr;
-        }
-
-        void updateC_solveV(int i) {
-            arma::mat* Hptr = this->Hi[i].get();
-            this->C_solveV.rows(0, this->ncol_E[i] - 1) = *Hptr;
-            this->C_solveV.rows(this->ncol_E[i], 2 * this->ncol_E[i] - 1) = sqrtLambda * *Hptr;
-        }
-
-        void updateC_solveW(int i) {
-            // Only update slices of C_solveW that correspond to Hi[i]
-            arma::mat* Hptr = this->Hi[i].get();
-            unsigned int start = 0, end;
-            // accumulate the number of columns of Ei up to i
-            for (unsigned int j = 0; j < i; ++j) {
-                start += this->ncol_E[j];
-            }
-            end = start + this->ncol_E[i] - 1;
-            this->C_solveW.rows(start, end) = *Hptr;
-        }
-
-        // void updateB_solveH(T* E) {
-        //     std::unique_ptr<T> B_H;
-        //     B_H = std::unique_ptr<T>(new T(2 * this->m, E->n_cols));
-        //     // Copy the values from E to the top half of B_H
-        //     B_H->rows(0, this->m - 1) = *E;
-        //     B_solveH.push_back(std::move(B_H));
-        // }
-
-        // void updateB_solveV(int i) {
-        //     T* Eptr = this->Ei[i].get();
-        //     arma::mat* Wptr = W.get();
-        //     arma::mat* Hptr = this->Hi[i].get();
-        //     unsigned int dataSize = this->ncol_E[i];
-        //     this->B_solveV.rows(0, dataSize - 1) = Eptr->t() - *Hptr * Wptr->t();
-        //     this->B_solveV.rows(dataSize, 2 * dataSize - 1) = arma::zeros<T>(dataSize, this->m);
-        // }
-
-        // void updateB_solveW(int i) {
-        //     T* Eptr = this->Ei[i].get();
-        //     arma::mat* Hptr = this->Hi[i].get();
-        //     arma::mat* Vptr = this->Vi[i].get();
-        //     unsigned int start = 0, end;
-        //     // accumulate the number of columns of Ei up to i
-        //     for (unsigned int j = 0; j < i; ++j) {
-        //         start += this->ncol_E[j];
-        //     }
-        //     end = start + this->ncol_E[i] - 1;
-        //     this->B_solveW.rows(start, end) = Eptr->t() - *Hptr * Vptr->t();
-        // }
-
-        double objective() {
-            // Calculate the objective function
-            double obj = 0, n1, n2;
-            // arma::mat* Wptr = this->W.get();
-            arma::mat* WTptr = this->WT.get();
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
+                arma::uword dataSize = this->ncol_E[i];
                 T* Eptr = this->Ei[i].get();
                 arma::mat* Hptr = this->Hi[i].get();
-                arma::mat* VTptr = this->ViT[i].get();
-                // TODO: Perhaps we can also write this part in chunks to save memory
-                arma::mat diff = *Hptr * (*VTptr + *WTptr) - Eptr->t();
-                n1 = arma::norm<arma::mat>(diff, "fro");
-                n1 *= n1;
-                obj += n1;
-                n2 = arma::norm<arma::mat>(*Hptr * *VTptr, "fro");
-                n2 *= n2;
-                obj += this->lambda * n2;
+                arma::mat* Vptr = this->Vi[i].get();
+                unsigned int numChunks = dataSize / INMF_CHUNK_SIZE;
+                if (numChunks * INMF_CHUNK_SIZE < dataSize) numChunks++;
+#pragma omp parallel for schedule(auto)
+                for (unsigned int j = 0; j < numChunks; ++j) {
+                    unsigned int spanStart = j * INMF_CHUNK_SIZE;
+                    unsigned int spanEnd = (j + 1) * INMF_CHUNK_SIZE - 1;
+                    double norm;
+                    if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;
+                    arma::mat errMat(this->m, spanEnd - spanStart + 1);
+                    errMat = (*Vptr + *Wptr) * arma::mat(Hptr->t()).cols(spanStart, spanEnd);
+                    errMat -= Eptr->cols(spanStart, spanEnd);
+                    norm = arma::norm<arma::mat>(errMat, "fro");
+                    norm *= norm;
+                    obj += norm;
+
+                    errMat = *Vptr * arma::mat(Hptr->t()).cols(spanStart, spanEnd);
+                    norm = arma::norm<arma::mat>(errMat, "fro");
+                    norm *= norm;
+                    obj += this->lambda * norm;
+                }
             }
+#ifdef _VERBOSE
+            std::cout << toc() << " sec" << std::endl;
+#endif
             return obj;
         }
 
-        void initHWV() {
-            // Initialize H, W, V
+        void constructObject(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, bool makeTranspose) {
+            this->Ei = std::move(Ei);
+            this->k = k;
+            this->m = this->Ei[0].get()->n_rows;
+            this->nMax = 0;
+            this->nSum = 0;
+            this->nDatasets = 0;
+#ifdef _VERBOSE
+            std::cout << "k=" << k << "; m=" << m << std::endl;
+#endif
+            for (unsigned int i = 0; i < this->Ei.size(); ++i)
+            {
+                T* E = this->Ei[i].get();
+                if (makeTranspose) {
+                    T ET = E->t();
+                    std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
+                    this->EiT.push_back(std::move(ETptr));
+                }
+                this->ncol_E.push_back(E->n_cols);
+                if (E->n_cols > this->nMax) {
+                    this->nMax = E->n_cols;
+                }
+                this->nSum += E->n_cols;
+                this->nDatasets++;
+            };
+#ifdef _VERBOSE
+            std::cout << "nMax=" << this->nMax << "; nSum=" << this->nSum << std::endl;
+            std::cout << "nDatasets=" << this->nDatasets << std::endl;
+#endif
+            // this->initHWV();
+            this->lambda = lambda;
+            this->sqrtLambda = sqrt(lambda); //TODO
+            //TODO implement common tasks i.e. norm, reg, etc
+        }
+
+        void checkK() {
+            for (unsigned int i = 0; i < this->nDatasets; ++i) {
+                if (this->k != this->Hi[i]->n_cols) {
+                    std::string msg = "Preset `k` (" + std::to_string(this->k) +
+                                      ") does not match with H[" + std::to_string(i) + "]";
+                    throw std::invalid_argument(msg);
+                }
+                if (this->k != this->Vi[i]->n_cols) {
+                    std::string msg = "Preset `k` (" + std::to_string(this->k) +
+                                      ") does not match with V[" + std::to_string(i) + "]";
+                    throw std::invalid_argument(msg);
+                }
+            }
+            if (this->k != this->W.get()->n_cols) {
+                std::string msg = "Preset `k` (" + std::to_string(this->k) +
+                                  ") does not match with W";
+                throw std::invalid_argument(msg);
+            }
+        }
+    public:
+        INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, bool makeTranspose = true) {
+            this->constructObject(Ei, k, lambda, makeTranspose);
+            // this->initHWV();
+        }
+        // INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda,
+        //      std::vector<std::unique_ptr<arma::mat>>& Hinit,
+        //      std::vector<std::unique_ptr<arma::mat>>& Vinit,
+        //      arma::mat& Winit) {
+        //     this->constructObject(Ei, k, lambda);
+        //     this->W = std::make_unique<arma::mat>(Winit);
+
+        //     for (arma::uword i = 0; i < this->nDatasets; ++i) {
+        //         this->Hi.push_back(std::move(Hinit[i]));
+        //         arma::mat* Vptr = Vinit[i].get();
+        //         std::unique_ptr<arma::mat> VTptr = std::unique_ptr<arma::mat>(new arma::mat);
+        //         *VTptr = Vptr->t();
+        //         this->Vi.push_back(std::move(Vinit[i]));
+        //         this->ViT.push_back(std::move(VTptr));
+        //     }
+        //     std::unique_ptr<arma::mat> WTptr = std::unique_ptr<arma::mat>(new arma::mat);
+        //     *WTptr = this->W->t();
+        //     this->WT = std::move(WTptr);
+        // }
+        void initH(std::vector<arma::mat>& Hinit) {
+#ifdef _VERBOSE
+            std::cout << "Taking initialized H matrices" << std::endl;
+#endif
+            if (this->Hi.size() != this->nDatasets) {
+                std::string msg = "Must provide " +
+                                  std::to_string(this->nDatasets) +
+                                  " H matrices";
+                throw std::invalid_argument(msg);
+            }
             std::unique_ptr<arma::mat> H;
-            std::unique_ptr<arma::mat> V;
-            std::unique_ptr<arma::mat> VT;
-            // std::unique_ptr<arma::mat> W;
+            for (arma::uword i = 0; i < this->nDatasets; ++i) {
+                if (Hinit[i].n_cols != this->k || Hinit[i].n_rows != this->ncol_E[i]) {
+                    std::string msg = "Each given H must be of size Ei[i].n_cols x " +
+                                      std::to_string(this->k);
+                    throw std::invalid_argument(msg);
+                }
+                H = std::unique_ptr<arma::mat>(new arma::mat);
+                *H = Hinit[i];
+                this->Hi.push_back(std::move(H));
+            }
+        }
+
+        void initH() {
+#ifdef _VERBOSE
+            std::cout << "Randomly initializing H matrices" << std::endl;
+#endif
+            std::unique_ptr<arma::mat> H;
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
                 H = std::unique_ptr<arma::mat>(new arma::mat);
                 *H = arma::randu<arma::mat>(this->ncol_E[i], this->k);
                 this->Hi.push_back(std::move(H));
+            }
+        }
 
+        void initV(std::vector<arma::mat>& Vinit, bool transpose = true) {
+#ifdef _VERBOSE
+            std::cout << "Taking initialized V matrices" << std::endl;
+#endif
+            if (Vinit.size() != this->nDatasets) {
+                std::string msg = "Must provide " +
+                                  std::to_string(this->nDatasets) +
+                                  " V matrices";
+                throw std::invalid_argument(msg);
+            }
+            std::unique_ptr<arma::mat> V;
+            std::unique_ptr<arma::mat> VT;
+            for (arma::uword i = 0; i < this->nDatasets; ++i) {
+                if (Vinit[i].n_cols != this->k || Vinit[i].n_rows != this->m) {
+                    std::string msg = "All given Vs must be of size " +
+                                      std::to_string(this->m) + " x " +
+                                      std::to_string(this->k);
+                    throw std::invalid_argument(msg);
+                }
+                V = std::unique_ptr<arma::mat>(new arma::mat);
+                *V = Vinit[i];
+                this->Vi.push_back(std::move(V));
+                if (transpose) {
+                    VT = std::unique_ptr<arma::mat>(new arma::mat);
+                    *VT = (*V).t();
+                    this->ViT.push_back(std::move(VT));
+                }
+            }
+        }
+
+        void initV() {
+#ifdef _VERBOSE
+            std::cout << "Randomly initializing V matrices" << std::endl;
+#endif
+            std::unique_ptr<arma::mat> V;
+            std::unique_ptr<arma::mat> VT;
+            for (arma::uword i = 0; i < this->nDatasets; ++i) {
                 V = std::unique_ptr<arma::mat>(new arma::mat);
                 VT = std::unique_ptr<arma::mat>(new arma::mat);
                 *V = arma::randu<arma::mat>(this->m, this->k);
@@ -137,71 +222,78 @@ namespace planc {
                 this->Vi.push_back(std::move(V));
                 this->ViT.push_back(std::move(VT));
             }
+        }
+
+        void initW(arma::mat Winit, bool transpose = true) {
+#ifdef _VERBOSE
+            std::cout << "Taking initialized W matrix" << std::endl;
+#endif
+            if (Winit.n_cols != this->k || Winit.n_rows != this->m) {
+                std::string msg = "Given W must be of size " +
+                                  std::to_string(this->m) + " x " +
+                                  std::to_string(this->k) + " but is " +
+                                  std::to_string(Winit.n_rows) + " x " +
+                                  std::to_string(Winit.n_cols);
+                throw std::invalid_argument(msg);
+            }
+            this->W = std::unique_ptr<arma::mat>(new arma::mat);
+            *this->W = Winit;
+            if (transpose) {
+                this->WT = std::unique_ptr<arma::mat>(new arma::mat);
+                *this->WT = (*this->W).t();
+            }
+        }
+
+        void initW() {
+#ifdef _VERBOSE
+            std::cout << "Randomly initializing W matrix" << std::endl;
+#endif
             this->W = std::unique_ptr<arma::mat>(new arma::mat);
             this->WT = std::unique_ptr<arma::mat>(new arma::mat);
             *this->W = arma::randu<arma::mat>(this->m, this->k);
             *this->WT = (*this->W).t();
-            this->objective_err = this->objective();
-            std::cout << "Initial objective: " << this->objective_err << std::endl;
         }
-    public:
-        INMF(std::vector<std::unique_ptr<T>>& Ei,
-            arma::uword k, double lambda) {
-            this->Ei = std::move(Ei);
-            this->k = k;
-            this->m = this->Ei[0].get()->n_rows;
-            this->nMax = 0;
-            this->nSum = 0;
-            this->nDatasets = 0;
-            std::cout << "k=" << k << "; m=" << m << std::endl;
-            for (unsigned int i = 0; i < this->Ei.size(); ++i)
-            {
-                T* E = this->Ei[i].get();
-                T ET = E->t();
-                std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
-                this->EiT.push_back(std::move(ETptr));
-                this->ncol_E.push_back(E->n_cols);
-                if (E->n_cols > this->nMax) {
-                    this->nMax = E->n_cols;
-                }
-                this->nSum += E->n_cols;
-                this->nDatasets++;
-                // updateB_solveH(E);
-            };
-            std::cout << "nMax=" << this->nMax << "; nSum=" << this->nSum << std::endl;
-            std::cout << "nDatasets=" << this->nDatasets << std::endl;
-            this->initHWV();
-            this->lambda = lambda;
-            this->sqrtLambda = sqrt(lambda); //TODO
-            //TODO implement common tasks i.e. norm, reg, etc
-            this->C_solveH = arma::zeros(2 * this->m, this->k);
-            this->C_solveV = arma::zeros(2 * this->nMax, this->k);
-            this->C_solveW = arma::zeros(this->nSum, this->k);
-            // this->B_solveV = arma::zeros<T>(2 * this->nMax, this->m);
-            // this->B_solveW = arma::zeros<T>(this->nSum, this->m);
-        };
+
+        double objErr() {
+            return this->objective_err;
+        }
+
+        arma::mat getHi(int i) {
+            return *(this->Hi[i].get());
+        }
+
+        std::vector<std::unique_ptr<arma::mat>> getAllH() {
+            return this->Hi;
+        }
+
+        arma::mat getVi(int i) {
+            return *(this->Vi[i].get());
+        }
+
+        std::vector<std::unique_ptr<arma::mat>> getAllV() {
+            return this->Vi;
+        }
+
+        arma::mat getW() {
+            return *(this->W.get());
+        }
+
         ~INMF() { clear(); }
         void clear() {
             if (!this->cleared) {
-                this->C_solveH.clear();
-                this->C_solveV.clear();
-                this->C_solveW.clear();
-                // this->B_solveW.clear();
-                // this->B_solveV.clear();
-                // this->B_solveH_chunk.clear();
-                // for (unsigned int i = 0; i < B_solveH.size(); ++i) {
-                //     B_solveH[i].reset();
-                // }
                 for (unsigned int i = 0; i < Ei.size(); ++i) {
                     Ei[i].reset();
+                    EiT[i].reset();
                 }
                 for (unsigned int i = 0; i < Hi.size(); ++i) {
                     Hi[i].reset();
                 }
                 for (unsigned int i = 0; i < Vi.size(); ++i) {
                     Vi[i].reset();
+                    ViT[i].reset();
                 }
                 this->W.reset();
+                this->WT.reset();
             }
             this->cleared = true;
         }
