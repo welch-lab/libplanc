@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # the settings below will be automatically configured by the rest of this script
 
@@ -33,6 +33,8 @@ if(NOT (TITAN_FOUND EQUAL -1 AND SUMMIT_FOUND EQUAL -1))
     set(CMAKE_BUILD_CUDA 1)
 endif()
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
@@ -42,23 +44,25 @@ set(DISTNMF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/distnmf)
 set(DISTNTF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/distntf)
 set(HIERNMF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/hiernmf)
 
-set(DENSEDIRS nmf)
-set(SPARSEDIRS nmf)
+set(DENSEDIRS)
+set(SPARSEDIRS)
 
 set(NMFLIB_COMMON ${PROJECT_SOURCE_DIR}/common)
 set(NNLS_SRC ${PROJECT_SOURCE_DIR}/nnls)
 message(STATUS "NMF_SOURCE_DIR =  ${NMF_SOURCE_DIR}")
 message(STATUS "NMFLIB_COMMON =  ${NMFLIB_COMMON}")
 
+add_subdirectory(nmf)
 
-set(CMAKE_BUILD_SPARSE 0)
-foreach (DENSEDIR ${DENSEDIRS})
-  add_subdirectory(${DENSEDIR} dense_${DENSEDIR})
-endforeach()
 
-set(CMAKE_BUILD_SPARSE 1)
-set(CMAKE_BUILD_CUDA 0)
-foreach (SPARSEDIR ${SPARSEDIRS})
-  add_subdirectory(${SPARSEDIR} sparse_${SPARSEDIR})
-endforeach()
-add_subdirectory(bench)
+#set(CMAKE_BUILD_SPARSE 0)
+#foreach (DENSEDIR ${DENSEDIRS})
+#  add_subdirectory(${DENSEDIR} dense_${DENSEDIR})
+#endforeach()
+
+#set(CMAKE_BUILD_SPARSE 1)
+#set(CMAKE_BUILD_CUDA 0)
+#foreach (SPARSEDIR ${SPARSEDIRS})
+#  add_subdirectory(${SPARSEDIR} sparse_${SPARSEDIR})
+#endforeach()
+#add_subdirectory(bench)

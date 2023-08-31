@@ -17,10 +17,10 @@ set(NMFLIB_USE_ATLAS            false)
 OPTION(CMAKE_IGNORE_MKL "Build Ignoring MKL" ON)
 
 #to build sparse comment or uncomment this line.
-OPTION(CMAKE_BUILD_SPARSE "Build Sparse" OFF)
-if(CMAKE_BUILD_SPARSE)
-  add_definitions(-DBUILD_SPARSE=1)
-endif()
+#OPTION(CMAKE_BUILD_SPARSE "Build Sparse" OFF)
+#if(CMAKE_BUILD_SPARSE)
+#  add_definitions(-DBUILD_SPARSE=1)
+#endif()
 
 OPTION(CMAKE_WITH_BARRIER_TIMING "Barrier placed to collect time" ON)
 if(CMAKE_WITH_BARRIER_TIMING)
@@ -28,7 +28,7 @@ if(CMAKE_WITH_BARRIER_TIMING)
 endif()
 
 #C++11 standard
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set (CMAKE_CXX_EXTENSIONS OFF) # use -std=c++11 instead of -std=gnu++11
 

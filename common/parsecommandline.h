@@ -77,7 +77,7 @@ constexpr auto UNPARTITIONED=2015;
 // mpirun -np 12 distnmf algotype lowrank m n numIteration pr pc
 // mpirun -np 12 distnmf algotype lowrank Afile  outputfile numIteration pr pc
 
-struct option plancopts[] = {
+inline struct option plancopts[] = {
     {"algo", required_argument, 0, 'a'},
     {"dimensions", required_argument, 0, 'd'},
     {"error", required_argument, 0, 'e'},

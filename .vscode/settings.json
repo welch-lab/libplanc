@@ -89,7 +89,15 @@
         "ios": "cpp",
         "locale": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "csetjmp": "cpp",
+        "strstream": "cpp",
+        "cfenv": "cpp",
+        "unordered_set": "cpp",
+        "source_location": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "typeindex": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

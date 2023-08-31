@@ -93,7 +93,7 @@ void fixDecimalPlaces(T *X, const int places = NUMBEROF_DECIMAL_PLACES) {
  * Returns the nth prime number.
  * There are totally 10000 prime numbers within 104000;
  */
-int random_sieve(const int nthprime) {
+inline int random_sieve(const int nthprime) {
   int i, m, k;
   int klimit, nlimit;
   int *mark;
@@ -179,7 +179,7 @@ void printVector(const std::vector<T> &x) {
   INFO << std::endl;
 }
 
-std::vector<std::vector<size_t>> cartesian_product(
+inline std::vector<std::vector<size_t>> cartesian_product(
     const std::vector<std::vector<size_t>> &v) {
   std::vector<std::vector<size_t>> s = {{}};
   for (auto &u : v) {
@@ -289,7 +289,7 @@ void ARMAMKLSCSCMM(const arma::sp_mat &mklMat, char transa, const arma::mat &Bt,
  * Something is going crazy with armadillo
  */
 
-void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
+inline void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
   arma::uword m = A.n_rows;
   arma::uword n = B.n_cols;
   arma::uword k = A.n_cols;
@@ -311,7 +311,7 @@ void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
  * @param[in] trans is a flag to indicate that Xt is sent in.
  * @param[in] mseed is the seed for the first column of the matrix
  */
-void gen_discard(int row_start, int nrows, int k,
+inline void gen_discard(int row_start, int nrows, int k,
         arma::mat &X, bool trans, int mseed=7907) {
   for(int j = 0; j < k; ++j) {
     std::mt19937 gen(mseed + j);
@@ -329,21 +329,21 @@ void gen_discard(int row_start, int nrows, int k,
 /*
  * Read in a dense matrix
  */
-void read_input_matrix(arma::mat &A, std::string fname) {
+inline void read_input_matrix(arma::mat &A, std::string fname) {
   A.load(fname);
 }
 
 /*
  * Read in a sparse matrix
  */
-void read_input_matrix(arma::sp_mat &A, std::string fname) {
+inline void read_input_matrix(arma::sp_mat &A, std::string fname) {
   A.load(fname, arma::coord_ascii);
 }
 
 /*
  * Generate random dense matrix
  */
-void generate_rand_matrix(arma::mat &A, std::string rtype,
+inline void generate_rand_matrix(arma::mat &A, std::string rtype,
         arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 1, int kbeta = 0) {
   if (rtype == "uniform") {
@@ -390,7 +390,7 @@ void generate_rand_matrix(arma::mat &A, std::string rtype,
 /*
  * Generate random sparse matrix
  */
-void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
+inline void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
         arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 5, int kbeta = 10) {
   if (rtype == "uniform") {
@@ -450,7 +450,7 @@ void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
   }
 }
 
-int debug_hook(){
+inline int debug_hook(){
   int i = 0;
   while(i < 1){}
   return 0;

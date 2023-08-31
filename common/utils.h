@@ -18,6 +18,7 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #define ARMA_DONT_USE_WRAPPER
 #define ARMA_USE_BLAS
 #define ARMA_USE_LAPACK
+#define ARMA_USE_HDF5
 // #endif
 #include <armadillo>
 #include <cmath>
