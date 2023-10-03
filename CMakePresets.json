@@ -43,8 +43,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/g++",
-        "CMAKE_C_COMPILER": "/opt/homebrew/bin/gcc",
-        "CMAKE_CXX_FLAGS": "-flto"
+        "CMAKE_C_COMPILER": "/opt/homebrew/bin/gcc"
       },
       "condition": {
         "type": "equals",
@@ -69,21 +68,18 @@
       "name": "windows-base",
       "description": "Target Windows with the Visual Studio development environment.",
       "hidden": true,
-      "generator": "MinGW Makefiles",
       "environment": {
-        "PATH": "C:/msys64/ucrt64/bin;C:/msys64/usr/bin;$penv{PATH}",
-        "MINGW64_ROOT": "C:/msys64/ucrt64",
-        "INCLUDE": "$penv{INCLUDE};C:/msys64/ucrt64/include"
+        "PATH": "C:/rtools43/ucrt64/bin;C:/rtools43/usr/bin;$penv{PATH}",
+        "MINGW64_ROOT": "C:/rtools43/ucrt64",
+        "INCLUDE": "$penv{INCLUDE};C:/rtools43/ucrt64/include"
       },
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
-      "cmakeExecutable": "C:/msys64/ucrt64/bin/cmake.exe",
+      "cmakeExecutable": "C:/rtools43/ucrt64/bin/cmake.exe",
       "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
-        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe",
-        "CMAKE_CXX_FLAGS": "-flto",
-        "CMAKE_MAKE_PROGRAM": "C:/msys64/ucrt64/bin/mingw32-make.exe",
+        "CMAKE_C_COMPILER": "C:/rtools43/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/rtools43/ucrt64/bin/g++.exe",
         "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
 
       },
@@ -122,16 +118,15 @@
       "description": "Target Windows with the Clang-based MinGW toolchain. (Debug)",
       "inherits": "windows-base",
       "environment": {
-        "PATH": "C:/msys64/clang64/bin;C:/msys64/usr/bin;$penv{PATH}",
-        "MINGW64_ROOT": "C:/msys64/clang64",
-        "INCLUDE": "$penv{INCLUDE};C:/msys64/clang64/include"
+        "PATH": "C:/rtools43/clang64/bin;C:/rtools43/usr/bin;$penv{PATH}",
+        "MINGW64_ROOT": "C:/rtools43/clang64",
+        "INCLUDE": "$penv{INCLUDE};C:/rtools43/clang64/include"
       },
-      "cmakeExecutable": "C:/msys64/clang64/bin/cmake.exe",
+      "cmakeExecutable": "C:/rtools43/clang64/bin/cmake.exe",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "C:/msys64/clang64/bin/clang.exe",
-        "CMAKE_CXX_COMPILER": "C:/msys64/clang64/bin/clang++.exe",
-        "CMAKE_MAKE_PROGRAM": "C:/msys64/clang64/bin/mingw32-make.exe"
+        "CMAKE_C_COMPILER": "C:/rtools43/clang64/bin/clang.exe",
+        "CMAKE_CXX_COMPILER": "C:/rtools43/clang64/bin/clang++.exe"
       }
     },
     {
