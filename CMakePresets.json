@@ -65,8 +65,29 @@
       }
     },
     {
+      "name": "windows-msvc-base",
+      "displayName": "Windows MSVC x64 Debug",
+      "description": "Sets Ninja generator, compilers, x64 architecture, build and install directory, debug build type",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+       "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      }
+    },
+    {
       "name": "windows-base",
-      "description": "Target Windows with the Visual Studio development environment.",
+      "description": "Target Windows with the UCRT-linked MinGW development environment.",
       "hidden": true,
       "environment": {
         "PATH": "C:/rtools43/ucrt64/bin;C:/rtools43/usr/bin;$penv{PATH}",
@@ -100,7 +121,7 @@
       "inherits": "windows-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_VERBOSE_MAKEFILE":  true
+        "CMAKE_VERBOSE_MAKEFILE": true
       }
     },
     {

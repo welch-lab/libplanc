@@ -14,7 +14,7 @@ include_directories(${NMFLIB_COMMON} ${NNLS_SRC}
   ${MKL_INCLUDE_DIR}
   ${OPENBLAS_INCLUDE_DIR}
   ${SUPERLU_INCLUDES})
-add_compile_definitions(HAVE_FLEXIBLAS_CBLAS_H) #fixme
+add_compile_definitions(HAVE_OPENBLAS_CBLAS_H) #fixme
 add_library(sparse_nmf OBJECT SparseNMFDriver.cpp)
 add_library(dense_nmf OBJECT NMFDriver.cpp)
 add_executable(plancnmf nmf_cmd.cpp)
@@ -22,7 +22,8 @@ add_executable(plancnmf nmf_cmd.cpp)
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)
-target_link_libraries(plancnmf PUBLIC ${NMFLIB_LIBS} PRIVATE $<TARGET_OBJECTS:sparse_nmf> $<TARGET_OBJECTS:dense_nmf>)
+find_library(GETOPT_LIB getopt)
+target_link_libraries(plancnmf PUBLIC ${NMFLIB_LIBS} PRIVATE $<TARGET_OBJECTS:sparse_nmf> $<TARGET_OBJECTS:dense_nmf> ${GETOPT_LIB})
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 install(TARGETS plancnmf
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

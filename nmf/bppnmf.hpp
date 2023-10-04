@@ -52,8 +52,8 @@ class BPPNMF : public NMF<T> {
 #endif
     tic();
 
-#pragma omp parallel for schedule(auto)
-    for (unsigned int i = 0; i < numChunks; i++) {
+#pragma omp parallel for schedule(dynamic)
+    for (int i = 0; i < numChunks; i++) {
       unsigned int spanStart = i * ONE_THREAD_MATRIX_SIZE;
       unsigned int spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
       if (spanEnd > input.n_cols - 1) {
@@ -118,8 +118,8 @@ class BPPNMF : public NMF<T> {
       arma::mat WtA = Wt * this->A;
       Wt.clear();
       {
-#pragma omp parallel for schedule(auto)
-        for (unsigned int i = 0; i < this->n; i++) {
+#pragma omp parallel for schedule(dynamic)
+        for (int i = 0; i < this->n; i++) {
           BPPNNLS<arma::mat, arma::vec> *subProblemforH =
               new BPPNNLS<arma::mat, arma::vec>(WtW, (arma::vec)WtA.col(i), true);
 #ifdef _VERBOSE
@@ -151,8 +151,8 @@ class BPPNMF : public NMF<T> {
         arma::mat HtAt = Ht * At;
         Ht.clear();
 // solve for W given H;
-#pragma omp parallel for schedule(auto)
-        for (unsigned int i = 0; i < this->m; i++) {
+#pragma omp parallel for schedule(dynamic)
+        for (int i = 0; i < this->m; i++) {
           BPPNNLS<arma::mat, arma::vec> *subProblemforW =
               new BPPNNLS<arma::mat, arma::vec>(HtH, (arma::vec)HtAt.col(i), true);
 #ifdef _VERBOSE

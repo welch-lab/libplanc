@@ -401,8 +401,8 @@ private:
             unsigned int dataSize = this->ncol_E[i];
             unsigned int numChunks = dataSize / INMF_CHUNK_SIZE;
             if (numChunks * INMF_CHUNK_SIZE < dataSize) numChunks++;
-#pragma omp parallel for schedule(auto)
-            for (unsigned int j = 0; j < numChunks; ++j) {
+#pragma omp parallel for schedule(dynamic)
+            for (int j = 0; j < numChunks; ++j) {
                 unsigned int spanStart = j * INMF_CHUNK_SIZE;
                 unsigned int spanEnd = (j + 1) * INMF_CHUNK_SIZE - 1;
                 if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;
@@ -500,8 +500,8 @@ private:
             unsigned int dataSize = this->ncol_E[idx];
             unsigned int numChunks = dataSize / INMF_CHUNK_SIZE;
             if (numChunks * INMF_CHUNK_SIZE < dataSize) numChunks++;
-#pragma omp parallel for schedule(auto)
-            for (unsigned int j = 0; j < numChunks; ++j) {
+#pragma omp parallel for schedule(dynamic)
+            for (int j = 0; j < numChunks; ++j) {
                 unsigned int spanStart = j * INMF_CHUNK_SIZE;
                 unsigned int spanEnd = (j + 1) * INMF_CHUNK_SIZE - 1;
                 if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;

@@ -31,8 +31,8 @@ private:
             unsigned int dataSize = this->ncol_E[i];
             unsigned int numChunks = dataSize / INMF_CHUNK_SIZE;
             if (numChunks * INMF_CHUNK_SIZE < dataSize) numChunks++;
-#pragma omp parallel for schedule(auto)
-            for (unsigned int j = 0; j < numChunks; ++j) {
+#pragma omp parallel for schedule(dynamic)
+            for (int j = 0; j < numChunks; ++j) {
                 unsigned int spanStart = j * INMF_CHUNK_SIZE;
                 unsigned int spanEnd = (j + 1) * INMF_CHUNK_SIZE - 1;
                 if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;
@@ -65,8 +65,8 @@ private:
             T* ETptr = this->EiT[i].get();
             unsigned int numChunks = this->m / INMF_CHUNK_SIZE;
             if (numChunks * INMF_CHUNK_SIZE < this->m) numChunks++;
-#pragma omp parallel for schedule(auto)
-            for (unsigned int j = 0; j < numChunks; ++j) {
+#pragma omp parallel for schedule(dynamic)
+            for (int j = 0; j < numChunks; ++j) {
                 unsigned int spanStart = j * INMF_CHUNK_SIZE;
                 unsigned int spanEnd = (j + 1) * INMF_CHUNK_SIZE - 1;
                 if (spanEnd > this->m - 1) spanEnd = this->m - 1;
@@ -107,8 +107,8 @@ private:
             unsigned int spanEnd = (i + 1) * INMF_CHUNK_SIZE - 1;
             if (spanEnd > this->m - 1) spanEnd = this->m - 1;
             giventInput = arma::zeros<arma::mat>(this->k, spanEnd - spanStart + 1); ///
-            #pragma omp parallel for schedule(auto)
-            for (unsigned int j = 0; j < this->nDatasets; ++j) {
+            #pragma omp parallel for schedule(dynamic)
+            for (int j = 0; j < this->nDatasets; ++j) {
                 T* ETptr = this->EiT[j].get();
                 arma::mat* Hptr = this->Hi[j].get();
                 arma::mat* VTptr = this->ViT[j].get();
