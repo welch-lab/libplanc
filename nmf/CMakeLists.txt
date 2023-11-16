@@ -23,7 +23,7 @@ add_executable(plancnmf nmf_cmd.cpp)
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)
 find_library(GETOPT_LIB getopt)
-target_link_libraries(plancnmf PUBLIC ${NMFLIB_LIBS} PRIVATE $<TARGET_OBJECTS:sparse_nmf> $<TARGET_OBJECTS:dense_nmf> ${GETOPT_LIB})
+target_link_libraries(plancnmf PUBLIC ${NMFLIB_LIBS} PRIVATE $<TARGET_OBJECTS:sparse_nmf> $<TARGET_OBJECTS:dense_nmf> $<$<BOOL:${GETOPT_LIB}>:${GETOPT_LIB}>)
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 install(TARGETS plancnmf
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
