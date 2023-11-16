@@ -1,7 +1,7 @@
 #pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#include <assert.h>
+#include <cassert>
 #include <string>
 #include "utils.hpp"
 
@@ -26,6 +26,7 @@ class NMF {
   const T &A;       /// input matrix of size mxn
   arma::mat W, H;  /// left and low rank factors of size mxk and nxk respectively
   arma::mat Winit, Hinit;
+  int ncores;
   unsigned int m, n, k;  /// rows, columns and lowrank
 
   /*
@@ -210,14 +211,19 @@ class NMF {
       const arma::mat &rightlowrankfactor): A(input) {
     try
     {
-      if (!(leftlowrankfactor.n_cols == rightlowrankfactor.n_cols))
+      if (leftlowrankfactor.n_cols != rightlowrankfactor.n_cols)
       {
         throw std::logic_error("received factor matrices with uneven shape");
-      };
+      }
     }
     catch(const std::logic_error& e)
     {
-      throw;
+#ifdef USING_R
+        std::string ex_str = e.what();
+        Rcpp::stop(ex_str);
+#else
+        throw e;
+#endif
     }
     // this->A = input;
     this->W = leftlowrankfactor;
@@ -252,6 +258,7 @@ class NMF {
    ||WH||_F^2 - over all nnz (w_i h_j)^2
    *
    */
+/*
 #if 0
     void computeObjectiveError() {
         // 1. over all nnz (a_ij - w_i h_j)^2
@@ -326,8 +333,9 @@ class NMF {
     INFO << "Entering computeObjectiveError A=" << this->A.n_rows << "x"
          << this->A.n_cols << " W = " << this->W.n_rows << "x" << this->W.n_cols
          << " H=" << this->H.n_rows << "x" << this->H.n_cols << std::endl;
-#endif // _VERBOSE
     tic();
+#endif // _VERBOSE
+
     // always restrict the errMtx size to fit it in memory
     // and doesn't occupy much space.
     // For eg., the max we can have only 3 x 10^6 elements.
@@ -397,14 +405,15 @@ class NMF {
       A_err_sub_mtx %= A_err_sub_mtx;
       splitErr(i) = arma::accu(A_err_sub_mtx);
     }
-    double err_time = toc();
+
 #ifdef _VERBOSE
+    double err_time = toc();
     INFO << "err compute time::" << err_time << std::endl;
 #endif
     this->objective_err = arma::sum(splitErr);
   }
-
-  void computeObjectiveError() {
+*/
+  virtual void computeObjectiveError() {
     arma::mat AtW = this->A.t() * this->W;
     arma::mat WtW = this->W.t() * this->W;
     arma::mat HtH = this->H.t() * this->H;
@@ -439,7 +448,7 @@ class NMF {
     this->objective_err = this->fit_err_sq + fro_W_obj + fro_H_obj
         + l1_W_obj + l1_H_obj + sym_obj;
   }
-#endif  // ifdef BUILD_SPARSE
+// #endif  // ifdef BUILD_SPARSE
   void computeObjectiveError(const T &At, const arma::mat &WtW, const arma::mat &HtH) {
     arma::mat AtW = At * this->W;
 
@@ -475,7 +484,7 @@ class NMF {
   }
 
   /// Print out the objective stats
-  void printObjective(const int itr) {
+  virtual void printObjective(const int itr) {
     double err = (this->fit_err_sq > 0)? sqrt(this->fit_err_sq) : this->normA;
     INFO << "Completed it = " << itr
          << "::algo::" << this->m_updalgo << "::k::" << this->k << std::endl;
@@ -516,8 +525,11 @@ class NMF {
   void updalgo(algotype dat) { this->m_updalgo = dat; }
 
   /// Returns the number of iterations
-  const unsigned int num_iterations() const { return m_num_iterations; }
+  [[nodiscard]] unsigned int num_iterations() const { return m_num_iterations; }
 
+  /// Returns the last objective error calculated
+  double objErr() { return this->objective_err; }
+  
   ~NMF() { clear(); }
   /// Clear the memory for input matrix A, right low rank factor W
   /// and left low rank factor H

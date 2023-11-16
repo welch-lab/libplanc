@@ -2,50 +2,43 @@
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
 
-#include <assert.h>
+#include <cassert>
 #ifdef _OPENMP
 #include <omp.h>
 #endif //_OPENMP
-#include <stdio.h>
+#include <cstdio>
 #include <chrono>
 #include <ctime>
 #include <stack>
 #include <typeinfo>
+#include <utility>
 #include <vector>
-#include "utils.h"
 #include <random>
+#include "data.hpp"
+#include "config.h"
 
-#ifdef MKL_FOUND
-#include <mkl.h>
-#else
+#include "utils.h"
 
-#if defined(__APPLE__)
-#include "vecLib/cblas.h"
-#elif defined(HAVE_FLEXIBLAS_CBLAS_H)
-#include "flexiblas/cblas.h"
-#elif defined(HAVE_OPENBLAS_CBLAS_H)
-#include "openblas/cblas.h"
-#else
-#include "cblas.h"
-#endif
-#endif
+extern "C" {
+  #include "hw_detect.h"
+}
 
-static ULONG powersof10[16] = {1,
-                               10,
-                               100,
-                               1000,
-                               10000,
-                               100000,
-                               1000000,
-                               10000000,
-                               100000000,
-                               1000000000,
-                               10000000000,
-                               100000000000,
-                               1000000000000,
-                               10000000000000,
-                               100000000000000,
-                               1000000000000000};
+static uint64_t powersof10[16] = {1,
+                                  10,
+                                  100,
+                                  1000,
+                                  10000,
+                                  100000,
+                                  1000000,
+                                  10000000,
+                                  100000000,
+                                  1000000000,
+                                  10000000000,
+                                  100000000000,
+                                  1000000000000,
+                                  10000000000000,
+                                  100000000000000,
+                                  1000000000000000};
 
 static std::stack<std::chrono::steady_clock::time_point> tictoc_stack;
 static std::stack<double> tictoc_stack_omp_clock;
@@ -93,7 +86,7 @@ void fixDecimalPlaces(T *X, const int places = NUMBEROF_DECIMAL_PLACES) {
  * Returns the nth prime number.
  * There are totally 10000 prime numbers within 104000;
  */
-inline int random_sieve(const int nthprime) {
+int random_sieve(const int nthprime) {
   int i, m, k;
   int klimit, nlimit;
   int *mark;
@@ -143,32 +136,35 @@ void absmat(T *X) {
 template <class T>
 void makeSparse(const double sparsity, T(*X)) {
   // make a matrix sparse
+#ifndef USING_R
   srand(RAND_SEED_SPARSE);
-#pragma omp parallel for
-  for (int j = 0; j < X->n_cols; j++) {
-    for (int i = 0; i < X->n_rows; i++) {
+#endif
+#pragma omp parallel for default(none) shared(sparsity, X)
+  for (arma::uword j = 0; j < X->n_cols; j++) {
+    for (arma::uword i = 0; i < X->n_rows; i++) {
       if (arma::randu() > sparsity) (*X)(i, j) = 0;
     }
   }
 }
 
-template <class T>
 void randNMF(const arma::uword m, const arma::uword n, const arma::uword k, const double sparsity,
-             T *A) {
-#ifdef BUILD_SPARSE
-  T temp = arma::sprandu<T>(m, n, sparsity);
-  A = &temp;
-#else
+             arma::mat *A) {
+#ifndef USING_R
   srand(RAND_SEED);
+#endif
   arma::mat W = 10 * arma::randu<arma::mat>(m, k);
   arma::mat H = 10 * arma::randu<arma::mat>(n, k);
   if (sparsity < 1) {
     makeSparse<arma::mat>(sparsity, &W);
     makeSparse<arma::mat>(sparsity, &H);
   }
-  T temp = ceil(W * trans(H));
+  arma::mat temp = ceil(W * trans(H));
   A = &temp;
-#endif
+}
+void randNMF(const arma::uword m, const arma::uword n, const arma::uword k, const double sparsity,
+             arma::sp_mat *A) {
+  auto temp = arma::sprandu<arma::sp_mat>(m, n, sparsity);
+  A = &temp;
 }
 
 template <class T>
@@ -179,7 +175,7 @@ void printVector(const std::vector<T> &x) {
   INFO << std::endl;
 }
 
-inline std::vector<std::vector<size_t>> cartesian_product(
+std::vector<std::vector<size_t>> cartesian_product(
     const std::vector<std::vector<size_t>> &v) {
   std::vector<std::vector<size_t>> s = {{}};
   for (auto &u : v) {
@@ -218,7 +214,7 @@ double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
   LRTYPE Qw(m, k);
   LRTYPE Qh(n, k);
   LRTYPE RwRh(k, k);
-#pragma omp parallel for reduction(+ : nnzsse, nnzwh)
+#pragma omp parallel for reduction(+ : nnzsse, nnzwh) default(none)
   for (arma::uword jj = 1; jj <= A.n_cols; jj++) {
     arma::uword startIdx = A.col_ptrs[jj - 1];
     arma::uword endIdx = A.col_ptrs[jj];
@@ -253,50 +249,19 @@ double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
   return (fastErr);
 }
 
-#if defined(MKL_FOUND) && defined(BUILD_SPARSE)
-/*
- * mklMat is csc representation
- * Bt is the row major order of the arma B matrix
- * Ct is the row major order of the arma C matrix
- * Once you receive Ct, transpose again to print
- * C using arma
- */
-void ARMAMKLSCSCMM(const arma::sp_mat &mklMat, char transa, const arma::mat &Bt,
-                   double *Ct) {
-  MKL_INT m, k, n, nnz;
-  m = static_cast<MKL_INT>(mklMat.n_rows);
-  k = static_cast<MKL_INT>(mklMat.n_cols);
-  n = static_cast<MKL_INT>(Bt.n_rows);
-  // arma::mat B = B.t();
-  // C = alpha * A * B + beta * C;
-  // mkl_?cscmm - https://software.MKL_INTel.com/en-us/node/468598
-  // char transa = 'N';
-  double alpha = 1.0;
-  double beta = 0.0;
-  char *matdescra = "GUNC";
-  MKL_INT ldb = n;
-  MKL_INT ldc = n;
-  MKL_INT *pntrb = static_cast<MKL_INT *>(mklMat.col_ptrs);
-  MKL_INT *pntre = pntrb + 1;
-  mkl_dcscmm(&transa, &m, &n, &k, &alpha, matdescra, mklMat.values,
-             static_cast<MKL_INT *> mklMat.row_indices, pntrb, pntre,
-             static_cast<double *>(Bt.memptr()), &ldb, &beta, Ct, &ldc);
-}
-#endif
-
 /*
  * This is an sgemm wrapper for armadillo matrices
  * Something is going crazy with armadillo
  */
 
-inline void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
+void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
   arma::uword m = A.n_rows;
   arma::uword n = B.n_cols;
   arma::uword k = A.n_cols;
   double alpha = 1.0;
   double beta = 0.0;
-  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha,
-              A.memptr(), m, B.memptr(), k, beta, C, m);
+  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, (int32_t)m, (int32_t)n, (int32_t)k, alpha,
+              A.memptr(), (int32_t)m, B.memptr(), (int32_t)k, beta, C, (int32_t)m);
 }
 
 /**
@@ -311,16 +276,16 @@ inline void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C) {
  * @param[in] trans is a flag to indicate that Xt is sent in.
  * @param[in] mseed is the seed for the first column of the matrix
  */
-inline void gen_discard(int row_start, int nrows, int k,
+void gen_discard(arma::uword row_start, arma::uword nrows, arma::uword k,
         arma::mat &X, bool trans, int mseed=7907) {
-  for(int j = 0; j < k; ++j) {
+  for(unsigned int j = 0; j < k; ++j) {
     std::mt19937 gen(mseed + j);
     gen.discard(row_start);
-    for(int i = 0; i < nrows; ++i) {
+    for(unsigned int i = 0; i < nrows; ++i) {
       if (trans) {
-          X(j, i) =  ((double)gen()) / gen.max();
+          X(j, i) =  ((double)gen()) / std::mt19937::max();
       } else {
-          X(i, j) =  ((double)gen()) / gen.max();
+          X(i, j) =  ((double)gen()) / std::mt19937::max();
       }
     }
   }
@@ -329,21 +294,21 @@ inline void gen_discard(int row_start, int nrows, int k,
 /*
  * Read in a dense matrix
  */
-inline void read_input_matrix(arma::mat &A, std::string fname) {
-  A.load(fname);
+void read_input_matrix(arma::mat &A, std::string fname) {
+  A.load(std::move(fname));
 }
 
 /*
  * Read in a sparse matrix
  */
-inline void read_input_matrix(arma::sp_mat &A, std::string fname) {
-  A.load(fname, arma::coord_ascii);
+void read_input_matrix(arma::sp_mat &A, std::string fname) {
+  A.load(std::move(fname), arma::coord_ascii);
 }
 
 /*
  * Generate random dense matrix
  */
-inline void generate_rand_matrix(arma::mat &A, std::string rtype,
+void generate_rand_matrix(arma::mat &A, const std::string& rtype,
         arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 1, int kbeta = 0) {
   if (rtype == "uniform") {
@@ -390,7 +355,7 @@ inline void generate_rand_matrix(arma::mat &A, std::string rtype,
 /*
  * Generate random sparse matrix
  */
-inline void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
+void generate_rand_matrix(arma::sp_mat &A, const std::string& rtype,
         arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
         bool adjrand = false, int kalpha = 5, int kbeta = 10) {
   if (rtype == "uniform") {
@@ -413,7 +378,7 @@ inline void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
   } else if (rtype == "lowrank") {
     if (symm_flag) {
       double dens = 0.5 * density;
-      arma::sp_mat mask = arma::sprandu<arma::sp_mat>(m, n, dens);
+      auto mask = arma::sprandu<arma::sp_mat>(m, n, dens);
       mask = 0.5 * (mask + mask.t());
       mask = arma::spones(mask);
       arma::mat Htrue = arma::zeros(n, k);
@@ -424,7 +389,7 @@ inline void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
       Htrue.clear();
       mask.clear();
     } else {
-      arma::sp_mat mask = arma::sprandu<arma::sp_mat>(m, n, density);
+      auto mask = arma::sprandu<arma::sp_mat>(m, n, density);
       mask = arma::spones(mask);
       arma::mat Wtrue = arma::zeros(m, k);
       gen_discard(0, m, k, Wtrue, false, WTRUE_SEED);
@@ -450,8 +415,18 @@ inline void generate_rand_matrix(arma::sp_mat &A, std::string rtype,
   }
 }
 
-inline int debug_hook(){
+int debug_hook(){
   int i = 0;
   while(i < 1){}
   return 0;
 }
+
+template<typename T>
+arma::uword chunk_size_dense(arma::uword rank) {
+#ifdef _OPENMP
+return (get_l1_data_cache() / (rank * sizeof(T)));
+#else
+return (get_l2_data_cache() / (rank * sizeof(T)));
+#endif
+}
+

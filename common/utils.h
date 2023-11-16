@@ -1,4 +1,5 @@
 #pragma once
+#include "config.h"
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
 
@@ -13,13 +14,7 @@ enum normtype { NONE, L2NORM, MAXNORM };
 
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
-// #if !defined(ARMA_64BIT_WORD)
-// #define ARMA_64BIT_WORD
-#define ARMA_DONT_USE_WRAPPER
-#define ARMA_USE_BLAS
-#define ARMA_USE_LAPACK
-#define ARMA_USE_HDF5
-// #endif
+
 #include <armadillo>
 #include <cmath>
 #include <iostream>
@@ -28,19 +23,19 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 // using namespace std;
 
 #ifndef ERR
-#define ERR std::cerr
+#define ERR Rcpp::Rcerr
 #endif
 
 #ifndef WARN
-#define WARN std::cerr
+#define WARN Rcpp::Rcerr
 #endif
 
 #ifndef INFO
-#define INFO std::cout
+#define INFO Rcpp::Rcout
 #endif
 
 #ifndef OUTPUT
-#define OUTPUT std::cout
+#define OUTPUT Rcpp::Rcout
 #endif
 
 constexpr auto EPSILON_1EMINUS16 = 0.00000000000000001;
@@ -53,12 +48,7 @@ constexpr auto RAND_SEED_SPARSE = 100;
 constexpr auto WTRUE_SEED=1196089;
 constexpr auto HTRUE_SEED=1230587;
 
-#ifdef BUILD_SPARSE
-typedef std::pair<arma::sp_mat, arma::mat> PAIRMAT;
-#endif
-#ifndef BUILD_SPARSE
-typedef std::pair<arma::mat, arma::mat> PAIRMAT;
-#endif
+
 #define PRINTMATINFO(A) "::" #A "::" << (A).n_rows << "x" << (A).n_cols
 
 #define PRINTMAT(A) PRINTMATINFO((A)) << std::endl << (A)
@@ -71,7 +61,7 @@ void absmat(const arma::fmat *X);
 inline void tic();
 inline double toc();
 
-int random_sieve(const int);
+int random_sieve(int);
 
 template <typename FVT>
 inline void fillVector(const FVT value, std::vector<FVT> *a) {
