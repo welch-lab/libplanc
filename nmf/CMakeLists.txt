@@ -1,13 +1,13 @@
 #Copyright 2016 Ramakrishnan Kannan
 
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 
-include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
+#include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
 # the settings below will be automatically configured by the rest of this script
 
-include_directories(${NMFLIB_COMMON} ${NNLS_SRC}
+include_directories(${PLANC_COMMON} ${NNLS_SRC}
   ${ARMADILLO_INCLUDE_DIR}
   ${ARMADILLO_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIR}

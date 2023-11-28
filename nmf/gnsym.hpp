@@ -68,7 +68,7 @@ class GNSYMNMF : public NMF<T> {
   }
 
  public:
-  GNSYMNMF(const T &A, int lowrank) : NMF<T>(A, lowrank) {
+  GNSYMNMF(const T &A, int lowrank, const int& ncores = 0) : NMF<T>(A, lowrank) {
     this->W.clear();  //  clear W variable
     allocateMatrices();
     sqnormA = this->normA * this->normA;
@@ -96,7 +96,7 @@ class GNSYMNMF : public NMF<T> {
     cg_tot_iters = 0;
   }
 
-  GNSYMNMF(const T &A, const arma::mat &llf, const arma::mat &rlf) : NMF<T>(A, llf, rlf) {
+  GNSYMNMF(const T &A, const arma::mat &llf, const arma::mat &rlf, const int& ncores = 0) : NMF<T>(A, llf, rlf) {
     this->W.clear();  //  clear W variable
     allocateMatrices();
     sqnormA = this->normA * this->normA;
@@ -142,7 +142,7 @@ class GNSYMNMF : public NMF<T> {
     cg_nongrams++;
   }
 
-  void computeObjectiveError() {
+  void computeObjectiveError() override {
     // Fast formula using,
     // \norm{A}_F^2 - 2Tr(AHH^T) + Tr(H^TH * H^TH)
 
@@ -164,7 +164,7 @@ class GNSYMNMF : public NMF<T> {
     this->objective_err = this->fit_err_sq;
   }
 
-  void printObjective(const int itr) {
+  void printObjective(const int itr) override {
     double err = (this->fit_err_sq > 0)? sqrt(this->fit_err_sq) : this->normA;
     INFO << "Completed it = " << itr << std::endl;
     INFO << "objective::" << this->objective_err
@@ -174,7 +174,7 @@ class GNSYMNMF : public NMF<T> {
     INFO << "H frobenius norm::" << this->normH << std::endl;
   }
 
-  void computeNMF() {
+  void computeNMF() override {
     unsigned int currentIteration = 0;
     unsigned int cgiter = 0;
     while (currentIteration < this->num_iterations()) {
@@ -261,7 +261,7 @@ class GNSYMNMF : public NMF<T> {
       currentIteration++;
     }
   }
-  ~GNSYMNMF() {}
+  ~GNSYMNMF() = default;
 };
 
 }  // namespace planc

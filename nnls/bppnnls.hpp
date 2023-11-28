@@ -1,7 +1,6 @@
 #pragma once
 /*Copyright 2016 Ramakrishnan Kannan*/
 
-#include <assert.h>
 #include "nnls.hpp"
 #include "utils.hpp"
 #include <set>
@@ -38,7 +37,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
      *
      * Special case of the multi RHS solver.
      */
-    int solveNNLSOneRHS() {
+    unsigned int solveNNLSOneRHS() {
         // Set the RHS matrix
         this->AtB.zeros(this->n, this->k);
         this->AtB.col(0) = this->Atb;
@@ -48,7 +47,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         this->X.col(0) = this->x;
 
         // Call matrix method
-        int iter = solveNNLSMultipleRHS();
+        unsigned int iter = solveNNLSMultipleRHS();
 
         this->x = this->X.col(0);
 
@@ -62,16 +61,15 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
      * Based on the nnlsm_blockpivot subroutine from the MATLAB code
      * associated with the paper.
      */
-    int solveNNLSMultipleRHS() {
+    unsigned int solveNNLSMultipleRHS() {
         unsigned int iter = 0;
         unsigned int MAX_ITERATIONS = this->n * 5;
-        bool success = true;
 
         // Set the initial feasible solution
         MATTYPE Y = (this->AtA * this->X) - this->AtB;
         arma::umat PassiveSet = (this->X > 0);
 
-        int pbar = 3;
+        unsigned int pbar = 3;
         arma::urowvec P(this->k);
         P.fill(pbar);
 
@@ -98,9 +96,18 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
 
         while (numNonOptCols > 0) {
             iter++;
-
-            assert(!((MAX_ITERATIONS > 0) && (iter > MAX_ITERATIONS)));
-
+            try {
+            if ((MAX_ITERATIONS <= 0) || (iter > MAX_ITERATIONS)) {
+                throw std::logic_error("invalid iteration call");
+            }
+            }  catch(std::exception &ex) {
+#ifdef USING_R
+                std::string ex_str = ex.what();
+                Rcpp::stop(ex_str);
+#else
+                throw ex;
+#endif
+            }
             Cols1 = NotOptCols % (NotGood < Ninf);
             Cols2 = NotOptCols % (NotGood >= Ninf) % (P >= 1);
             arma::urowvec Cols3Ix = arma::conv_to<arma::urowvec>::from(
@@ -269,7 +276,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         beginIndex.push_back(beginIdx);
         for (unsigned int i = 0; i < sortedIdx.size(); ++i) {
             if (i == sortedIdx.size() - 1 ||
-                    bac(sortedIdx[i], sortedIdx[i + 1]) == true) {
+                bac(sortedIdx[i], sortedIdx[i + 1])) {
                 beginIdx = i + 1;
                 beginIndex.push_back(beginIdx);
             }
