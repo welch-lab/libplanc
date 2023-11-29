@@ -66,9 +66,10 @@
     },
     {
       "name": "windows-msvc-base",
-      "displayName": "Windows MSVC x64 Debug",
-      "description": "Sets Ninja generator, compilers, x64 architecture, build and install directory, debug build type",
+      "displayName": "Windows MSVC-LLVM x64 Debug",
+      "description": "Sets generator, compilers, x64 architecture, build and install directory, debug build type",
       "generator": "Visual Studio 17 2022",
+      "toolset": "ClangCL",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
        "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "architecture": {
@@ -81,6 +82,7 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-clang-x64",
           "hostOS": [ "Windows" ]
         }
       }
@@ -101,7 +103,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "C:/rtools43/ucrt64/bin/gcc.exe",
         "CMAKE_CXX_COMPILER": "C:/rtools43/ucrt64/bin/g++.exe",
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-static"
 
       },
       "condition": {
@@ -129,32 +131,6 @@
       "displayName": "x64 Release",
       "description": "Target Windows (64-bit) with the UCRT-linked MinGW toolchain. (Release)",
       "inherits": "x64-debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "x64-clang-debug",
-      "displayName": "x64 Clang Debug",
-      "description": "Target Windows with the Clang-based MinGW toolchain. (Debug)",
-      "inherits": "windows-base",
-      "environment": {
-        "PATH": "C:/rtools43/clang64/bin;C:/rtools43/usr/bin;$penv{PATH}",
-        "MINGW64_ROOT": "C:/rtools43/clang64",
-        "INCLUDE": "$penv{INCLUDE};C:/rtools43/clang64/include"
-      },
-      "cmakeExecutable": "C:/rtools43/clang64/bin/cmake.exe",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "C:/rtools43/clang64/bin/clang.exe",
-        "CMAKE_CXX_COMPILER": "C:/rtools43/clang64/bin/clang++.exe"
-      }
-    },
-    {
-      "name": "x64-clang-release",
-      "displayName": "x64 Clang Release",
-      "description": "Target Windows with the Clang-based MinGW toolchain. (Release)",
-      "inherits": "x64-clang-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
