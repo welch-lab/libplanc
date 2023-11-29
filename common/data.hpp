@@ -41,7 +41,12 @@ namespace planc {
 
             // Check if the rank is 2
             if (rank != 2u) {
-                Rcpp::Rcout << "The H5D does not have a rank of 2." << std::endl;
+#ifdef USING_R
+                Rcpp::Rcout
+#else
+                std::cout
+#endif
+            << "The H5D does not have a rank of 2." << std::endl;
             }
             std::vector<size_t> dims = dataspace.getDimensions();
             // dataspace.close();
@@ -56,7 +61,12 @@ namespace planc {
             // cparms.close();
 
 //#ifdef _VERBOSE
-            Rcpp::Rcout << "==H5Mat constructed==" << std::endl
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+            << "==H5Mat constructed==" << std::endl
                 << "H5File:    " << this->filename << std::endl
                 << "Mat path:  " << this->datapath << std::endl
                 << "Dimension: " << this->n_rows << " x " << this->n_cols << std::endl;
@@ -218,7 +228,12 @@ namespace planc {
             tDims[0] = this->n_rows;
             tDims[1] = this->n_cols;
             HighFive::DataSpace fspace(tDims);
-            Rcpp::Rcout << "Creating transposed data at "
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+                << "Creating transposed data at "
                 << tmpfilename << ":data" << std::endl;
             HighFive::DataSet H5DT = tmpfile.createDataSet<double>("data", fspace, cparms_new);
             // HighFive::DataSet H5DT = this->createDataSet<double>(tempPath, fspace, cparms_new);
@@ -368,7 +383,12 @@ namespace planc {
             this->p_chunksize = p_chunkdim[0];
             // p_cparms.close();
 // #ifdef _VERBOSE
-            Rcpp::Rcout << "==H5SpMat constructed==" << std::endl
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+                << "==H5SpMat constructed==" << std::endl
                 << "H5File:    " << filename << std::endl
                 << "colptr path:  " << pPath << std::endl
                 << "rowind path:  " << iPath << std::endl
@@ -479,7 +499,12 @@ namespace planc {
         // }
 // not thread safe
         H5SpMat t() {
-            Rcpp::Rcout << "Creating on-disk transposition of the sparse matrix, which is currently poorly supported and slow" << std::endl;
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+            << "Creating on-disk transposition of the sparse matrix, which is currently poorly supported and slow" << std::endl;
             // Create new H5 FILE with only the transposed dataset
             std::string tmpfilename = planc::H5SpMat::increUniqName(this->filename + ".sparse_transposed.");
             HighFive::File tmpfile(tmpfilename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);

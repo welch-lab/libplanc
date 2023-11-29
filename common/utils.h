@@ -23,19 +23,35 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 // using namespace std;
 
 #ifndef ERR
+#ifdef USING_R
 #define ERR Rcpp::Rcerr
+#else
+#define ERR std::cerr
+#endif
 #endif
 
 #ifndef WARN
+#ifdef USING_R
 #define WARN Rcpp::Rcerr
+#else
+#define WARN std::cerr
+#endif
 #endif
 
 #ifndef INFO
+#ifdef USING_R
 #define INFO Rcpp::Rcout
+#else
+#define INFO std::cout
+#endif
 #endif
 
 #ifndef OUTPUT
+#ifdef USING_R
 #define OUTPUT Rcpp::Rcout
+#else
+#define OUTPUT std::cout
+#endif
 #endif
 
 constexpr auto EPSILON_1EMINUS16 = 0.00000000000000001;
@@ -54,14 +70,14 @@ constexpr auto HTRUE_SEED=1230587;
 #define PRINTMAT(A) PRINTMATINFO((A)) << std::endl << (A)
 
 typedef std::vector<int> STDVEC;
+#ifndef ULONG
 typedef uint64_t ULONG;
+#endif
 
 void absmat(const arma::fmat *X);
 
-inline void tic();
-inline double toc();
 
-int random_sieve(int);
+
 
 template <typename FVT>
 inline void fillVector(const FVT value, std::vector<FVT> *a) {

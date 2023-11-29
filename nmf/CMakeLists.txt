@@ -7,23 +7,17 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # the settings below will be automatically configured by the rest of this script
 
-include_directories(${PLANC_COMMON} ${NNLS_SRC}
-  ${ARMADILLO_INCLUDE_DIR}
-  ${ARMADILLO_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIR}
-  ${MKL_INCLUDE_DIR}
-  ${OPENBLAS_INCLUDE_DIR}
-  ${SUPERLU_INCLUDES})
-add_compile_definitions(HAVE_OPENBLAS_CBLAS_H) #fixme
-add_library(sparse_nmf OBJECT SparseNMFDriver.cpp)
-add_library(dense_nmf OBJECT NMFDriver.cpp)
-add_executable(plancnmf nmf_cmd.cpp)
+#add_library(sparse_nmf OBJECT SparseNMFDriver.cpp)
+#add_library(dense_nmf OBJECT NMFDriver.cpp)
+add_executable(plancnmf nmf_cmd.cpp NMFDriver.cpp
+        bppnmf.cpp)
 
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)
 find_library(GETOPT_LIB getopt)
-target_link_libraries(plancnmf PUBLIC ${NMFLIB_LIBS} PRIVATE $<TARGET_OBJECTS:sparse_nmf> $<TARGET_OBJECTS:dense_nmf> $<$<BOOL:${GETOPT_LIB}>:${GETOPT_LIB}>)
+target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CXX_INCLUDE_DIRS})
+target_link_libraries(plancnmf PRIVATE HighFive $<$<BOOL:${GETOPT_LIB}>:${GETOPT_LIB}> progressWrapper utils hw_detect)
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 install(TARGETS plancnmf
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

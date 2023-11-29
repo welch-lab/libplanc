@@ -3,13 +3,13 @@
 #include "utils.hpp"
 #include "parsecommandline.hpp"
 #include "aoadmm.hpp"
-#include "bppnmf.hpp"
-#include "hals.hpp"
-#include "mu.hpp"
 #include "gnsym.hpp"
-#include "nmf.hpp"
-#include <stdio.h>
+#include "mu.hpp"
+#include "hals.hpp"
+#include "bppnmf.hpp"
+#include <cstdio>
 #include <string>
+#include <utility>
 
 
 namespace planc {
@@ -47,11 +47,11 @@ protected:
     void parseCommandLine(ParseCommandLine pc);
 
 public:
-NMFDriver(ParseCommandLine pc)
+explicit NMFDriver(ParseCommandLine pc)
 {
-    this->parseCommandLine(pc);
+    this->parseCommandLine(std::move(pc));
 }
-void callNMF()
+virtual void callNMF()
 {
 switch (this->m_nmfalgo)
     {
@@ -72,7 +72,41 @@ switch (this->m_nmfalgo)
         break;
     default:
         ERR << "Unsupported algorithm " << this->m_nmfalgo << std::endl;
-    };
+    }
 }
 };
+    class SparseNMFDriver : NMFDriver {
+    protected:
+        static const int kalpha = 5;
+        static const int kbeta = 10;
+        template <class NMFTYPE>
+        void CallNMF();
+
+    public:
+        explicit SparseNMFDriver(ParseCommandLine pc) : NMFDriver(std::move(pc)) {};
+        void callNMF() override
+        {
+            switch (this->m_nmfalgo)
+            {
+                case MU:
+                    CallNMF<MUNMF<arma::sp_mat>>();
+                    break;
+                case HALS:
+                    CallNMF<HALSNMF<arma::sp_mat>>();
+                    break;
+                case ANLSBPP:
+                    CallNMF<BPPNMF<arma::sp_mat>>();
+                    break;
+                case AOADMM:
+                    CallNMF<AOADMMNMF<arma::sp_mat>>();
+                    break;
+                case GNSYM:
+                    CallNMF<GNSYMNMF<arma::sp_mat>>();
+                    break;
+                default:
+                    ERR << "Unsupported algorithm " << this->m_nmfalgo << std::endl;
+            }
+        }
+    };
+
 }

@@ -5,7 +5,9 @@
 #define ARMA_DONT_USE_FORTRAN_HIDDEN_ARGS
 #define ARMA_USE_MKL_TYPES
 #else
-
+#ifdef _OPENMP
+#include <omp.h>
+#endif //_OPENMP
 #if defined(__APPLE__)
 #include "vecLib/cblas.h"
 #elif defined(HAVE_FLEXIBLAS_CBLAS_H)
@@ -26,3 +28,9 @@
 #define ARMA_USE_BLAS
 #define ARMA_USE_LAPACK
 // #endif
+#ifndef USING_R
+#define ULONG ULONG_FAKE
+#include "progressWrapper.h"
+#undef ULONG
+#undef FILE_CREATE
+#endif

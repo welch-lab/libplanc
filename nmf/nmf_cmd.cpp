@@ -1,9 +1,7 @@
 #include "NMFDriver.hpp"
-#include "SparseNMFDriver.hpp"
-#include "parsecommandline.hpp"
-#include <stdio.h>
+#include <cstdio>
 #include <string>
-#include "utils.hpp"
+
 
 int main(int argc, char *argv[]) {
   try {

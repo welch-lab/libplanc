@@ -2,8 +2,6 @@
 /* Copyright Ramakrishnan Kannan 2017 */
 
 
-#include <getopt.h>
-#include "utils.h"
 
 // usage scenarios
 // NMFLibrary algotype lowrank AfileName numIteration

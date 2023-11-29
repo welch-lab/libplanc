@@ -15,6 +15,12 @@
   }, {
     "name" : "pkgconf",
     "version>=" : "1.8.0#5"
+  }, {
+    "name" : "blas",
+    "version>=" : "2023-03-25"
+  }, {
+    "name" : "indicators",
+    "version>=" : "2.3"
   } ],
-  "builtin-baseline" : "9edb1b8e590cc086563301d735cae4b6e732d2d2"
+  "builtin-baseline" : "64ca152891d6ab135c6c27881e7eb0ac2fa15bba"
 }
