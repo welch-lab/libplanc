@@ -26,6 +26,13 @@
       }
     },
     {
+      "name": "linux-release",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "macos-debug",
       "displayName": "macOS Debug",
       "description": "Target a remote macOS system.",

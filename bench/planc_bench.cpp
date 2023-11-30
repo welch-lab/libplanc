@@ -61,7 +61,8 @@ private:
         this->m_m = A.n_rows;
         this->m_n = A.n_cols;
         UINT numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
-        #pragma omp parallel for schedule(dynamic) private(tictoc_stack)
+        double start = omp_get_wtime();
+        #pragma omp parallel for schedule(auto)
         for (UINT i = 0; i < numChunks; i++)\
         {
             UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
@@ -70,18 +71,21 @@ private:
             {
                 spanEnd = m_n - 1;
             }
-            #pragma omp critical
-            tic();
+            // double start = omp_get_wtime();
             BPPNNLS<AMAT, VEC> solveProblem(B.t(), (AMAT)A.cols(spanStart, spanEnd), false);
             solveProblem.solveNNLS();
-            titer = toc();
+            // double end = omp_get_wtime();
+            // titer = end - start;
             //#ifdef _VERBOSE
-            INFO << " start=" << spanStart
-                 << ", end=" << spanEnd
-                 << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
-                 << " time taken=" << titer << std::endl;
+            // INFO << " start=" << spanStart
+            //     << ", end=" << spanEnd
+            //     << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu() << std::endl;
+            //     // << " time taken=" << titer << std::endl;
             //#endif
         };
+        double end = omp_get_wtime();
+        tben = end - start;
+        INFO << " total nnls runtime=" << tben << std::endl;
     }
         void nnlsParseCommandLine()
         {
