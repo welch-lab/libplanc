@@ -15,7 +15,7 @@ class BPPNMF : public NMF<T> {
  private:
   T At;
   arma::mat giventGiven;
-  unsigned int ONE_THREAD_MATRIX_SIZE; // chunking
+  int ONE_THREAD_MATRIX_SIZE; // chunking
   // designed as if W is given and H is found.
   // The transpose is the other problem.
   void updateOtherGivenOneMultipleRHS(const T &input, const arma::mat &given,
@@ -24,7 +24,7 @@ class BPPNMF : public NMF<T> {
     double t2;
 #endif
     this->ONE_THREAD_MATRIX_SIZE = chunk_size_dense<double>(this->W.n_cols);
-    unsigned int numChunks = input.n_cols / this->ONE_THREAD_MATRIX_SIZE;
+    int numChunks = input.n_cols / this->ONE_THREAD_MATRIX_SIZE;
     if (numChunks * this->ONE_THREAD_MATRIX_SIZE < input.n_cols) numChunks++;
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
     tic();
@@ -55,9 +55,9 @@ class BPPNMF : public NMF<T> {
     tic();
 #endif
 #pragma omp parallel for schedule(dynamic) default(none) shared(numChunks, input, giventInput, othermat) num_threads(this->ncores)
-    for (unsigned int i = 0; i < numChunks; i++) {
-      unsigned int spanStart = i * this->ONE_THREAD_MATRIX_SIZE;
-      unsigned int spanEnd = (i + 1) * this->ONE_THREAD_MATRIX_SIZE - 1;
+    for (int i = 0; i < numChunks; i++) {
+      int spanStart = i * this->ONE_THREAD_MATRIX_SIZE;
+      int spanEnd = (i + 1) * this->ONE_THREAD_MATRIX_SIZE - 1;
       if (spanEnd > input.n_cols - 1) {
         spanEnd = input.n_cols - 1;
       }
@@ -170,7 +170,7 @@ void commonSolve() {
       Wt.clear();
       {
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
-        for (unsigned int i = 0; i < this->n; i++) {
+        for (int i = 0; i < this->n; i++) {
           auto *subProblemforH =
               new BPPNNLS<arma::mat, arma::vec>(WtW, (arma::vec)WtA.col(i), true);
 #ifdef _VERBOSE
@@ -212,7 +212,7 @@ void commonSolve() {
         Ht.clear();
 // solve for W given H;
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
-        for (unsigned int i = 0; i < this->m; i++) {
+        for (int i = 0; i < this->m; i++) {
           auto *subProblemforW =
               new BPPNNLS<arma::mat, arma::vec>(HtH, (arma::vec)HtAt.col(i), true);
 #ifdef _VERBOSE

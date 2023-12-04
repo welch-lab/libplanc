@@ -15,8 +15,8 @@ namespace planc {
     template <typename T>
     class INMF {
     protected:
-        arma::uword m, k, nDatasets, nMax, nSum;
-        arma::uword INMF_CHUNK_SIZE;                 // chunking
+        arma::uword k, nDatasets, nMax, nSum;
+        int INMF_CHUNK_SIZE, m;                 // chunking
         std::vector<arma::uword> ncol_E;             // vector of n_i
         std::vector<std::unique_ptr<T>> Ei;          // each of size mxn_i
         std::vector<std::unique_ptr<T>> EiT;          // each of size n_ixm
