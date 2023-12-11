@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
   try {
     planc::ParseCommandLine dnd(argc, argv);
-    planc::NMFDriver myNMF(dnd);
+    planc::NMFDriver<arma::mat> myNMF(dnd);
     myNMF.callNMF();
     fflush(stdout);
   } catch (const std::exception &e) {

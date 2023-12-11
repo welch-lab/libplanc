@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 #add_library(sparse_nmf OBJECT SparseNMFDriver.cpp)
 #add_library(dense_nmf OBJECT NMFDriver.cpp)
-add_executable(plancnmf nmf_cmd.cpp NMFDriver.cpp
+add_executable(plancnmf nmf_cmd.cpp
         bppnmf.cpp)
 
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
