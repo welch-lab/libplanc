@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 #include "parsecommandline.hpp"
+#include "plancopts.h"
 #include "aoadmm.hpp"
 #include "gnsym.hpp"
 #include "mu.hpp"
@@ -47,25 +48,24 @@ protected:
     static const int kbetaSp = 10;
     template<class NMFTYPE>
     void CallNMF();
-    void parseCommandLine(ParseCommandLine pc)
+    void parseParams(const params& pc)
     {
-        pc.parseplancopts();
-        this->m_nmfalgo = pc.lucalgo();
-        this->m_k = pc.lowrankk();
-        this->m_Afile_name = pc.input_file_name();
-        this->m_sparsity = pc.sparsity();
-        this->m_num_it = pc.iterations();
-        this->m_regW = pc.regW();
-        this->m_regH = pc.regH();
-        this->m_m = pc.globalm();
-        this->m_n = pc.globaln();
-        this->m_compute_error = pc.compute_error();
-        this->m_symm_reg = pc.symm_reg();
+        this->m_nmfalgo = pc.m_lucalgo;
+        this->m_k = pc.m_k;
+        this->m_Afile_name = pc.m_Afile_name;
+        this->m_sparsity = pc.m_sparsity;
+        this->m_num_it = pc.m_num_it;
+        this->m_regW = pc.m_regW;
+        this->m_regH = pc.m_regH;
+        this->m_m = pc.m_globalm;
+        this->m_n = pc.m_globaln;
+        this->m_compute_error = pc.m_compute_error;
+        this->m_symm_reg = pc.m_symm_reg;
         this->m_symm_flag = 0;
-        this->m_adj_rand = pc.adj_rand();
-        this->m_max_luciters = pc.max_luciters();
-        this->m_initseed = pc.initseed();
-        this->m_outputfile_name = pc.output_file_name();
+        this->m_adj_rand = pc.m_adj_rand;
+        this->m_max_luciters = pc.m_max_luciters;
+        this->m_initseed = pc.m_initseed;
+        this->m_outputfile_name = pc.m_outputfile_name;
 
         // Put in the default LUC iterations
         if (this->m_max_luciters == -1)
@@ -94,13 +94,13 @@ protected:
                 return;
             }
         }
-        pc.printConfig();
+        // pc.printConfig();
     }
 
 public:
-explicit NMFDriver<T>(ParseCommandLine pc)
+explicit NMFDriver<T>(params pc)
 {
-    this->parseCommandLine(std::move(pc));
+    this->parseParams(pc);
 }
 virtual void callNMF()
 {

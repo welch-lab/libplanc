@@ -6,87 +6,35 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "plancopts.h"
 #include "parsecommandline.h"
 #include "utils.h"
 
 namespace planc {
 class ParseCommandLine {
  protected:
-  int m_argc;
-  char **m_argv;
+    params clStruct;
+    int m_argc;
+    char **m_argv;
+    bool parsed = false;
 
-  // common to all algorithms.
-  algotype m_lucalgo;
-  normtype m_input_normalization;
-  bool m_compute_error;
-  int m_num_it;
-  int m_num_k_blocks;
-  bool m_dim_tree;
-  bool m_adj_rand;
 
-  // file names
-  std::string m_Afile_name;         // X (features) matrix for jointnmf
-  std::string m_outputfile_name;
-  std::string m_Sfile_name;         // S (connection) matrix for jointnmf
-  // std::string m_init_file_name;
-
-  // nmf related values
-  arma::uword m_k;
-  arma::uword m_globalm;
-  arma::uword m_globaln;
-  int m_initseed;
-
-  // algo related values
-  arma::fvec m_regW;
-  arma::fvec m_regH;
-  float m_sparsity;
-
-  // distnmf related values
-  int m_pr;
-  int m_pc;
-  double m_symm_reg;
-  double m_tolerance;
-
-  // dist ntf
-  int m_num_modes;
-  arma::uvec m_dimensions;
-  arma::uvec m_proc_grids;
-  arma::fvec m_regularizers;
-
-  // LUC params (optional)
-  int m_max_luciters;
-
-  // hiernmf related values
-  int m_num_nodes;
-
-  // jointnmf values
-  double alpha, beta;
-  bool feat_type, conn_type;
-  double m_gamma;
-  int m_unpartitioned;
-
-  // distjointnmf values
-  // grid size for the connection matrices (cpr x cpc)
-  arma::uvec m_conn_grids;
-  int m_cpr;
-  int m_cpc;
-
-  void parseArrayofString(const char opt, const char *input) {
+    void parseArrayofString(const char opt, const char *input) {
     std::stringstream ss(input);
     std::string s;
     int i = 0;
     // debug_hook();
-    if (this->m_num_modes == 0) {
+    if (clStruct.m_num_modes == 0) {
       while (getline(ss, s, ' ')) {
         if(!s.empty()){
           i++;
         }
       }
-      this->m_num_modes = i;
-      this->m_conn_grids = arma::zeros<arma::uvec>(this->m_num_modes);
-      this->m_dimensions = arma::zeros<arma::uvec>(this->m_num_modes);
-      this->m_regularizers = arma::zeros<arma::fvec>(2 * this->m_num_modes);
-      this->m_proc_grids = arma::ones<arma::uvec>(this->m_num_modes);
+      clStruct.m_num_modes = i;
+      clStruct.m_conn_grids = arma::zeros<arma::uvec>(clStruct.m_num_modes);
+      clStruct.m_dimensions = arma::zeros<arma::uvec>(clStruct.m_num_modes);
+        clStruct.m_regularizers = arma::zeros<arma::fvec>(2 * clStruct.m_num_modes);
+        clStruct.m_proc_grids = arma::ones<arma::uvec>(clStruct.m_num_modes);
     }
     i = 0;
     ss.clear();
@@ -95,16 +43,16 @@ class ParseCommandLine {
       if(!s.empty()){
         switch (opt) {
           case 'd':
-            this->m_dimensions(i++) = ::atoi(s.c_str());
+              clStruct.m_dimensions(i++) = ::atoi(s.c_str());
             break;
           case 'r':
-            this->m_regularizers(i++) = ::atof(s.c_str());
+              clStruct.m_regularizers(i++) = ::atof(s.c_str());
             break;
           case 'p':
-            this->m_proc_grids(i++) = ::atoi(s.c_str());
+              clStruct.m_proc_grids(i++) = ::atoi(s.c_str());
             break;
           case 'q':
-            this->m_conn_grids(i++) = ::atoi(s.c_str());
+              clStruct.m_conn_grids(i++) = ::atoi(s.c_str());
             break;
           default:
             INFO << "wrong option::" << opt << "::values::" << input << std::endl;
@@ -121,33 +69,33 @@ class ParseCommandLine {
    * @param[in] **argv - command line parameters.
    */
   ParseCommandLine(int argc, char **argv) : m_argc(argc), m_argv(argv) {
-    this->m_num_modes = 0;
-    this->m_pr = 1;
-    this->m_pc = 1;
-    this->m_cpr = 0; // default is single grid
-    this->m_cpc = 0; // default is single grid
-    this->m_regW = arma::zeros<arma::fvec>(2);
-    this->m_regH = arma::zeros<arma::fvec>(2);
-    this->m_num_k_blocks = 1;
-    this->m_k = 20;
-    this->m_num_it = 20;
-    this->m_lucalgo = ANLSBPP;
-    this->m_compute_error = 0;
-    this->m_input_normalization = NONE;
-    this->m_dim_tree = 1;
-    this->m_symm_reg = -1;
-    this->m_adj_rand = false;
-    this->m_max_luciters = -1;
-    this->m_tolerance = -1;
-    this->m_initseed = 193957;  // Random 6 digit prime
-    this->alpha = 0;
-    this->beta = 0;
-    this->m_gamma = -1;
-    this->m_unpartitioned = 1;
-    this->m_sparsity  = 0.01;
+    clStruct.m_num_modes = 0;
+    clStruct.m_pr = 1;
+    clStruct.m_pc = 1;
+    clStruct.m_cpr = 0; // default is single grid
+    clStruct.m_cpc = 0; // default is single grid
+    clStruct.m_regW = arma::zeros<arma::fvec>(2);
+    clStruct.m_regH = arma::zeros<arma::fvec>(2);
+    clStruct.m_num_k_blocks = 1;
+    clStruct.m_k = 20;
+    clStruct.m_num_it = 20;
+    clStruct.m_lucalgo = ANLSBPP;
+    clStruct.m_compute_error = 0;
+    clStruct.m_input_normalization = NONE;
+    clStruct.m_dim_tree = 1;
+    clStruct.m_symm_reg = -1;
+    clStruct.m_adj_rand = false;
+    clStruct.m_max_luciters = -1;
+    clStruct.m_tolerance = -1;
+    clStruct.m_initseed = 193957;  // Random 6 digit prime
+    clStruct.alpha = 0;
+    clStruct.beta = 0;
+    clStruct.m_gamma = -1;
+    clStruct.m_unpartitioned = 1;
+    clStruct.m_sparsity  = 0.01;
     // Default types (both dense)
-    this->feat_type = 1;
-    this->conn_type = 1;
+    clStruct.feat_type = 1;
+    clStruct.conn_type = 1;
   }
   /// parses the command line parameters
   void parseplancopts(int help_opt = 0) {
@@ -157,31 +105,31 @@ class ParseCommandLine {
                               &long_index)) != -1) {
       switch (opt) {
         case 'a':
-          this->m_lucalgo = static_cast<algotype>(atoi(optarg));
+          clStruct.m_lucalgo = static_cast<algotype>(atoi(optarg));
           break;
         case 'e':
-          this->m_compute_error = atoi(optarg);
+          clStruct.m_compute_error = atoi(optarg);
           break;
         case 'l':
-          this->m_tolerance = atof(optarg);
+            clStruct.m_tolerance = atof(optarg);
           break;
         case 'i': {
           std::string temp = std::string(optarg);
-          this->m_Afile_name = temp;
+            clStruct.m_Afile_name = temp;
           break;
         }
         // jointnmf connection matrix S
         case 'c': {
           std::string temp = std::string(optarg);
-          this->m_Sfile_name = temp;
+            clStruct.m_Sfile_name = temp;
           break;
         }
         case 'k':
-          this->m_k = atoi(optarg);
+            clStruct.m_k = atoi(optarg);
           break;
         case 'o': {
           std::string temp = std::string(optarg);
-          this->m_outputfile_name = temp;
+            clStruct.m_outputfile_name = temp;
           break;
         }
         case 'd':
@@ -193,44 +141,44 @@ class ParseCommandLine {
           parseArrayofString(opt, optarg);
           break;
         case 's':
-          this->m_sparsity = atof(optarg);
+            clStruct.m_sparsity = atof(optarg);
           break;
         case 't':
-          this->m_num_it = atoi(optarg);
+            clStruct.m_num_it = atoi(optarg);
           break;
         case 'n':
-          this->m_num_nodes = atoi(optarg);
+            clStruct.m_num_nodes = atoi(optarg);
           break;
         case NUMKBLOCKS:
-          this->m_num_k_blocks = atoi(optarg);
+            clStruct.m_num_k_blocks = atoi(optarg);
           break;
         case NORMALIZATION: {
           std::string temp = std::string(optarg);
           if (temp.compare("l2") == 0) {
-            this->m_input_normalization = normtype::L2NORM;
+              clStruct.m_input_normalization = normtype::L2NORM;
           } else if (temp.compare("max") == 0) {
-            this->m_input_normalization = normtype::MAXNORM;
+              clStruct.m_input_normalization = normtype::MAXNORM;
           }
           break;
         }
         case DIMTREE:
-          this->m_dim_tree = atoi(optarg);
+            clStruct.m_dim_tree = atoi(optarg);
           break;
         case SYMMETRICREG:
-          this->m_symm_reg = atof(optarg);
+            clStruct.m_symm_reg = atof(optarg);
           break;
         case ALPHAREG:
-          this->alpha = atof(optarg);
+            clStruct.alpha = atof(optarg);
           break;
         case BETAREG:
-          this->beta = atof(optarg);
+            clStruct.beta = atof(optarg);
           break;
         case MOMENTUM:
-          this->m_gamma = atof(optarg);
+            clStruct.m_gamma = atof(optarg);
           break;
 
         case UNPARTITIONED:
-          this->m_unpartitioned = atoi(optarg);
+            clStruct.m_unpartitioned = atoi(optarg);
           break;
 
         case MAT_TYPE: {
@@ -242,23 +190,23 @@ class ParseCommandLine {
             // for clarity...
             if(!s_den.empty()){break;}
           }
-          this->feat_type = atoi(s_den.c_str());
+            clStruct.feat_type = atoi(s_den.c_str());
           while(getline(ss_den, s_den, ' ')){
             if(!s_den.empty()){break;}
           }
-          this->conn_type = atoi(s_den.c_str());
-          INFO << "feat_type: " << this->feat_type << " conn_type: " << this->conn_type << std::endl;
+            clStruct.conn_type = atoi(s_den.c_str());
+          INFO << "feat_type: " << clStruct.feat_type << " conn_type: " << clStruct.conn_type << std::endl;
           break;
         }
 
         case ADJRAND:
-          this->m_adj_rand = true;
+            clStruct.m_adj_rand = true;
           break;
         case NUMLUCITERS:
-          this->m_max_luciters = atoi(optarg);
+            clStruct.m_max_luciters = atoi(optarg);
           break;
         case INITSEED:
-          this->m_initseed = atoi(optarg);
+            clStruct.m_initseed = atoi(optarg);
           break;
         case 'h':  // fall through intentionally
           print_usage(help_opt);
@@ -275,24 +223,24 @@ class ParseCommandLine {
     }
 
     // Input file must be given
-    if (this->m_Afile_name.empty()) {
+    if (clStruct.m_Afile_name.empty()) {
       INFO << "Input not given." << std::endl;
       print_usage(help_opt);
       exit(EXIT_FAILURE);
     }
 
     // properly initialize the values for nmf cases now.
-    if (this->m_num_modes == 2) {
-      this->m_globalm = this->m_dimensions(0);
-      this->m_globaln = this->m_dimensions(1);
-      this->m_regW(0) = this->m_regularizers(0);
-      this->m_regW(1) = this->m_regularizers(1);
-      this->m_regH(0) = this->m_regularizers(2);
-      this->m_regH(1) = this->m_regularizers(3);
-      this->m_pr      = this->m_proc_grids(0);
-      this->m_pc      = this->m_proc_grids(1);
-      this->m_cpr     = this->m_conn_grids(0);
-      this->m_cpc     = this->m_conn_grids(1);
+    if (clStruct.m_num_modes == 2) {
+      clStruct.m_globalm = clStruct.m_dimensions(0);
+      clStruct.m_globaln = clStruct.m_dimensions(1);
+      clStruct.m_regW(0) = clStruct.m_regularizers(0);
+      clStruct.m_regW(1) = clStruct.m_regularizers(1);
+      clStruct.m_regH(0) = clStruct.m_regularizers(2);
+      clStruct.m_regH(1) = clStruct.m_regularizers(3);
+      clStruct.m_pr      = clStruct.m_proc_grids(0);
+      clStruct.m_pc      = clStruct.m_proc_grids(1);
+      clStruct.m_cpr     = clStruct.m_conn_grids(0);
+      clStruct.m_cpc     = clStruct.m_conn_grids(1);
     }
   }
 
@@ -301,61 +249,61 @@ class ParseCommandLine {
   void printConfig(int opt = 0) {
     switch (opt) {
       case JOINTNMF:
-        INFO << "a::" << this->m_lucalgo << "::i::" << this->m_Afile_name
-             << "::c::" << this->m_Sfile_name
-             << "::o::" << this->m_outputfile_name
-             << "::m::" << this->m_globalm << "::n::" << this->m_globaln
-             << "::t::" << this->m_num_it
-             << "::error::" << this->m_compute_error
-             << "::tol::" << this->m_tolerance
-             << "::regW::" << this->m_regW << "::regH::" << this->m_regH
-             << "::sparsity::" << this->m_sparsity
-             << "::input normalization::" << this->m_input_normalization
-             << "::num_k_blocks::" << m_num_k_blocks
-             << "::adj_rand::" << this->m_adj_rand
-             << "::initseed::" << this->m_initseed
-             << "::alpha::" << this->alpha << "::beta::" << this->beta
+        INFO << "a::" << clStruct.m_lucalgo << "::i::" << clStruct.m_Afile_name
+             << "::c::" << clStruct.m_Sfile_name
+             << "::o::" << clStruct.m_outputfile_name
+             << "::m::" << clStruct.m_globalm << "::n::" << clStruct.m_globaln
+             << "::t::" << clStruct.m_num_it
+             << "::error::" << clStruct.m_compute_error
+             << "::tol::" << clStruct.m_tolerance
+             << "::regW::" << clStruct.m_regW << "::regH::" << clStruct.m_regH
+             << "::sparsity::" << clStruct.m_sparsity
+             << "::input normalization::" << clStruct.m_input_normalization
+             << "::num_k_blocks::" << clStruct.m_num_k_blocks
+             << "::adj_rand::" << clStruct.m_adj_rand
+             << "::initseed::" << clStruct.m_initseed
+             << "::alpha::" << clStruct.alpha << "::beta::" << clStruct.beta
              << std::endl;
         break;
       case DISTJOINTNMF:
-        INFO << "a::" << this->m_lucalgo << "::i::" << this->m_Afile_name
-             << "::c::" << this->m_Sfile_name
-             << "::o::" << this->m_outputfile_name
-             << "::m::" << this->m_globalm << "::n::" << this->m_globaln
-             << "::t::" << this->m_num_it
-             << "::error::" << this->m_compute_error
-             << "::tol::" << this->m_tolerance
-             << "::regW::" << this->m_regW << "::regH::" << this->m_regH
-             << "::sparsity::" << this->m_sparsity
-             << "::input normalization::" << this->m_input_normalization
-             << "::num_k_blocks::" << m_num_k_blocks
-             << "::adj_rand::" << this->m_adj_rand
-             << "::initseed::" << this->m_initseed
-             << "::alpha::" << this->alpha << "::beta::" << this->beta
-             << "::pr::" << this->m_pr << "::pc::" << this->m_pc
-             << "::cpr::" << this->m_cpr << "::cpc::" << this->m_cpc
+        INFO << "a::" << clStruct.m_lucalgo << "::i::" << clStruct.m_Afile_name
+             << "::c::" << clStruct.m_Sfile_name
+             << "::o::" << clStruct.m_outputfile_name
+             << "::m::" << clStruct.m_globalm << "::n::" << clStruct.m_globaln
+             << "::t::" << clStruct.m_num_it
+             << "::error::" << clStruct.m_compute_error
+             << "::tol::" << clStruct.m_tolerance
+             << "::regW::" << clStruct.m_regW << "::regH::" << clStruct.m_regH
+             << "::sparsity::" << clStruct.m_sparsity
+             << "::input normalization::" << clStruct.m_input_normalization
+             << "::num_k_blocks::" << clStruct.m_num_k_blocks
+             << "::adj_rand::" << clStruct.m_adj_rand
+             << "::initseed::" << clStruct.m_initseed
+             << "::alpha::" << clStruct.alpha << "::beta::" << clStruct.beta
+             << "::pr::" << clStruct.m_pr << "::pc::" << clStruct.m_pc
+             << "::cpr::" << clStruct.m_cpr << "::cpc::" << clStruct.m_cpc
              << std::endl;
         break;
       default:
-        INFO << "a::" << this->m_lucalgo << "::i::" << this->m_Afile_name
-                  << "::k::" << this->m_k << "::m::" << this->m_globalm
-                  << "::n::" << this->m_globaln << "::t::" << this->m_num_it
-                  << "::pr::" << this->m_pr << "::pc::" << this->m_pc
-                  << "::error::" << this->m_compute_error  << "::tol::" << this->m_tolerance
+        INFO << "a::" << clStruct.m_lucalgo << "::i::" << clStruct.m_Afile_name
+                  << "::k::" << clStruct.m_k << "::m::" << clStruct.m_globalm
+                  << "::n::" << clStruct.m_globaln << "::t::" << clStruct.m_num_it
+                  << "::pr::" << clStruct.m_pr << "::pc::" << clStruct.m_pc
+                  << "::error::" << clStruct.m_compute_error  << "::tol::" << clStruct.m_tolerance
                   << "::regW::"
-                  << "l2::" << this->m_regW(0) << "::l1::" << this->m_regW(1)
+                  << "l2::" << clStruct.m_regW(0) << "::l1::" << clStruct.m_regW(1)
                   << "::regH::"
-                  << "l2::" << this->m_regH(0) << "::l1::" << this->m_regH(1)
-                  << "::num_k_blocks::" << m_num_k_blocks
-                  << "::dimensions::" << this->m_dimensions
-                  << "::procs::" << this->m_proc_grids
-                  << "::regularizers::" << this->m_regularizers
-                  << "::input normalization::" << this->m_input_normalization
-                  << "::symm_reg::" << this->m_symm_reg
-                  << "::luciters::" << this->m_max_luciters
-                  << "::adj_rand::" << this->m_adj_rand
-                  << "::initseed::" << this->m_initseed
-                  << "::dimtree::" << this->m_dim_tree << std::endl;
+                  << "l2::" << clStruct.m_regH(0) << "::l1::" << clStruct.m_regH(1)
+                  << "::num_k_blocks::" << clStruct.m_num_k_blocks
+                  << "::dimensions::" << clStruct.m_dimensions
+                  << "::procs::" << clStruct.m_proc_grids
+                  << "::regularizers::" << clStruct.m_regularizers
+                  << "::input normalization::" << clStruct.m_input_normalization
+                  << "::symm_reg::" << clStruct.m_symm_reg
+                  << "::luciters::" << clStruct.m_max_luciters
+                  << "::adj_rand::" << clStruct.m_adj_rand
+                  << "::initseed::" << clStruct.m_initseed
+                  << "::dimtree::" << clStruct.m_dim_tree << std::endl;
     }
   }
 
@@ -591,105 +539,114 @@ class ParseCommandLine {
     }
   }
   /// returns the low rank. Passed as parameter --lowrank or -k
-  arma::uword lowrankk() { return m_k; }
+  arma::uword lowrankk() { return clStruct.m_k; }
   /// return global rows. Passed as parameter -d
-  arma::uword globalm() { return m_globalm; }
+  arma::uword globalm() { return clStruct.m_globalm; }
   //// returns the global columns. Passed as parameter -d
-  arma::uword globaln() { return m_globaln; }
+  arma::uword globaln() { return clStruct.m_globaln; }
   /**
    * L2 regularization as the first parameter and L1 as second
    * for left lowrank factor W. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
    */
-  arma::fvec regW() { return m_regW; }
+  arma::fvec regW() { return clStruct.m_regW; }
   /**
    * L2 regularization as the first parameter and L1 as second
    * for right lowrank factor H. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
    */
-  arma::fvec regH() { return m_regH; }
+  arma::fvec regH() { return clStruct.m_regH; }
   /// Returns the NMF algorithm to run. Passed as parameter --algo or -a
-  algotype lucalgo() { return m_lucalgo; }
+  algotype lucalgo() { return clStruct.m_lucalgo; }
   /**
    *  Returns the process grid configuration.
    * Passed as parameter --processors or -p
    */
 
-  arma::uvec processor_grids() { return m_proc_grids; }
+  arma::uvec processor_grids() { return clStruct.m_proc_grids; }
   /**
    * Returns the vector regularizers for all the modes.
    * It will 2 times the mode values. The first entry is
    * L2 regularization and second value is L1 for every mode.
    * Passed as parameter --regularizers "L2 L1" for every mode.
    */
-  arma::fvec regularizers() { return m_regularizers; }
+  arma::fvec regularizers() { return clStruct.m_regularizers; }
   /**
    *  Returns vector of dimensions for every mode.
    * Passed as parameter -d or --dimensions
    */
-  arma::uvec dimensions() { return m_dimensions; }
-  int num_k_blocks() { return m_num_k_blocks; }
+  arma::uvec dimensions() { return clStruct.m_dimensions; }
+  int num_k_blocks() { return clStruct.m_num_k_blocks; }
   /// Returns number of iterations. passed as -t or --iter
-  int iterations() { return m_num_it; }
+  int iterations() { return clStruct.m_num_it; }
   /// Returns error tolerance for stopping NMF iterations. Passed as -l or --tolerance
-  double tolerance() { return m_tolerance; }
+  double tolerance() { return clStruct.m_tolerance; }
   /// Returns number of nodes to compute in a H2NMF tree. Passed as -n or --nodes
-  int nodes() { return m_num_nodes; }
+  int nodes() { return clStruct.m_num_nodes; }
   /// Input parameter for generating sparse matrix. Passed as -s or --sparsity
-  float sparsity() { return m_sparsity; }
+  float sparsity() { return clStruct.m_sparsity; }
   /// Returns input file name. Passed as -i or --input
-  std::string input_file_name() { return m_Afile_name; }
+  std::string input_file_name() { return clStruct.m_Afile_name; }
   /// Returns connection file name. Passed as -c or --connection_matrix
-  std::string conn_file_name() { return m_Sfile_name; }
+  std::string conn_file_name() { return clStruct.m_Sfile_name; }
   /**
    * Returns output file name. Passed as -o or --output.
    * Every mode will appended as _mode.
    */
-  std::string output_file_name() { return m_outputfile_name; }
+  std::string output_file_name() { return clStruct.m_outputfile_name; }
   /**
    * Returns the number of processor rows.
    * Used for distributed NMF. The first parameter of -p.
    */
-  int pr() { return m_pr; }
+  int pr() { return clStruct.m_pr; }
     /**
    * Returns the number of processor columns.
    * Used for distributed NMF. The second parameter of -p.
    */
-  int pc() { return m_pc; }
+  int pc() { return clStruct.m_pc; }
   /// Getter functions for the second grid (JointNMF)
-  int cpr() { return m_cpr; }
-  int cpc() { return m_cpc; }
+  int cpr() { return clStruct.m_cpr; }
+  int cpc() { return clStruct.m_cpc; }
   /// Returns number of modes in tensors. For matrix it is two.
-  int num_modes() { return m_num_modes; }
+  int num_modes() { return clStruct.m_num_modes; }
   /**
    * Enable dimension tree or not. By default we use dimension trees
    * for more than three modes. Passed as parameter --dimtree 1
    */
-  bool dim_tree() { return m_dim_tree; }
+  bool dim_tree() { return clStruct.m_dim_tree; }
   /**
    * Enable adjusting random matrix creationg by using a pointwise
    * non-linear function. X(i,j) = ceil(alpha*X(i,j) + beta)
    */
-  bool adj_rand() { return m_adj_rand; }
+  bool adj_rand() { return clStruct.m_adj_rand; }
   /// Returns whether to compute error not. Passed as parameter -e or --error
-  bool compute_error() { return m_compute_error; }
+  bool compute_error() { return clStruct.m_compute_error; }
   /// To column normalize the input matrix.
-  normtype input_normalization() { return this->m_input_normalization; }
+  normtype input_normalization() { return clStruct.m_input_normalization; }
   /// Returns the value of the symmetric regularizer
-  double symm_reg() { return m_symm_reg; }
-  /// Return the maximum number of CG iterations to take
-  int max_luciters() { return m_max_luciters; }
+  double symm_reg() { return clStruct.m_symm_reg; }
+  /// return the maximum number of CG iterations to take
+  int max_luciters() { return clStruct.m_max_luciters; }
   /// Initialisation seed for starting point of W, H matrices
-  int initseed() { return m_initseed; }
+  int initseed() { return clStruct.m_initseed; }
   // JointNMF parameters
-  double joint_alpha() { return alpha; }
+  double joint_alpha() { return clStruct.alpha; }
   // JointNMF parameters
-  double joint_beta() { return beta; }
+  double joint_beta() { return clStruct.beta; }
   // PGD momentum parameters
-  double gamma() { return m_gamma; }
-  double unpartitioned() { return m_unpartitioned; }
-  bool feat_typesity() { return feat_type; }
-  bool conn_typesity() { return conn_type; }
+  double gamma() { return clStruct.m_gamma; }
+  double unpartitioned() { return clStruct.m_unpartitioned; }
+  bool feat_typesity() { return clStruct.feat_type; }
+  bool conn_typesity() { return clStruct.conn_type; }
+
+  params getPlancParams() {
+      if (this->parsed == false) {
+          this->parseplancopts();
+          this->parsed = true;
+      }
+      this->printConfig();
+      return clStruct;
+  }
 
 };  // ParseCommandLine
 }  // namespace planc
