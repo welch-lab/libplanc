@@ -5,6 +5,8 @@
 #ifndef PLANC_PLANCOPTS_H
 #define PLANC_PLANCOPTS_H
 
+#include "utils.h"
+
 namespace planc {
     struct params {
         // common to all algorithms.
