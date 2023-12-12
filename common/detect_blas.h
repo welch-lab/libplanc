@@ -6,11 +6,14 @@
 #define DETECT_BLAS_H
 #include <stdbool.h>
 
+typedef int(*openblas_handle_t)(void);
+openblas_handle_t get_openblas_handle(void);
+
 typedef int(*openblas_init_t)(void);
-openblas_init_t get_openblas_parallel(void* libloc);
+openblas_init_t get_openblas_parallel(openblas_handle_t libloc);
 
 typedef void(*openblas_set_t)(int);
-openblas_set_t get_openblas_set(void* libloc);
+openblas_set_t get_openblas_set(openblas_handle_t libloc);
 
 bool is_openmp(void);
 

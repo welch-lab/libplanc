@@ -1,4 +1,5 @@
-#include "NMFDriver.hpp"
+#include "parsecommandline.hpp"
+#include "nmf_lib.hpp"
 #include <cstdio>
 #include <string>
 
@@ -6,9 +7,10 @@
 int main(int argc, char *argv[]) {
   try {
     planc::ParseCommandLine dnd(argc, argv);
-    planc::NMFDriver<arma::mat> myNMF(dnd.getPlancParams());
-    myNMF.callNMF();
+    auto libstate = planc::nmflib();
+    int status = libstate.runNMF<arma::mat>(dnd.getPlancParams());
     fflush(stdout);
+    return status;
   } catch (const std::exception &e) {
     INFO << "Exception with stack trace " << std::endl;
     INFO << e.what();

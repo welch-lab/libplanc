@@ -21,6 +21,9 @@
   }, {
     "name" : "indicators",
     "version>=" : "2.3"
+  }, {
+    "name" : "dlfcn-win32",
+    "version>=" : "1.4.1"
   } ],
   "builtin-baseline" : "64ca152891d6ab135c6c27881e7eb0ac2fa15bba"
 }
