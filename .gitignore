@@ -6,3 +6,11 @@
 .vs/*
 out/*
 vcpkg_installed/*
+/cmake-build-debug-mingw
+/cmake-build-debug-visual-studio
+/cmake-build-debug-visual-studio-clang
+/cmake-build-debug-wsl
+/cmake-build-release-mingw
+/cmake-build-release-visual-studio
+/cmake-build-release-visual-studio-clang
+/cmake-build-release-wsl

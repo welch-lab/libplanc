@@ -8,6 +8,7 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
+      "toolchainFile": "~/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_COMPILER": "g++",
@@ -65,13 +66,13 @@
       }
     },
     {
-      "name": "windows-msvc-base",
+      "name": "windows-msvc-llvm-base",
       "displayName": "Windows MSVC-LLVM x64 Debug",
       "description": "Sets generator, compilers, x64 architecture, build and install directory, debug build type",
       "generator": "Visual Studio 17 2022",
       "toolset": "ClangCL",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-       "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "toolchainFile": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "architecture": {
         "value": "x64",
         "strategy": "external"
@@ -85,6 +86,33 @@
           "intelliSenseMode": "windows-clang-x64",
           "hostOS": [ "Windows" ]
         }
+      }
+    },
+    {
+      "name": "windows-msvc-llvm-release",
+      "inherits": "windows-msvc-llvm-base",
+      "displayName": "Windows MSVC-LLVM x64 Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-msvc-debug",
+      "inherits": "windows-msvc-llvm-base",
+      "displayName": "Windows MSVC x64 Debug",
+      "toolset": "v143",
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intelliSenseMode": "windows-msvc-x64"
+        }
+      }
+    },
+    {
+      "name": "windows-msvc-release",
+      "inherits": "windows-msvc-debug",
+      "displayName": "Windows MSVC x64 Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {

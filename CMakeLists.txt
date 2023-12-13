@@ -54,7 +54,7 @@ endif()
 find_package(Armadillo CONFIG REQUIRED)
 find_package(HighFive CONFIG REQUIRED)
 find_package(indicators CONFIG REQUIRED)
-find_package(hwloc REQUIRED)
+find_package(HWLOC REQUIRED)
 
 if(OpenMP_CXX_FOUND)
     add_compile_options(${OpenMP_CXX_FLAGS})
