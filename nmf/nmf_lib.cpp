@@ -36,13 +36,14 @@ void planc::nmflib::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp
 }
 }
 
-template<typename T>
-int planc::nmflib::runNMF(planc::params opts, auto mat) {
-    planc::NMFDriver<T> myNMF(opts);
+template<> int planc::nmflib::runNMF<arma::mat>(planc::params opts) {
+    planc::NMFDriver<arma::mat> myNMF(opts);
     myNMF.callNMF();
     return 0;
-}
-
-template<> int planc::nmflib::runNMF<arma::mat>(planc::params opts);
-template<> int planc::nmflib::runNMF<arma::sp_mat>(planc::params opts);
+};
+template<> int planc::nmflib::runNMF<arma::sp_mat>(planc::params opts) {
+    planc::NMFDriver<arma::sp_mat> myNMF(opts);
+    myNMF.callNMF();
+    return 0;
+};
 

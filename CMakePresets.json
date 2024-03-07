@@ -21,7 +21,27 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "copySourcesOptions": {
+            "exclusionList": [
+              ".vs",
+              ".idea",
+              ".git",
+              ".vscode",
+              "cmake-build-debug-mingw",
+              "cmake-build-debug-visual-studio",
+              "cmake-build-debug-visual-studio-clang",
+              "cmake-build-debug-wsl",
+              "cmake-build-release-mingw",
+              "cmake-build-release-visual-studio",
+              "cmake-build-release-visual-studio-clang",
+              "cmake-build-release-wsl",
+              "out"
+            ]
+          },
+          "copyAdditionalIncludeDirectoriesList": [
+            "$env{HOME}/.vs/$ms{projectDirName}/out/build/${presetName}/nmf"
+          ]
         }
       }
     },
