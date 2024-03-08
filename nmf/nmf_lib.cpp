@@ -47,3 +47,13 @@ template<> int planc::nmflib::runNMF<arma::sp_mat>(planc::params opts) {
     return 0;
 };
 
+template<> int planc::nmflib::runINMF<arma::mat>(planc::params opts) {
+    planc::NMFDriver<arma::mat> myNMF(opts);
+    myNMF.callNMF();
+    return 0;
+};
+template<> int planc::nmflib::runINMF<arma::sp_mat>(planc::params opts) {
+    planc::NMFDriver<arma::sp_mat> myNMF(opts);
+    myNMF.callNMF();
+    return 0;
+};

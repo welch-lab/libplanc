@@ -7,9 +7,6 @@
     "name" : "armadillo",
     "version>=" : "12.4.1"
   }, {
-    "name" : "getopt",
-    "version>=" : "0#3"
-  }, {
     "name" : "hwloc",
     "version>=" : "2.9.3"
   }, {
@@ -23,8 +20,11 @@
     "version>=" : "2.3"
   }, {
     "name" : "dlfcn-win32",
-    "version>=": "1.4.1",
-    "platform": "windows"
-     } ],
+    "version>=" : "1.4.1",
+    "platform" : "windows"
+  }, {
+    "name" : "argparse",
+    "version>=" : "3.0"
+  } ],
   "builtin-baseline" : "64ca152891d6ab135c6c27881e7eb0ac2fa15bba"
 }

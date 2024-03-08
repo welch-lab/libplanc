@@ -18,6 +18,9 @@ namespace planc {
         template<typename T>
         int NMFLIB_EXPORT runNMF(params opts);
 
+        template<typename T>
+        int NMFLIB_EXPORT runINMF(params opts);
+
     private:
         static void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
         static void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);

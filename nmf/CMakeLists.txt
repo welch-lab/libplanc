@@ -15,11 +15,11 @@ add_library(nmflib
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)
-find_library(GETOPT_LIB getopt)
+find_package(argparse)
 target_include_directories(nmflib PRIVATE ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(nmflib PUBLIC HighFive progressWrapper utils hw_detect detect_blas)
-target_link_libraries(plancnmf PRIVATE nmflib $<$<BOOL:${GETOPT_LIB}>:${GETOPT_LIB}>)
+target_link_libraries(plancnmf PRIVATE nmflib argparse::argparse)
 generate_export_header(nmflib)
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 install(TARGETS plancnmf nmflib

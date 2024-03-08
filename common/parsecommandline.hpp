@@ -1,7 +1,7 @@
 #pragma once
 /* Copyright Ramakrishnan Kannan 2017 */
 
-#include <getopt.h>
+#include <argparse/argparse.hpp>
 #include <armadillo>
 #include <iostream>
 #include <sstream>
@@ -11,56 +11,26 @@
 #include "utils.h"
 
 namespace planc {
-class ParseCommandLine {
+class ParseCommandLine : argparse::ArgumentParser {
  protected:
     params clStruct;
     int m_argc;
     char **m_argv;
     bool parsed = false;
+    ParseCommandLine() : argparse::ArgumentParser("planc") {};
 
-
-    void parseArrayofString(const char opt, const char *input) {
-    std::stringstream ss(input);
-    std::string s;
-    int i = 0;
-    // debug_hook();
-    if (clStruct.m_num_modes == 0) {
-      while (getline(ss, s, ' ')) {
-        if(!s.empty()){
-          i++;
+    void parseDimArray() {
+        // debug_hook();
+        if (clStruct.m_num_modes == 0) {
+            for (int i = 0; i < this->clStruct.m_dimensions.size(); ++i) {
+                clStruct.m_num_modes = i;
+                clStruct.m_conn_grids = arma::zeros<arma::uvec>(clStruct.m_num_modes);
+                clStruct.m_dimensions = arma::zeros<arma::uvec>(clStruct.m_num_modes);
+                clStruct.m_regularizers = arma::zeros<arma::fvec>(2 * clStruct.m_num_modes);
+                clStruct.m_proc_grids = arma::ones<arma::uvec>(clStruct.m_num_modes);
+            }
         }
-      }
-      clStruct.m_num_modes = i;
-      clStruct.m_conn_grids = arma::zeros<arma::uvec>(clStruct.m_num_modes);
-      clStruct.m_dimensions = arma::zeros<arma::uvec>(clStruct.m_num_modes);
-        clStruct.m_regularizers = arma::zeros<arma::fvec>(2 * clStruct.m_num_modes);
-        clStruct.m_proc_grids = arma::ones<arma::uvec>(clStruct.m_num_modes);
     }
-    i = 0;
-    ss.clear();
-    ss.str(input);
-    while (getline(ss, s, ' ')) {
-      if(!s.empty()){
-        switch (opt) {
-          case 'd':
-              clStruct.m_dimensions(i++) = ::atoi(s.c_str());
-            break;
-          case 'r':
-              clStruct.m_regularizers(i++) = ::atof(s.c_str());
-            break;
-          case 'p':
-              clStruct.m_proc_grids(i++) = ::atoi(s.c_str());
-            break;
-          case 'q':
-              clStruct.m_conn_grids(i++) = ::atoi(s.c_str());
-            break;
-          default:
-            INFO << "wrong option::" << opt << "::values::" << input << std::endl;
-        }
-      }
-    }
-  }
-
  public:
   /**
    * Constructor that takes the number of arguments and the
@@ -69,179 +39,158 @@ class ParseCommandLine {
    * @param[in] **argv - command line parameters.
    */
   ParseCommandLine(int argc, char **argv) : m_argc(argc), m_argv(argv) {
-    clStruct.m_num_modes = 0;
+      this->add_argument("-h", "--help")
+            .flag();
+      // call print_usage
+      this->add_argument("-a", "--algorithm")
+            .default_value<algotype>(ANLSBPP)
+            .required()
+            .help("algorithm");
+      clStruct.m_lucalgo = this->get<algotype>("-a");
+      this->add_argument("--input_normalization")
+              .default_value<normtype>(NONE)
+              .help("normalization");
+      clStruct.m_input_normalization = this->get<normtype>("--input_normalization");
+      this->add_argument("-d", "--dims")
+              .nargs(argparse::nargs_pattern::at_least_one)
+              .default_value(std::vector<int>(2, 0))
+              .scan<'i', int>()
+              .help("dimensions");
+      clStruct.m_dimensions = this->get("-d");
+      this->add_argument("--mat_type")
+              .nargs(2)
+              .default_value(std::vector<int>(2, 0))
+              .scan<'i', int>()
+              .help("mat type");
+      clStruct.feat_type = this->get("--mat_type")[0];
+      clStruct.conn_type = this->get("--mat_type")[1];
+      this->add_argument("-e", "--error")
+            .implicit_value(1)
+            .default_value(0)
+            .help("compute error");
+      clStruct.m_compute_error = this->get<bool>("-e");
+      this->add_argument("--unpartitioned")
+              .implicit_value(1)
+              .default_value(0)
+              .help("unpartitioned");
+      clStruct.m_unpartitioned = this->get<bool>("--unpartitioned");
+      this->add_argument("--symm")
+              .default_value(-1)
+              .scan<'g', float>()
+              .help("symmetric reg param");
+      clStruct.m_symm_reg = this->get<float>("--symm");
+      this->add_argument("--alpha")
+              .default_value(0)
+              .scan<'g', float>()
+              .help("alpha hyperparam");
+      clStruct.alpha = this->get<float>("--alpha");
+      this->add_argument("--beta")
+              .default_value(0)
+              .scan<'g', float>()
+              .help("beta hyperparam");
+      clStruct.beta = this->get<float>("--beta");
+      this->add_argument("--momentum")
+              .default_value(0)
+              .scan<'g', float>()
+              .help("momentum hyperparam");
+      clStruct.m_gamma = this->get<float>("--momentum");
+      this->add_argument("--adjrand")
+              .implicit_value(1)
+              .default_value(0)
+              .help("adjrand");
+      clStruct.m_adj_rand = this->get<bool>("--adjrand");
+      this->add_argument("--dimtree")
+              .implicit_value(1)
+              .default_value(0)
+              .help("dimtreer");
+      clStruct.m_dim_tree = this->get<bool>("--dimtree");
+      this->add_argument("-l", "--tolerance")
+            .default_value(-1)
+            .scan<'i', int>()
+            .help("tolerance");
+      clStruct.m_tolerance = this->get<int>("-l");
+      this->add_argument("--luciters")
+              .default_value(-1)
+              .scan<'i', int>()
+              .help("luciters");
+      clStruct.m_max_luciters = this->get<int>("-l");
+      this->add_argument("-t", "--iterations")
+              .default_value(20)
+              .scan<'i', int>()
+              .help("iterations");
+      clStruct.m_num_it = this->get<int>("-t");
+      this->add_argument("-s", "--sparsity")
+              .default_value(0.01)
+              .scan<'g', float>()
+              .help("sparsity");
+      clStruct.m_sparsity = this->get<float>("-s");
+      this->add_argument("-n", "--num_nodes")
+              .default_value(1)
+              .scan<'i', int>()
+              .help("nodes");
+      clStruct.m_num_nodes = this->get<int>("-n");
+      this->add_argument("-i", "--input")
+              .default_value("")
+              .help("input 1");
+      clStruct.m_Afile_name = this->get("-i");
+      this->add_argument("-c", "--connections")
+              .default_value("")
+              .help("connections");
+      clStruct.m_Sfile_name = this->get("-c");
+      this->add_argument("-o", "--output")
+              .default_value("")
+              .help("output");
+      clStruct.m_outputfile_name = this->get("-o");
+      //this->add_argument("-j", "--input2")
+      //        .default_value("")
+      //        .help("input 2");
+      //clStruct.m_Bfile_name = this->get("-j");
+      this->add_argument("--seed")
+              .default_value(193957)
+              .scan<'i', int>()
+              .help("seed");
+      clStruct.m_initseed = this->get<int>("--seed");
+      this->add_argument("-r", "--regs")
+              .nargs(argparse::nargs_pattern::at_least_one)
+              .default_value(std::vector<float>(4, 0))
+              .scan<'g', float>()
+              .help("regularizers");
+      clStruct.m_regularizers = this->get("-r");
+      this->add_argument("-p", "--processors")
+              .nargs(argparse::nargs_pattern::at_least_one)
+              .default_value(std::vector<int>(2, 0))
+              .scan<'i', int>()
+              .help("processor grid");
+      clStruct.m_proc_grids = this->get("-p");
+      this->add_argument("-q", "--connection_grid")
+              .nargs(argparse::nargs_pattern::at_least_one)
+              .default_value(std::vector<int>(2, 0))
+              .scan<'i', int>()
+              .help("processor grid");
+      clStruct.m_conn_grids = this->get("-q");
+      this->add_argument("--numkblocks")
+              .default_value(1)
+              .scan<'i', int>()
+              .help("numkblocks");
+      clStruct.m_num_k_blocks = this->get<int>("--numkblocks");
     clStruct.m_pr = 1;
     clStruct.m_pc = 1;
     clStruct.m_cpr = 0; // default is single grid
     clStruct.m_cpc = 0; // default is single grid
     clStruct.m_regW = arma::zeros<arma::fvec>(2);
     clStruct.m_regH = arma::zeros<arma::fvec>(2);
-    clStruct.m_num_k_blocks = 1;
-    clStruct.m_k = 20;
-    clStruct.m_num_it = 20;
-    clStruct.m_lucalgo = ANLSBPP;
-    clStruct.m_compute_error = 0;
-    clStruct.m_input_normalization = NONE;
-    clStruct.m_dim_tree = 1;
-    clStruct.m_symm_reg = -1;
-    clStruct.m_adj_rand = false;
-    clStruct.m_max_luciters = -1;
-    clStruct.m_tolerance = -1;
-    clStruct.m_initseed = 193957;  // Random 6 digit prime
-    clStruct.alpha = 0;
-    clStruct.beta = 0;
-    clStruct.m_gamma = -1;
-    clStruct.m_unpartitioned = 1;
-    clStruct.m_sparsity  = 0.01;
-    // Default types (both dense)
-    clStruct.feat_type = 1;
-    clStruct.conn_type = 1;
-  }
-  /// parses the command line parameters
-  void parseplancopts(int help_opt = 0) {
-    int opt, long_index;
-    while ((opt = getopt_long(this->m_argc, this->m_argv,
-                              "a:d:e:i:c:k:o:p:r:s:t:h:l:n", plancopts,
-                              &long_index)) != -1) {
-      switch (opt) {
-        case 'a':
-          clStruct.m_lucalgo = static_cast<algotype>(atoi(optarg));
-          break;
-        case 'e':
-          clStruct.m_compute_error = atoi(optarg);
-          break;
-        case 'l':
-            clStruct.m_tolerance = atof(optarg);
-          break;
-        case 'i': {
-          std::string temp = std::string(optarg);
-            clStruct.m_Afile_name = temp;
-          break;
-        }
-        // jointnmf connection matrix S
-        case 'c': {
-          std::string temp = std::string(optarg);
-            clStruct.m_Sfile_name = temp;
-          break;
-        }
-        case 'k':
-            clStruct.m_k = atoi(optarg);
-          break;
-        case 'o': {
-          std::string temp = std::string(optarg);
-            clStruct.m_outputfile_name = temp;
-          break;
-        }
-        case 'd':
-        case 'r':
-        case 'p':
-          parseArrayofString(opt, optarg);
-          break;
-        case 'q':
-          parseArrayofString(opt, optarg);
-          break;
-        case 's':
-            clStruct.m_sparsity = atof(optarg);
-          break;
-        case 't':
-            clStruct.m_num_it = atoi(optarg);
-          break;
-        case 'n':
-            clStruct.m_num_nodes = atoi(optarg);
-          break;
-        case NUMKBLOCKS:
-            clStruct.m_num_k_blocks = atoi(optarg);
-          break;
-        case NORMALIZATION: {
-          std::string temp = std::string(optarg);
-          if (temp.compare("l2") == 0) {
-              clStruct.m_input_normalization = normtype::L2NORM;
-          } else if (temp.compare("max") == 0) {
-              clStruct.m_input_normalization = normtype::MAXNORM;
-          }
-          break;
-        }
-        case DIMTREE:
-            clStruct.m_dim_tree = atoi(optarg);
-          break;
-        case SYMMETRICREG:
-            clStruct.m_symm_reg = atof(optarg);
-          break;
-        case ALPHAREG:
-            clStruct.alpha = atof(optarg);
-          break;
-        case BETAREG:
-            clStruct.beta = atof(optarg);
-          break;
-        case MOMENTUM:
-            clStruct.m_gamma = atof(optarg);
-          break;
-
-        case UNPARTITIONED:
-            clStruct.m_unpartitioned = atoi(optarg);
-          break;
-
-        case MAT_TYPE: {
-          // debug_hook();
-          std::stringstream ss_den(optarg);
-          std::string s_den;
-          while(getline(ss_den, s_den, ' ')){
-            // NOTE: we could probably have put this in the above while statement, but put it here
-            // for clarity...
-            if(!s_den.empty()){break;}
-          }
-            clStruct.feat_type = atoi(s_den.c_str());
-          while(getline(ss_den, s_den, ' ')){
-            if(!s_den.empty()){break;}
-          }
-            clStruct.conn_type = atoi(s_den.c_str());
-          INFO << "feat_type: " << clStruct.feat_type << " conn_type: " << clStruct.conn_type << std::endl;
-          break;
-        }
-
-        case ADJRAND:
-            clStruct.m_adj_rand = true;
-          break;
-        case NUMLUCITERS:
-            clStruct.m_max_luciters = atoi(optarg);
-          break;
-        case INITSEED:
-            clStruct.m_initseed = atoi(optarg);
-          break;
-        case 'h':  // fall through intentionally
-          print_usage(help_opt);
-          exit(0);
-        case '?':
-          INFO << "failed while processing argument:" << std::endl;
-          print_usage(help_opt);
-          exit(EXIT_FAILURE);
-        default:
-          INFO << "failed while processing argument:" << std::endl;
-          print_usage(help_opt);
-          exit(EXIT_FAILURE);
+      if (clStruct.m_dimensions.size() == 2) {
+          clStruct.m_globalm = clStruct.m_dimensions(0);
+          clStruct.m_globaln = clStruct.m_dimensions(1);
+          clStruct.m_regW(0) = clStruct.m_regularizers(0);
+          clStruct.m_regW(1) = clStruct.m_regularizers(1);
+          clStruct.m_regH(0) = clStruct.m_regularizers(2);
+          clStruct.m_regH(1) = clStruct.m_regularizers(3);
+          clStruct.m_pr      = clStruct.m_proc_grids(0);
+          clStruct.m_pc      = clStruct.m_proc_grids(1);
+          clStruct.m_cpr     = clStruct.m_conn_grids(0);
+          clStruct.m_cpc     = clStruct.m_conn_grids(1);
       }
-    }
-
-    // Input file must be given
-    if (clStruct.m_Afile_name.empty()) {
-      INFO << "Input not given." << std::endl;
-      print_usage(help_opt);
-      exit(EXIT_FAILURE);
-    }
-
-    // properly initialize the values for nmf cases now.
-    if (clStruct.m_num_modes == 2) {
-      clStruct.m_globalm = clStruct.m_dimensions(0);
-      clStruct.m_globaln = clStruct.m_dimensions(1);
-      clStruct.m_regW(0) = clStruct.m_regularizers(0);
-      clStruct.m_regW(1) = clStruct.m_regularizers(1);
-      clStruct.m_regH(0) = clStruct.m_regularizers(2);
-      clStruct.m_regH(1) = clStruct.m_regularizers(3);
-      clStruct.m_pr      = clStruct.m_proc_grids(0);
-      clStruct.m_pc      = clStruct.m_proc_grids(1);
-      clStruct.m_cpr     = clStruct.m_conn_grids(0);
-      clStruct.m_cpc     = clStruct.m_conn_grids(1);
-    }
   }
 
   /// print the configuration received through the command line paramters
@@ -641,7 +590,7 @@ class ParseCommandLine {
 
   params getPlancParams() {
       if (this->parsed == false) {
-          this->parseplancopts();
+          this->parse_args(this->m_argc,this->m_argv);
           this->parsed = true;
       }
       this->printConfig();
