@@ -43,104 +43,85 @@ class ParseCommandLine : argparse::ArgumentParser {
             .flag();
       // call print_usage
       this->add_argument("-a", "--algorithm")
-            .default_value<algotype>(ANLSBPP)
-            .required()
+            .default_value("ANLSBPP")
+            .choices("MU", "HALS", "ANLSBPP", "NAIVEANLSBPP", "AOADMM",
+                     "NESTEROV", "CPALS", "GNSYM", "R2", "PGD", "PGNCG")
             .help("algorithm");
-      clStruct.m_lucalgo = this->get<algotype>("-a");
       this->add_argument("--input_normalization")
-              .default_value<normtype>(NONE)
+              .default_value("NONE")
+              .choices("NONE","L2NORM","MAXNORM")
               .help("normalization");
-      clStruct.m_input_normalization = this->get<normtype>("--input_normalization");
       this->add_argument("-d", "--dims")
               .nargs(argparse::nargs_pattern::at_least_one)
-              .default_value(std::vector<int>(2, 0))
+              .default_value("2 0")
               .scan<'i', int>()
               .help("dimensions");
-      clStruct.m_dimensions = this->get("-d");
       this->add_argument("--mat_type")
               .nargs(2)
-              .default_value(std::vector<int>(2, 0))
+              .default_value("2 0")
               .scan<'i', int>()
               .help("mat type");
-      clStruct.feat_type = this->get("--mat_type")[0];
-      clStruct.conn_type = this->get("--mat_type")[1];
       this->add_argument("-e", "--error")
-            .implicit_value(1)
-            .default_value(0)
+            .implicit_value(true)
+            .default_value(false)
             .help("compute error");
-      clStruct.m_compute_error = this->get<bool>("-e");
       this->add_argument("--unpartitioned")
-              .implicit_value(1)
-              .default_value(0)
+              .implicit_value(true)
+              .default_value(false)
               .help("unpartitioned");
-      clStruct.m_unpartitioned = this->get<bool>("--unpartitioned");
       this->add_argument("--symm")
-              .default_value(-1)
-              .scan<'g', float>()
+              .default_value(-1.)
+              .scan<'g', double>()
               .help("symmetric reg param");
-      clStruct.m_symm_reg = this->get<float>("--symm");
       this->add_argument("--alpha")
-              .default_value(0)
-              .scan<'g', float>()
+              .default_value(0.)
+              .scan<'g', double>()
               .help("alpha hyperparam");
-      clStruct.alpha = this->get<float>("--alpha");
       this->add_argument("--beta")
-              .default_value(0)
-              .scan<'g', float>()
+              .default_value(0.)
+              .scan<'g', double>()
               .help("beta hyperparam");
-      clStruct.beta = this->get<float>("--beta");
       this->add_argument("--momentum")
-              .default_value(0)
-              .scan<'g', float>()
+              .default_value(0.)
+              .scan<'g', double>()
               .help("momentum hyperparam");
-      clStruct.m_gamma = this->get<float>("--momentum");
       this->add_argument("--adjrand")
-              .implicit_value(1)
-              .default_value(0)
+              .implicit_value(true)
+              .default_value(false)
               .help("adjrand");
-      clStruct.m_adj_rand = this->get<bool>("--adjrand");
       this->add_argument("--dimtree")
-              .implicit_value(1)
-              .default_value(0)
-              .help("dimtreer");
-      clStruct.m_dim_tree = this->get<bool>("--dimtree");
+              .implicit_value(true)
+              .default_value(false)
+              .help("dimtree");
       this->add_argument("-l", "--tolerance")
-            .default_value(-1)
-            .scan<'i', int>()
+            .default_value(-1.)
+            .scan<'g', double>()
             .help("tolerance");
-      clStruct.m_tolerance = this->get<int>("-l");
       this->add_argument("--luciters")
               .default_value(-1)
               .scan<'i', int>()
               .help("luciters");
-      clStruct.m_max_luciters = this->get<int>("-l");
       this->add_argument("-t", "--iterations")
               .default_value(20)
               .scan<'i', int>()
               .help("iterations");
-      clStruct.m_num_it = this->get<int>("-t");
       this->add_argument("-s", "--sparsity")
-              .default_value(0.01)
+              .default_value(0.01f)
               .scan<'g', float>()
               .help("sparsity");
-      clStruct.m_sparsity = this->get<float>("-s");
       this->add_argument("-n", "--num_nodes")
               .default_value(1)
               .scan<'i', int>()
               .help("nodes");
-      clStruct.m_num_nodes = this->get<int>("-n");
       this->add_argument("-i", "--input")
               .default_value("")
               .help("input 1");
-      clStruct.m_Afile_name = this->get("-i");
       this->add_argument("-c", "--connections")
               .default_value("")
               .help("connections");
-      clStruct.m_Sfile_name = this->get("-c");
       this->add_argument("-o", "--output")
               .default_value("")
               .help("output");
-      clStruct.m_outputfile_name = this->get("-o");
       //this->add_argument("-j", "--input2")
       //        .default_value("")
       //        .help("input 2");
@@ -149,36 +130,58 @@ class ParseCommandLine : argparse::ArgumentParser {
               .default_value(193957)
               .scan<'i', int>()
               .help("seed");
-      clStruct.m_initseed = this->get<int>("--seed");
       this->add_argument("-r", "--regs")
               .nargs(argparse::nargs_pattern::at_least_one)
-              .default_value(std::vector<float>(4, 0))
+              .default_value("4 0")
               .scan<'g', float>()
               .help("regularizers");
-      clStruct.m_regularizers = this->get("-r");
       this->add_argument("-p", "--processors")
               .nargs(argparse::nargs_pattern::at_least_one)
-              .default_value(std::vector<int>(2, 0))
+              .default_value("2 0")
               .scan<'i', int>()
               .help("processor grid");
-      clStruct.m_proc_grids = this->get("-p");
       this->add_argument("-q", "--connection_grid")
               .nargs(argparse::nargs_pattern::at_least_one)
-              .default_value(std::vector<int>(2, 0))
+              .default_value("2 0")
               .scan<'i', int>()
               .help("processor grid");
-      clStruct.m_conn_grids = this->get("-q");
       this->add_argument("--numkblocks")
               .default_value(1)
               .scan<'i', int>()
               .help("numkblocks");
+  }
+  void initClStruct() {
+      clStruct.m_lucalgo = algomap[this->get("-a")];
+      clStruct.m_input_normalization = normmap[this->get("--input_normalization")];
+      clStruct.feat_type = this->get("--mat_type")[0];
+      clStruct.conn_type = this->get("--mat_type")[1];
+      clStruct.m_compute_error = this->get<bool>("-e");
+      clStruct.m_unpartitioned = this->get<bool>("--unpartitioned");
+      clStruct.m_symm_reg = this->get<double>("--symm");
+      clStruct.alpha = this->get<double>("--alpha");
+      clStruct.beta = this->get<double>("--beta");
+      clStruct.m_gamma = this->get<double>("--momentum");
+      clStruct.m_adj_rand = this->get<bool>("--adjrand");
+      clStruct.m_dim_tree = this->get<bool>("--dimtree");
+      clStruct.m_tolerance = this->get<double>("-l");
+      clStruct.m_max_luciters = this->get<int>("--luciters");
+      clStruct.m_num_it = this->get<int>("-t");
+      clStruct.m_sparsity = this->get<float>("-s");
+      clStruct.m_num_nodes = this->get<int>("-n");
+      clStruct.m_Afile_name = this->get("-i");
+      clStruct.m_Sfile_name = this->get("-c");
+      clStruct.m_outputfile_name = this->get("-o");
+      clStruct.m_initseed = this->get<int>("--seed");
+      clStruct.m_regularizers = this->get("-r");
+      clStruct.m_proc_grids = this->get("-p");
+      clStruct.m_conn_grids = this->get("-q");
       clStruct.m_num_k_blocks = this->get<int>("--numkblocks");
-    clStruct.m_pr = 1;
-    clStruct.m_pc = 1;
-    clStruct.m_cpr = 0; // default is single grid
-    clStruct.m_cpc = 0; // default is single grid
-    clStruct.m_regW = arma::zeros<arma::fvec>(2);
-    clStruct.m_regH = arma::zeros<arma::fvec>(2);
+      clStruct.m_pr = 1;
+      clStruct.m_pc = 1;
+      clStruct.m_cpr = 0; // default is single grid
+      clStruct.m_cpc = 0; // default is single grid
+      clStruct.m_regW = arma::zeros<arma::fvec>(2);
+      clStruct.m_regH = arma::zeros<arma::fvec>(2);
       if (clStruct.m_dimensions.size() == 2) {
           clStruct.m_globalm = clStruct.m_dimensions(0);
           clStruct.m_globaln = clStruct.m_dimensions(1);
@@ -591,6 +594,7 @@ class ParseCommandLine : argparse::ArgumentParser {
   params getPlancParams() {
       if (this->parsed == false) {
           this->parse_args(this->m_argc,this->m_argv);
+          this->initClStruct();
           this->parsed = true;
       }
       this->printConfig();

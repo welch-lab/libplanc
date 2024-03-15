@@ -1,5 +1,7 @@
 #pragma once
 #include "config.h"
+#include <map>
+
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
 
@@ -9,11 +11,13 @@
 
 enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM,
         NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
+extern std::map<std::string, algotype> algomap;
 
 enum normtype { NONE, L2NORM, MAXNORM };
+extern std::map<std::string, normtype> normmap;
+
 
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
-
 
 #include <armadillo>
 #include <cmath>
