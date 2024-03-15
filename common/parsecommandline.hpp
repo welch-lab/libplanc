@@ -105,6 +105,10 @@ class ParseCommandLine : argparse::ArgumentParser {
               .default_value(20)
               .scan<'i', int>()
               .help("iterations");
+      this->add_argument("-k", "--lowrankk")
+              .default_value(20)
+              .scan<'i', int>()
+              .help("iterations");
       this->add_argument("-s", "--sparsity")
               .default_value(0.01f)
               .scan<'g', float>()
@@ -166,6 +170,7 @@ class ParseCommandLine : argparse::ArgumentParser {
       clStruct.m_tolerance = this->get<double>("-l");
       clStruct.m_max_luciters = this->get<int>("--luciters");
       clStruct.m_num_it = this->get<int>("-t");
+      clStruct.m_k = this->get<int>("-k");
       clStruct.m_sparsity = this->get<float>("-s");
       clStruct.m_num_nodes = this->get<int>("-n");
       clStruct.m_Afile_name = this->get("-i");
