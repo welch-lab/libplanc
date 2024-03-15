@@ -5,14 +5,14 @@
 
 
 int main(int argc, char *argv[]) {
-  try {
+//  try {
     planc::ParseCommandLine dnd(argc, argv);
     auto libstate = planc::nmflib();
-    int status = libstate.runNMF<arma::mat>(dnd.getPlancParams());
+    int status = libstate.runNMF<arma::sp_mat>(dnd.getPlancParams());
     fflush(stdout);
     return status;
-  } catch (const std::exception &e) {
-    INFO << "Exception with stack trace " << std::endl;
-    INFO << e.what();
-  }
+//  } catch (const std::exception &e) {
+//    INFO << "Exception with stack trace " << std::endl;
+//    INFO << e.what();
+//  }
 }
