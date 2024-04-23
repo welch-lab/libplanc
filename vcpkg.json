@@ -1,18 +1,6 @@
 {
   "$schema" : "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies" : [ {
-    "name" : "highfive",
-    "version>=" : "2.7.1#1"
-  }, {
-    "name" : "armadillo",
-    "version>=" : "12.4.1"
-  }, {
-    "name" : "hwloc",
-    "version>=" : "2.9.3"
-  }, {
-    "name" : "blas",
-    "version>=" : "2023-03-25"
-  }, {
     "name" : "indicators",
     "version>=" : "2.3"
   }, {
@@ -23,8 +11,17 @@
     "name" : "argparse",
     "version>=" : "3.0"
   }, {
+    "name" : "armadillo",
+    "version>=" : "12.6.6"
+  }, {
+    "name" : "highfive",
+    "version>=" : "2.9.0"
+  }, {
     "name" : "pkgconf",
-    "version>=" : "1.8.0#5"
+    "version>=" : "2.1.0"
+  }, {
+    "name" : "hwloc",
+    "version>=" : "2.10.0"
   } ],
   "builtin-baseline" : "64ca152891d6ab135c6c27881e7eb0ac2fa15bba"
 }
