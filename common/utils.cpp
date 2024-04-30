@@ -15,7 +15,7 @@ extern "C" {
 
 void tic() {tictoc_stack.push(std::chrono::steady_clock::now()); }
 double toc()  {
-    std::chrono::duration<double> time_span =
+    auto time_span =
             std::chrono::duration_cast<std::chrono::duration<double>>(
                     std::chrono::steady_clock::now() - tictoc_stack.top());
     double rc = time_span.count();

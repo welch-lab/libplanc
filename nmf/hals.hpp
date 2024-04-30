@@ -114,7 +114,7 @@ class HALSNMF : public NMF<T> {
 
       INFO << "Completed It (" << currentIteration << "/"
            << this->num_iterations() << ")"
-           << " time =" << toc() << std::endl
+           << " time =" << toc() << std::endl;
 #endif
       this->computeObjectiveError();
 #ifdef _VERBOSE

@@ -23,5 +23,5 @@
     "name" : "hwloc",
     "version>=" : "2.10.0"
   } ],
-  "builtin-baseline" : "64ca152891d6ab135c6c27881e7eb0ac2fa15bba"
+  "builtin-baseline" : "c4af3593e1f1aa9e14a560a09e45ea2cb0dfd74d"
 }

@@ -2,5 +2,11 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-debug-mingw/_deps/fast_matrix_market-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-debug-visual-studio-clang/_deps/fast_matrix_market-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-debug-visual-studio/_deps/fast_matrix_market-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-release-mingw/_deps/fast_matrix_market-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-release-visual-studio-clang/_deps/fast_matrix_market-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bench/cmake-build-release-visual-studio/_deps/fast_matrix_market-src" vcs="Git" />
   </component>
 </project>

@@ -51,6 +51,7 @@ protected:
     void parseParams(const params& pc)
     {
         this->m_nmfalgo = pc.m_lucalgo;
+        this->m_input_normalization = pc.m_input_normalization;
         this->m_k = pc.m_k;
         this->m_Afile_name = pc.m_Afile_name;
         this->m_sparsity = pc.m_sparsity;
