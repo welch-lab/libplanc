@@ -4,7 +4,7 @@
 #include "NMFDriver.hpp"
 #include "utils.hpp"
 #include "nmf_lib.hpp"
-#include "NMFDriver.hpp"
+
 
 extern "C" {
 #include "detect_blas.h"
