@@ -171,8 +171,8 @@ void commonSolve() {
       {
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
         for (int i = 0; i < this->n; i++) {
-          auto *subProblemforH =
-              new BPPNNLS<arma::mat, arma::vec>(WtW, (arma::vec)WtA.col(i), true);
+          auto subProblemforH =
+              BPPNNLS<arma::mat, arma::vec>(WtW, (arma::vec)WtA.col(i), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "H(" << i << "/" << this->n << ")";
@@ -181,7 +181,7 @@ void commonSolve() {
           tic();
           int numIter = subProblemforH->solveNNLS();
 #else
-          subProblemforH->solveNNLS();
+          subProblemforH.solveNNLS();
 #endif
 
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
@@ -190,7 +190,7 @@ void commonSolve() {
 #ifdef _VERBOSE
           INFO << subProblemforH->getSolutionVector();
 #endif
-          this->H.row(i) = subProblemforH->getSolutionVector().t();
+          this->H.row(i) = subProblemforH.getSolutionVector().t();
 #ifdef _VERBOSE
           INFO << "Comp H(" << i << "/" << this->n
                << ") of it=" << currentIteration << " time taken=" << t2
@@ -213,8 +213,8 @@ void commonSolve() {
 // solve for W given H;
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
         for (int i = 0; i < this->m; i++) {
-          auto *subProblemforW =
-              new BPPNNLS<arma::mat, arma::vec>(HtH, (arma::vec)HtAt.col(i), true);
+          auto subProblemforW =
+              BPPNNLS<arma::mat, arma::vec>(HtH, (arma::vec)HtAt.col(i), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "W(" << i << "/" << this->m << ")";
@@ -223,7 +223,7 @@ void commonSolve() {
           tic();
           int numIter = subProblemforW->solveNNLS();
 #else
-          subProblemforW->solveNNLS();
+          subProblemforW.solveNNLS();
 #endif
       //     int numIter = subProblemforW->solveNNLS();
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
@@ -233,7 +233,7 @@ void commonSolve() {
           INFO << subProblemforW->getSolutionVector();
 #endif
 
-          this->W.row(i) = subProblemforW->getSolutionVector().t();
+          this->W.row(i) = subProblemforW.getSolutionVector().t();
 #ifdef _VERBOSE
           INFO << "Comp W(" << i << "/" << this->n
                << ") of it=" << currentIteration << " time taken=" << t2
