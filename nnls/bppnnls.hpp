@@ -96,18 +96,18 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
 
         while (numNonOptCols > 0) {
             iter++;
-            try {
-            if ((MAX_ITERATIONS <= 0) || (iter > MAX_ITERATIONS)) {
-                throw std::logic_error("invalid iteration call");
-            }
-            }  catch(std::exception &ex) {
+            //try {
+            //if ((MAX_ITERATIONS <= 0) || (iter > MAX_ITERATIONS)) {
+            //    throw std::logic_error("invalid iteration call");
+            //}
+            //}  catch(std::exception &ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
 #else
-                throw ex;
+                //throw ex;
 #endif
-            }
+            //}
             Cols1 = NotOptCols % (NotGood < Ninf);
             Cols2 = NotOptCols % (NotGood >= Ninf) % (P >= 1);
             arma::urowvec Cols3Ix = arma::conv_to<arma::urowvec>::from(
@@ -203,7 +203,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         arma::uvec anyZeros = arma::find(PassSet == 0);
         if (anyZeros.empty()) {
             // Everything is the in the passive set.
-            Z = arma::solve(AtA, AtB, arma::solve_opts::likely_sympd);
+            Z = arma::solve(AtA, AtB, arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
         } else {
             arma::uvec Pv = arma::find(PassSet != 0);
             Z.resize(AtB.n_rows, AtB.n_cols);
@@ -212,7 +212,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             if (k1 == 1) {
                 // Single column to solve for.
                 Z(Pv) = arma::solve(AtA(Pv, Pv), AtB(Pv),
-                                arma::solve_opts::likely_sympd);
+                                arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
             } else {
                 // we have to group passive set columns that are same.
                 // find the correlation matrix of passive set matrix.
@@ -245,7 +245,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
                     Z(currentPassiveSet, samePassiveSetCols) = arma::solve(
                             AtA(currentPassiveSet, currentPassiveSet),
                             AtB(currentPassiveSet, samePassiveSetCols),
-                            arma::solve_opts::likely_sympd);
+                            arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
                 }
             }
         }
