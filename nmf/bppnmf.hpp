@@ -14,8 +14,8 @@ template <typename T>
 class BPPNMF : public NMF<T> {
  private:
   T At;
-  arma::mat giventGiven;
-  int ONE_THREAD_MATRIX_SIZE; // chunking
+  //arma::mat giventGiven;
+  arma::uword ONE_THREAD_MATRIX_SIZE; // chunking
   // designed as if W is given and H is found.
   // The transpose is the other problem.
   void updateOtherGivenOneMultipleRHS(const T &input, const arma::mat &given,
@@ -31,7 +31,7 @@ class BPPNMF : public NMF<T> {
 #endif
     arma::mat giventInput(this->k, input.n_cols);
     // This is WtW
-    giventGiven = given.t() * given;
+    arma::mat giventGiven = given.t() * given;
     this->applyReg(reg, &giventGiven);
     // This is WtA
     giventInput = given.t() * input;
@@ -54,45 +54,60 @@ class BPPNMF : public NMF<T> {
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
     tic();
 #endif
-#pragma omp parallel for schedule(dynamic) default(none) shared(numChunks, input, giventInput, othermat) num_threads(this->ncores)
-    for (int i = 0; i < numChunks; i++) {
-      int spanStart = i * this->ONE_THREAD_MATRIX_SIZE;
-      int spanEnd = (i + 1) * this->ONE_THREAD_MATRIX_SIZE - 1;
-      if (spanEnd > input.n_cols - 1) {
-        spanEnd = input.n_cols - 1;
-      }
-
-      BPPNNLS<arma::mat, arma::vec> subProblem(giventGiven,
-                              (arma::mat)giventInput.cols(spanStart, spanEnd), true);
-#ifdef _VERBOSE
-      #pragma omp critical
+    std::vector<BPPNNLS<arma::mat, arma::vec>> subproblems;
+    std::vector<std::pair<int, int>> indices;
+#pragma omp parallel default(none) shared(othermat, input, giventInput, giventGiven, subproblems, indices) num_threads(this->ncores)
       {
-        INFO << "Scheduling " << worh << " start=" << spanStart
-             << ", end=" << spanEnd
-             // << ", tid=" << omp_get_thread_num()
-             << std::endl
-             << "LHS ::" << std::endl
-             << giventGiven << std::endl
-             << "RHS ::" << std::endl
-             << (arma::mat)giventInput.cols(spanStart, spanEnd) << std::endl;
+#pragma omp for schedule(dynamic)
+          for (int i = 0; i < numChunks; i++) {
+              int spanStart = i * this->ONE_THREAD_MATRIX_SIZE;
+              int spanEnd = (i + 1) * this->ONE_THREAD_MATRIX_SIZE - 1;
+              if (spanEnd > input.n_cols - 1) {
+                  spanEnd = input.n_cols - 1;
+              }
+              BPPNNLS<arma::mat, arma::vec> subProblem(giventGiven,
+                                                       (arma::mat) giventInput.cols(spanStart, spanEnd), true);
+#pragma omp critical
+              {
+                  subproblems.push_back(subProblem);
+                  indices.emplace_back(spanStart, spanEnd);
+              }
+#ifdef _VERBOSE
+#pragma omp critical
+              {
+                INFO << "Scheduling " << worh << " start=" << spanStart
+                     << ", end=" << spanEnd
+                     // << ", tid=" << omp_get_thread_num()
+                     << std::endl
+                     << "LHS ::" << std::endl
+                     << giventGiven << std::endl
+                     << "RHS ::" << std::endl
+                     << (arma::mat)giventInput.cols(spanStart, spanEnd) << std::endl;
+              }
+#endif
+          }
+#pragma omp for schedule(dynamic)
+          for (int i = 0; i < subproblems.size(); i++) {
+              subproblems[i].solveNNLS();
+
+
+#ifdef _VERBOSE
+              INFO << "completed " << worh << " start=" << spanStart
+                   << ", end=" << spanEnd
+                   // << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
+                   << " time taken=" << t2 << std::endl;
+#endif
+          }
       }
-#endif
-
-      subProblem.solveNNLS();
-
-#ifdef _VERBOSE
-      INFO << "completed " << worh << " start=" << spanStart
-           << ", end=" << spanEnd
-           // << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu()
-           << " time taken=" << t2 << std::endl;
-#endif
-      (*othermat).rows(spanStart, spanEnd) = subProblem.getSolutionMatrix().t();
-    }
+#pragma omp for schedule(dynamic)
+          for (int i = 0; i < subproblems.size(); i++) {
+          (*othermat).rows(indices[i].first, indices[i].second) = subproblems[i].getSolutionMatrix().t();
+          }
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
-    double totalH2 = toc();
+          double totalH2 = toc();
 #endif
 #ifdef _VERBOSE
-    INFO << worh << " total time taken :" << totalH2 << std::endl;
+          INFO << worh << " total time taken :" << totalH2 << std::endl;
 #endif
     giventGiven.clear();
     giventInput.clear();
@@ -145,7 +160,7 @@ void commonSolve() {
   };
  public:
   BPPNMF(const T &A, int lowrank, const int& ncores = 0) : NMF<T>(A, lowrank) {
-    giventGiven = arma::zeros<arma::mat>(lowrank, lowrank);
+    arma::mat giventGiven = arma::zeros<arma::mat>(lowrank, lowrank);
     this->At = A.t();
     this->ncores = ncores;
   }
