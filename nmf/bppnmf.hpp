@@ -54,7 +54,7 @@ class BPPNMF : public NMF<T> {
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
     tic();
 #endif
-    std::vector<BPPNNLS<arma::mat, arma::vec>> subproblems;
+    std::vector<std::unique_ptr<BPPNNLS<arma::mat, arma::vec>>> subproblems;
     std::vector<std::pair<int, int>> indices;
 #pragma omp parallel default(none) shared(othermat, input, giventInput, giventGiven, subproblems, indices) num_threads(this->ncores)
       {
@@ -65,11 +65,12 @@ class BPPNMF : public NMF<T> {
               if (spanEnd > input.n_cols - 1) {
                   spanEnd = input.n_cols - 1;
               }
-              BPPNNLS<arma::mat, arma::vec> subProblem(giventGiven,
-                                                       (arma::mat) giventInput.cols(spanStart, spanEnd), true);
+              std::unique_ptr<BPPNNLS<arma::mat, arma::vec>> subProblem( new BPPNNLS<arma::mat, arma::vec>(giventGiven,
+                                                             (arma::mat) giventInput.cols(spanStart, spanEnd), true));
+
 #pragma omp critical
               {
-                  subproblems.push_back(subProblem);
+                  subproblems.push_back(std::move(subProblem));
                   indices.emplace_back(spanStart, spanEnd);
               }
 #ifdef _VERBOSE
@@ -88,7 +89,7 @@ class BPPNMF : public NMF<T> {
           }
 #pragma omp for schedule(dynamic)
           for (int i = 0; i < subproblems.size(); i++) {
-              subproblems[i].solveNNLS();
+              subproblems[i]->solveNNLS();
 
 
 #ifdef _VERBOSE
@@ -101,8 +102,9 @@ class BPPNMF : public NMF<T> {
       }
 #pragma omp for schedule(dynamic)
           for (int i = 0; i < subproblems.size(); i++) {
-          (*othermat).rows(indices[i].first, indices[i].second) = subproblems[i].getSolutionMatrix().t();
+          (*othermat).rows(indices[i].first, indices[i].second) = subproblems[i]->getSolutionMatrix().t();
           }
+
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
           double totalH2 = toc();
 #endif
