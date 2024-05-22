@@ -56,7 +56,7 @@ class BPPNMF : public NMF<T> {
 #endif
     std::vector<std::unique_ptr<BPPNNLS<arma::mat, arma::vec>>> subproblems;
     std::vector<std::pair<int, int>> indices;
-#pragma omp parallel default(none) shared(othermat, input, giventInput, giventGiven, subproblems, indices) num_threads(this->ncores)
+#pragma omp parallel default(none) shared(othermat, input, giventInput, giventGiven, subproblems, indices, numChunks) num_threads(this->ncores)
       {
 #pragma omp for schedule(dynamic)
           for (int i = 0; i < numChunks; i++) {
