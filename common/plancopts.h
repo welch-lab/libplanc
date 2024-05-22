@@ -107,7 +107,7 @@ namespace planc {
         int m_num_nodes;
 
         // jointnmf values
-        double alpha{}, beta;
+        double alpha, beta;
         int feat_type, conn_type;
         double m_gamma;
         int m_unpartitioned;
