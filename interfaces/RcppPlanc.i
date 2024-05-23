@@ -4,10 +4,12 @@
 
 %{
 #include <../nmf/nmf_lib.hpp>
+    using namespace std;
 %}
 %include "nmflib_export.h"
 %include <../common/plancopts.h>
 %include <../nmf/nmf_lib.hpp>
-%template(runDenseNMF) planc::nmflib::runNMF<arma::mat>;
-%template(runSparseNMF) planc::nmflib::runNMF<arma::sp_mat>;
+%include <std/std_array.i>
+%template(runDenseNMF) planc::nmf<arma::mat>;
+%template(runSparseNMF) planc::nmf<arma::sp_mat>;
 

@@ -57,3 +57,7 @@ template<> int planc::nmflib::runINMF<arma::sp_mat>(planc::params opts) {
     myNMF.callNMF();
     return 0;
 };
+
+std::map<std::string, planc::runNMFindex> NMFindexmap{{"W", planc::outW},
+                                                      {"H", planc::outH},
+                                                      {"objErr", planc::objErr}};
