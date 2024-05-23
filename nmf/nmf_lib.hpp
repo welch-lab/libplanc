@@ -30,7 +30,7 @@ namespace planc {
     };
 
     enum NMFLIB_EXPORT runNMFindex {outW, outH, objErr};
-    extern std::map<std::string, runNMFindex> NMFindexmap;
+    //extern std::map<std::string, runNMFindex> NMFindexmap;
 
     template <class T1, class T2>
     std::array<arma::mat, 3> NMFLIB_NO_EXPORT runNMF(T2 x, arma::uword k,
