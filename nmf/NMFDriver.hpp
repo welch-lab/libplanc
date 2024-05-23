@@ -18,26 +18,37 @@ namespace planc {
 class NMFDriver
 {
 protected:
-    int m_argc;
-    char **m_argv;
-    int m_k;
-    arma::uword m_m, m_n;
+    int m_argc{};
+    char **m_argv{};
+    int m_k{};
+    arma::uword m_m{}, m_n{};
     std::string m_Afile_name;
     std::string m_outputfile_name;
     std::string m_w_init_file_name;
     std::string m_h_init_file_name;
-    int m_num_it;
+    int m_num_it{};
+public:
+    T getA() const {
+        return A;
+    }
+
+    void setA(T a) {
+        A = a;
+    }
+
+protected:
+    T A;
     arma::fvec m_regW;
     arma::fvec m_regH;
-    double m_symm_reg;
-    int m_symm_flag;
-    bool m_adj_rand;
-    algotype m_nmfalgo;
-    double m_sparsity;
-    unsigned int m_compute_error;
-    normtype m_input_normalization;
-    int m_max_luciters;
-    int m_initseed;
+    double m_symm_reg{};
+    int m_symm_flag{};
+    bool m_adj_rand{};
+    algotype m_nmfalgo{};
+    double m_sparsity{};
+    unsigned int m_compute_error{};
+    normtype m_input_normalization{};
+    int m_max_luciters{};
+    int m_initseed{};
 
     // Variables for creating random matrix
     static const int kW_seed_idx = 1210873;
@@ -97,13 +108,168 @@ protected:
         }
         // pc.printConfig();
     }
+    virtual void loadMat(double t2) {
+        tic();
+        A.load(this->m_Afile_name, arma::coord_ascii);
+        t2 = toc();
+        INFO << "Successfully loaded input matrix A " << PRINTMATINFO(A)
+             << "(" << t2 << " s)" << std::endl;
+        this->m_m = A.n_rows;
+        this->m_n = A.n_cols;;
+    }
+    void genDense(double t2) {
+        {
+            arma::arma_rng::set_seed(planc::NMFDriver<arma::mat>::kW_seed_idx);
+            std::string rand_prefix("rand_");
+            std::string type = this->m_Afile_name.substr(rand_prefix.size());
+            assert(type == "normal" || type == "lowrank" || type == "uniform");
+            tic();
+            if (type == "uniform")
+            {
+                if (this->m_symm_flag)
+                {
+                    A = arma::randu<arma::mat>(this->m_m, this->m_n);
+                    A = 0.5 * (A + A.t());
+                }
+                else
+                {
+                    A = arma::randu<arma::mat>(this->m_m, this->m_n);
+                }
+            }
+            else if (type == "normal")
+            {
+                if (this->m_symm_flag)
+                {
+                    A = arma::randn<arma::mat>(this->m_m, this->m_n);
+                    A = 0.5 * (A + A.t());
+                }
+                else
+                {
+                    A = arma::randn<arma::mat>(this->m_m, this->m_n);
+                }
+                A.elem(find(A < 0)).zeros();
+            }
+            else
+            {
+                if (this->m_symm_flag)
+                {
+                    auto Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
+                    A = Wtrue * Wtrue.t();
+
+                    // Free auxiliary variables
+                    Wtrue.clear();
+                }
+                else
+                {
+                    auto Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
+                    auto Htrue = arma::randu<arma::mat>(this->m_k, this->m_n);
+                    A = Wtrue * Htrue;
+
+                    // Free auxiliary variables
+                    Wtrue.clear();
+                    Htrue.clear();
+                }
+            }
+            if (this->m_adj_rand)
+            {
+                A = kalpha * (A) + kbeta;
+                A = ceil(A);
+            }
+            t2 = toc();
+            INFO << "generated random matrix A " << PRINTMATINFO(A)
+                 << "(" << t2 << " s)" << std::endl;
+        }
+    }
+    void genSparse(double t2)
+    {
+        arma::arma_rng::set_seed(planc::NMFDriver<arma::sp_mat>::kW_seed_idx);
+        std::string rand_prefix("rand_");
+        std::string type = this->m_Afile_name.substr(rand_prefix.size());
+        assert(type == "normal" || type == "lowrank" || type == "uniform");
+        tic();
+        if (type == "uniform")
+        {
+            if (this->m_symm_flag)
+            {
+                double sp = 0.5 * this->m_sparsity;
+                A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n, sp);
+                A = 0.5 * (A + A.t());
+            }
+            else
+            {
+                A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
+                                                this->m_sparsity);
+            }
+        }
+        else if (type == "normal")
+        {
+            if (this->m_symm_flag)
+            {
+                double sp = 0.5 * this->m_sparsity;
+                A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n, sp);
+                A = 0.5 * (A + A.t());
+            }
+            else
+            {
+                A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n,
+                                                this->m_sparsity);
+            }
+        }
+        else if (type == "lowrank")
+        {
+            if (this->m_symm_flag)
+            {
+                double sp = 0.5 * this->m_sparsity;
+                auto mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
+                                                        sp);
+                mask = 0.5 * (mask + mask.t());
+                mask = arma::spones(mask);
+                arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
+                A = arma::sp_mat(mask % (Wtrue * Wtrue.t()));
+
+                // Free auxiliary space
+                Wtrue.clear();
+                mask.clear();
+            }
+            else
+            {
+                auto mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
+                                                        this->m_sparsity);
+                mask = arma::spones(mask);
+                arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
+                arma::mat Htrue = arma::randu(this->m_k, this->m_n);
+                A = arma::sp_mat(mask % (Wtrue * Htrue));
+
+                // Free auxiliary space
+                Wtrue.clear();
+                Htrue.clear();
+                mask.clear();
+            }
+        }
+        // Adjust and project non-zeros
+        arma::sp_mat::iterator start_it = A.begin();
+        arma::sp_mat::iterator end_it = A.end();
+        for (arma::sp_mat::iterator it = start_it; it != end_it; ++it)
+        {
+            double curVal = (*it);
+            if (this->m_adj_rand)
+            {
+                (*it) = ceil(kalphaSp * curVal + kbeta);
+            }
+            if ((*it) < 0)
+                (*it) = kbetaSp;
+        }
+        t2 = toc();
+        INFO << "generated random matrix A " << PRINTMATINFO(A)
+             << "(" << t2 << " s)" << std::endl;
+    }
 
 public:
 explicit NMFDriver<T>(params pc)
 {
     this->parseParams(pc);
 }
-virtual void callNMF()
+    virtual void callNMF()
 {
 switch (this->m_nmfalgo)
     {
@@ -130,82 +296,11 @@ switch (this->m_nmfalgo)
         template<> template<class NMFTYPE>
         void NMFDriver<arma::mat>::CallNMF()
         {
-            arma::mat A;
 
             // Generate/Read data matrix
             double t2;
-            if (!this->m_Afile_name.empty())
-            {
-                tic();
-                A.load(this->m_Afile_name);
-                t2 = toc();
-                INFO << "Successfully loaded input matrix A " << PRINTMATINFO(A)
-                     << "(" << t2 << " s)" << std::endl;
-                this->m_m = A.n_rows;
-                this->m_n = A.n_cols;
-            }
-            else
-            {
-                arma::arma_rng::set_seed(planc::NMFDriver<arma::mat>::kW_seed_idx);
-                std::string rand_prefix("rand_");
-                std::string type = this->m_Afile_name.substr(rand_prefix.size());
-                assert(type == "normal" || type == "lowrank" || type == "uniform");
-                tic();
-                if (type == "uniform")
-                {
-                    if (this->m_symm_flag)
-                    {
-                        A = arma::randu<arma::mat>(this->m_m, this->m_n);
-                        A = 0.5 * (A + A.t());
-                    }
-                    else
-                    {
-                        A = arma::randu<arma::mat>(this->m_m, this->m_n);
-                    }
-                }
-                else if (type == "normal")
-                {
-                    if (this->m_symm_flag)
-                    {
-                        A = arma::randn<arma::mat>(this->m_m, this->m_n);
-                        A = 0.5 * (A + A.t());
-                    }
-                    else
-                    {
-                        A = arma::randn<arma::mat>(this->m_m, this->m_n);
-                    }
-                    A.elem(find(A < 0)).zeros();
-                }
-                else
-                {
-                    if (this->m_symm_flag)
-                    {
-                        auto Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
-                        A = Wtrue * Wtrue.t();
-
-                        // Free auxiliary variables
-                        Wtrue.clear();
-                    }
-                    else
-                    {
-                        auto Wtrue = arma::randu<arma::mat>(this->m_m, this->m_k);
-                        auto Htrue = arma::randu<arma::mat>(this->m_k, this->m_n);
-                        A = Wtrue * Htrue;
-
-                        // Free auxiliary variables
-                        Wtrue.clear();
-                        Htrue.clear();
-                    }
-                }
-                if (this->m_adj_rand)
-                {
-                    A = kalpha * (A) + kbeta;
-                    A = ceil(A);
-                }
-                t2 = toc();
-                INFO << "generated random matrix A " << PRINTMATINFO(A)
-                     << "(" << t2 << " s)" << std::endl;
-            }
+            if (!this->m_Afile_name.empty()) loadMat(t2);
+            else genDense(t2);
 
             // Normalize the input matrix
             if (this->m_input_normalization != NONE)
@@ -287,104 +382,11 @@ switch (this->m_nmfalgo)
         template<> template<class NMFTYPE>
         void NMFDriver<arma::sp_mat>::CallNMF()
         {
-            arma::sp_mat A;
 
             // Generate/Read data matrix
             double t2;
-            if (!this->m_Afile_name.empty())
-            {
-                tic();
-                A.load(this->m_Afile_name, arma::coord_ascii);
-                t2 = toc();
-                INFO << "Successfully loaded input matrix A " << PRINTMATINFO(A)
-                     << "(" << t2 << " s)" << std::endl;
-                this->m_m = A.n_rows;
-                this->m_n = A.n_cols;
-            }
-            else
-            {
-                arma::arma_rng::set_seed(planc::NMFDriver<arma::sp_mat>::kW_seed_idx);
-                std::string rand_prefix("rand_");
-                std::string type = this->m_Afile_name.substr(rand_prefix.size());
-                assert(type == "normal" || type == "lowrank" || type == "uniform");
-                tic();
-                if (type == "uniform")
-                {
-                    if (this->m_symm_flag)
-                    {
-                        double sp = 0.5 * this->m_sparsity;
-                        A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n, sp);
-                        A = 0.5 * (A + A.t());
-                    }
-                    else
-                    {
-                        A = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
-                                                        this->m_sparsity);
-                    }
-                }
-                else if (type == "normal")
-                {
-                    if (this->m_symm_flag)
-                    {
-                        double sp = 0.5 * this->m_sparsity;
-                        A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n, sp);
-                        A = 0.5 * (A + A.t());
-                    }
-                    else
-                    {
-                        A = arma::sprandn<arma::sp_mat>(this->m_m, this->m_n,
-                                                        this->m_sparsity);
-                    }
-                }
-                else if (type == "lowrank")
-                {
-                    if (this->m_symm_flag)
-                    {
-                        double sp = 0.5 * this->m_sparsity;
-                        auto mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
-                                                                sp);
-                        mask = 0.5 * (mask + mask.t());
-                        mask = arma::spones(mask);
-                        arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
-                        A = arma::sp_mat(mask % (Wtrue * Wtrue.t()));
-
-                        // Free auxiliary space
-                        Wtrue.clear();
-                        mask.clear();
-                    }
-                    else
-                    {
-                        auto mask = arma::sprandu<arma::sp_mat>(this->m_m, this->m_n,
-                                                                this->m_sparsity);
-                        mask = arma::spones(mask);
-                        arma::mat Wtrue = arma::randu(this->m_m, this->m_k);
-                        arma::mat Htrue = arma::randu(this->m_k, this->m_n);
-                        A = arma::sp_mat(mask % (Wtrue * Htrue));
-
-                        // Free auxiliary space
-                        Wtrue.clear();
-                        Htrue.clear();
-                        mask.clear();
-                    }
-                }
-                // Adjust and project non-zeros
-                arma::sp_mat::iterator start_it = A.begin();
-                arma::sp_mat::iterator end_it = A.end();
-                for (arma::sp_mat::iterator it = start_it; it != end_it; ++it)
-                {
-                    double curVal = (*it);
-                    if (this->m_adj_rand)
-                    {
-                        (*it) = ceil(kalphaSp * curVal + kbeta);
-                    }
-                    if ((*it) < 0)
-                        (*it) = kbetaSp;
-                }
-                t2 = toc();
-                INFO << "generated random matrix A " << PRINTMATINFO(A)
-                     << "(" << t2 << " s)" << std::endl;
-            }
-
+            if (!this->m_Afile_name.empty()) loadMat(t2);
+            else genSparse(t2);
             // Normalize the input matrix
             if (this->m_input_normalization != NONE)
             {
