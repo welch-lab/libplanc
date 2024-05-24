@@ -59,25 +59,23 @@ protected:
     static const int kbetaSp = 10;
     template<class NMFTYPE>
     void CallNMF();
-    void parseParams(const params& pc)
-    {
-        this->m_nmfalgo = pc.m_lucalgo;
-        this->m_input_normalization = pc.m_input_normalization;
-        this->m_k = pc.m_k;
-        this->m_Afile_name = pc.m_Afile_name;
-        this->m_sparsity = pc.m_sparsity;
-        this->m_num_it = pc.m_num_it;
-        this->m_regW = pc.m_regW;
-        this->m_regH = pc.m_regH;
-        this->m_m = pc.m_globalm;
-        this->m_n = pc.m_globaln;
+    void commonParams(const params& pc) {
+        this->m_nmfalgo = pc.getMLucalgo();
+        this->m_input_normalization = pc.getMInputNormalization();
+        this->m_k = pc.getMK();
+
+        this->m_sparsity = pc.getMSparsity();
+        this->m_num_it = pc.getMNumIt();
+        this->m_regW = pc.getMRegW();
+        this->m_regH = pc.getMRegH();
+        this->m_m = pc.getMGlobalm();
+        this->m_n = pc.getMGlobaln();
         this->m_compute_error = pc.m_compute_error;
-        this->m_symm_reg = pc.m_symm_reg;
+        this->m_symm_reg = pc.getMSymmReg();
         this->m_symm_flag = 0;
         this->m_adj_rand = pc.m_adj_rand;
-        this->m_max_luciters = pc.m_max_luciters;
-        this->m_initseed = pc.m_initseed;
-        this->m_outputfile_name = pc.m_outputfile_name;
+        this->m_max_luciters = pc.getMMaxLuciters();
+        this->m_initseed = pc.getMInitseed();
 
         // Put in the default LUC iterations
         if (this->m_max_luciters == -1)
@@ -107,6 +105,14 @@ protected:
             }
         }
         // pc.printConfig();
+    }
+    void parseParams(const params& pc)
+    {
+        this->m_Afile_name = pc.getMAfileName();
+        this->m_outputfile_name = pc.getMOutputfileName();
+        this->m_h_init_file_name = pc.getMHInitFileName();
+        this->m_w_init_file_name = pc.getMWInitFileName();
+        commonParams();
     }
     virtual void loadMat(double t2) {
         tic();

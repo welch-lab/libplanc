@@ -76,7 +76,7 @@ namespace planc {
         std::string m_outputfile_name;
         std::string m_Sfile_name;         // S (connection) matrix for jointnmf
         std::string m_h_init_file_name;
-        std::string w_h_init_file_name;
+        std::string M_W_init_file_name;
 
         // nmf related values
         arma::uword m_k{};
@@ -177,12 +177,12 @@ namespace planc {
             m_h_init_file_name = mHInitFileName;
         }
 
-        virtual const std::string &getWHInitFileName() const {
-            return w_h_init_file_name;
+        virtual const std::string &getMWInitFileName() const {
+            return M_W_init_file_name;
         }
 
-        virtual void setWHInitFileName(const std::string &wHInitFileName) {
-            w_h_init_file_name = wHInitFileName;
+        virtual void setMWInitFileName(const std::string &MWInitFileName) {
+            M_W_init_file_name = MWInitFileName;
         }
 
         arma::uword getMK() const {
@@ -428,6 +428,31 @@ namespace planc {
         // matrix pointers for direct passage
         T& m_a_mat;
         arma::mat& m_h_init_mat;
+
+        T &getMAMat() const {
+            return m_a_mat;
+        }
+
+        void setMAMat(T &mAMat) {
+            m_a_mat = mAMat;
+        }
+
+        arma::mat &getMHInitMat() const {
+            return m_h_init_mat;
+        }
+
+        void setMHInitMat(arma::mat &mHInitMat) {
+            m_h_init_mat = mHInitMat;
+        }
+
+        arma::mat &getMWInitMat() const {
+            return m_w_init_mat;
+        }
+
+        void setMWInitMat(arma::mat &mWInitMat) {
+            m_w_init_mat = mWInitMat;
+        }
+
         arma::mat& m_w_init_mat;
         const std::string & getMAfileName() const = delete;
         const std::string & getMOutputfileName() const = delete;
