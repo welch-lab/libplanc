@@ -295,6 +295,16 @@ protected:
             RLF.save(HfileName, arma::raw_ascii);
         }
     }
+    void loadWHInit(arma::mat W, arma::mat H) {
+        if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty()) {
+            W.load(m_w_init_file_name, arma::coord_ascii);
+            H.load(m_h_init_file_name, arma::coord_ascii);
+            this->m_k = W.n_cols;
+        } else {
+            W = arma::randu<arma::mat>(this->m_m, this->m_k);
+            H = arma::randu<arma::mat>(this->m_n, this->m_k);
+        }
+    }
 
 public:
 explicit NMFDriver<T>(params pc)
@@ -355,17 +365,7 @@ switch (this->m_nmfalgo)
             arma::arma_rng::set_seed(this->m_initseed);
             arma::mat W;
             arma::mat H;
-            if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty())
-            {
-                W.load(m_w_init_file_name, arma::coord_ascii);
-                H.load(m_h_init_file_name, arma::coord_ascii);
-                this->m_k = W.n_cols;
-            }
-            else
-            {
-                W = arma::randu<arma::mat>(this->m_m, this->m_k);
-                H = arma::randu<arma::mat>(this->m_n, this->m_k);
-            }
+            loadWHInit(W, H);
             if (this->m_symm_flag)
             {
                 double meanA = arma::mean(arma::mean(A));
@@ -426,14 +426,7 @@ switch (this->m_nmfalgo)
             arma::arma_rng::set_seed(this->m_initseed);
             arma::mat W;
             arma::mat H;
-            if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty()) {
-                W.load(m_w_init_file_name, arma::coord_ascii);
-                H.load(m_h_init_file_name, arma::coord_ascii);
-                this->m_k = W.n_cols;
-            } else {
-                W = arma::randu<arma::mat>(this->m_m, this->m_k);
-                H = arma::randu<arma::mat>(this->m_n, this->m_k);
-            }
+            loadWHInit(W, H);
             if (this->m_symm_flag) {
                 double meanA = arma::mean(arma::mean(A));
                 H = 2 * std::sqrt(meanA / this->m_k) * H;
