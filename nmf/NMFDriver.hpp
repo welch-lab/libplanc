@@ -27,6 +27,18 @@ protected:
     std::string m_w_init_file_name;
     std::string m_h_init_file_name;
     int m_num_it{};
+    arma::mat LLF{};
+public:
+    const arma::mat &getLlf() const {
+        return LLF;
+    }
+
+    const arma::mat &getRlf() const {
+        return RLF;
+    }
+
+protected:
+    arma::mat RLF{};
 public:
     T getA() const {
         return A;
@@ -269,6 +281,20 @@ protected:
         INFO << "generated random matrix A " << PRINTMATINFO(A)
              << "(" << t2 << " s)" << std::endl;
     }
+    template<class NMFTYPE>
+    void getRes(NMFTYPE nmfA) {
+        // Save the factor matrices
+        this->LLF = nmfA.getLeftLowRankFactor();
+        this->RLF = nmfA.getRightLowRankFactor();
+        if (!this->m_outputfile_name.empty())
+        {
+            std::string WfileName = this->m_outputfile_name + "_W";
+            std::string HfileName = this->m_outputfile_name + "_H";
+
+            LLF.save(WfileName, arma::raw_ascii);
+            RLF.save(HfileName, arma::raw_ascii);
+        }
+    }
 
 public:
 explicit NMFDriver<T>(params pc)
@@ -373,36 +399,22 @@ switch (this->m_nmfalgo)
             nmfAlgorithm.computeNMF();
             t2 = toc();
             INFO << "time taken:" << t2 << std::endl;
-
-            // Save the factor matrices
-            if (!this->m_outputfile_name.empty())
-            {
-                std::string WfileName = this->m_outputfile_name + "_W";
-                std::string HfileName = this->m_outputfile_name + "_H";
-
-                nmfAlgorithm.getLeftLowRankFactor().save(WfileName, arma::raw_ascii);
-                nmfAlgorithm.getRightLowRankFactor().save(HfileName, arma::raw_ascii);
-            }
+            getRes(nmfAlgorithm);
         }
 
         template<> template<class NMFTYPE>
-        void NMFDriver<arma::sp_mat>::CallNMF()
-        {
+        void NMFDriver<arma::sp_mat>::CallNMF() {
 
             // Generate/Read data matrix
             double t2;
             if (!this->m_Afile_name.empty()) loadMat(t2);
             else genSparse(t2);
             // Normalize the input matrix
-            if (this->m_input_normalization != NONE)
-            {
+            if (this->m_input_normalization != NONE) {
                 tic();
-                if (this->m_input_normalization == L2NORM)
-                {
+                if (this->m_input_normalization == L2NORM) {
                     A = arma::normalise(A);
-                }
-                else if (this->m_input_normalization == MAXNORM)
-                {
+                } else if (this->m_input_normalization == MAXNORM) {
                     double maxnorm = 1 / A.max();
                     A = maxnorm * A;
                 }
@@ -414,24 +426,19 @@ switch (this->m_nmfalgo)
             arma::arma_rng::set_seed(this->m_initseed);
             arma::mat W;
             arma::mat H;
-            if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty())
-            {
+            if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty()) {
                 W.load(m_w_init_file_name, arma::coord_ascii);
                 H.load(m_h_init_file_name, arma::coord_ascii);
                 this->m_k = W.n_cols;
-            }
-            else
-            {
+            } else {
                 W = arma::randu<arma::mat>(this->m_m, this->m_k);
                 H = arma::randu<arma::mat>(this->m_n, this->m_k);
             }
-            if (this->m_symm_flag)
-            {
+            if (this->m_symm_flag) {
                 double meanA = arma::mean(arma::mean(A));
                 H = 2 * std::sqrt(meanA / this->m_k) * H;
                 W = H;
-                if (this->m_symm_reg == 0.0)
-                {
+                if (this->m_symm_reg == 0.0) {
                     double symreg = A.max();
                     this->m_symm_reg = symreg * symreg;
                 }
@@ -444,12 +451,10 @@ switch (this->m_nmfalgo)
             // Always compute error for shared memory case
             // nmfAlgorithm.compute_error(this->m_compute_error);
 
-            if (!this->m_regW.empty())
-            {
+            if (!this->m_regW.empty()) {
                 nmfAlgorithm.regW(this->m_regW);
             }
-            if (!this->m_regH.empty())
-            {
+            if (!this->m_regH.empty()) {
                 nmfAlgorithm.regH(this->m_regH);
             }
 
@@ -458,15 +463,7 @@ switch (this->m_nmfalgo)
             nmfAlgorithm.computeNMF();
             t2 = toc();
             INFO << "time taken:" << t2 << std::endl;
-
-            // Save the factor matrices
-            if (!this->m_outputfile_name.empty())
-            {
-                std::string WfileName = this->m_outputfile_name + "_W";
-                std::string HfileName = this->m_outputfile_name + "_H";
-
-                nmfAlgorithm.getLeftLowRankFactor().save(WfileName, arma::raw_ascii);
-                nmfAlgorithm.getRightLowRankFactor().save(HfileName, arma::raw_ascii);
-            }
+            getRes(nmfAlgorithm);
         }
+
 }

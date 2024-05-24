@@ -429,6 +429,11 @@ namespace planc {
         T& m_a_mat;
         arma::mat& m_h_init_mat;
 
+        internalParams(T &mAMat, arma::mat &mHInitMat, arma::mat &mWInitMat) : m_a_mat(mAMat), m_h_init_mat(mHInitMat),
+                                                                               m_w_init_mat(mWInitMat) {}
+
+        explicit internalParams(T &mAMat) : m_a_mat(mAMat) {}
+
         T &getMAMat() const {
             return m_a_mat;
         }
