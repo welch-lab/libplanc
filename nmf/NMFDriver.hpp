@@ -112,7 +112,7 @@ protected:
         this->m_outputfile_name = pc.getMOutputfileName();
         this->m_h_init_file_name = pc.getMHInitFileName();
         this->m_w_init_file_name = pc.getMWInitFileName();
-        commonParams();
+        commonParams(pc);
     }
     virtual void loadMat(double t2) {
         tic();
