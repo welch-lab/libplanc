@@ -442,7 +442,7 @@ namespace planc {
             m_a_mat = mAMat;
         }
 
-        arma::mat &getMHInitMat() const {
+        [[nodiscard]] arma::mat &getMHInitMat() const {
             return m_h_init_mat;
         }
 
@@ -450,7 +450,7 @@ namespace planc {
             m_h_init_mat = mHInitMat;
         }
 
-        arma::mat &getMWInitMat() const {
+        [[nodiscard]] arma::mat &getMWInitMat() const {
             return m_w_init_mat;
         }
 
@@ -459,10 +459,10 @@ namespace planc {
         }
 
         arma::mat& m_w_init_mat;
-        const std::string & getMAfileName() const = delete;
-        const std::string & getMOutputfileName() const = delete;
-        const std::string & getMHInitFileName() const = delete;
-        const std::string & getMWInitFileName() const = delete;
+        [[nodiscard]] const std::string & getMAfileName() const override = delete;
+        [[nodiscard]] const std::string & getMOutputfileName() const override = delete;
+        [[nodiscard]] const std::string & getMHInitFileName() const override = delete;
+        [[nodiscard]] const std::string & getMWInitFileName() const override = delete;
     };
 }
 
