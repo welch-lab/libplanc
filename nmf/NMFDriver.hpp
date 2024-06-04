@@ -282,10 +282,8 @@ protected:
              << "(" << t2 << " s)" << std::endl;
     }
     template<class NMFTYPE>
-    void getRes(NMFTYPE nmfA) {
+    void outRes(NMFTYPE nmfA) {
         // Save the factor matrices
-        this->LLF = nmfA.getLeftLowRankFactor();
-        this->RLF = nmfA.getRightLowRankFactor();
         if (!this->m_outputfile_name.empty())
         {
             std::string WfileName = this->m_outputfile_name + "_W";
@@ -400,7 +398,9 @@ switch (this->m_nmfalgo)
             nmfAlgorithm.computeNMF();
             t2 = toc();
             INFO << "time taken:" << t2 << std::endl;
-            getRes(nmfAlgorithm);
+            this->LLF = nmfAlgorithm.getLeftLowRankFactor();
+            this->RLF = nmfAlgorithm.getRightLowRankFactor();
+            outRes(nmfAlgorithm);
         }
 
         template<> template<class NMFTYPE>
@@ -457,7 +457,9 @@ switch (this->m_nmfalgo)
             nmfAlgorithm.computeNMF();
             t2 = toc();
             INFO << "time taken:" << t2 << std::endl;
-            getRes(nmfAlgorithm);
+            this->LLF = nmfAlgorithm.getLeftLowRankFactor();
+            this->RLF = nmfAlgorithm.getRightLowRankFactor();
+            outRes(nmfAlgorithm);
         }
 
 }
