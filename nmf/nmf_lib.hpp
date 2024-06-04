@@ -9,6 +9,7 @@
 #include "bppnmf.hpp"
 #include "aoadmm.hpp"
 #include "mu.hpp"
+#include "EmbeddedNMFDriver.hpp"
 
 extern "C" {
 #include "detect_blas.h"

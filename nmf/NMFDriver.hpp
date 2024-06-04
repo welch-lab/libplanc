@@ -295,7 +295,8 @@ protected:
             RLF.save(HfileName, arma::raw_ascii);
         }
     }
-    void loadWHInit(arma::mat W, arma::mat H) {
+
+    virtual void loadWHInit(arma::mat W, arma::mat H) {
         if (!this->m_h_init_file_name.empty() && !this->m_w_init_file_name.empty()) {
             W.load(m_w_init_file_name, arma::coord_ascii);
             H.load(m_h_init_file_name, arma::coord_ascii);

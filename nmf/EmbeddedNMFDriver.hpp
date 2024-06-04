@@ -15,12 +15,14 @@ namespace planc {
             this->A = pc.getMAMat();
             this->Winit = pc.getMWInitMat();
             this->MInit = pc.getMHInitMat();
-            this->m_outputfile_name = pc.getMOutputfileName();
             commonParams(pc);
         }
-        void loadMat(double t2) {
 
-        }
+    private:
+        void loadWHInit(arma::mat W, arma::mat H) override {}
+
+        void loadMat(double t2) override {}
+
     public:
         explicit EmbeddedNMFDriver<T>(internalParams<T> pc)
         {
