@@ -11,6 +11,9 @@ namespace planc {
     template <typename T>
     class EmbeddedNMFDriver : NMFDriver<T> {
     protected:
+        T Winit;
+        T Hinit;
+
         void parseParams(const internalParams<T>& pc) {
             this->A = pc.getMAMat();
             this->Winit = pc.getMWInitMat();
@@ -19,7 +22,10 @@ namespace planc {
         }
 
     private:
-        void loadWHInit(arma::mat W, arma::mat H) override {}
+        void loadWHInit(arma::mat W, arma::mat H) override {
+            W = this->Winit;
+            H = this->Hinit;
+        }
 
         void loadMat(double t2) override {}
 
