@@ -93,8 +93,12 @@ namespace planc {
             return m_lucalgo;
         }
 
-        void setMLucalgo(algotype mLucalgo) {
-            m_lucalgo = mLucalgo;
+        void setMLucalgo(std::string mLucalgo) {
+            try {
+                m_lucalgo = algomap.at(mLucalgo);
+            } catch(std::out_of_range&) {
+                std::throw_with_nested(R"(Please choose `algo` from "anlsbpp", "admm", "hals" or "mu".)");
+            }
         }
 
         normtype getMInputNormalization() const {

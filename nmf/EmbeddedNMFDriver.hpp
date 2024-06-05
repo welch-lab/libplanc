@@ -51,18 +51,6 @@ namespace planc {
         template<class NMFTYPE>
         void outRes(NMFTYPE nmfA) {}
 
-        void validate_params() {
-            //TODO make this not disgusting
-            // Assume using dgCMatrix
-            if (algo == "anlsbpp") {
-            } else if (algo == "admm") {
-            } else if (algo == "hals") {
-            } else if (algo == "mu") {
-            } else {
-                std::throw_with_nested(R"(Please choose `algo` from "anlsbpp", "admm", "hals" or "mu".)");
-            }
-        }
-
     public:
         explicit EmbeddedNMFDriver<T>(internalParams<T> pc)
         {
@@ -70,7 +58,6 @@ namespace planc {
         }
 
         void callNMF() override {
-            this->validate_params();
             EmbeddedNMFDriver::NMFDriver.callNMF();
         }
     };
