@@ -44,7 +44,7 @@ namespace planc {
         internalParams<T> options(x, Winit, Hinit);
         options.m_k = k;
         options.m_num_it = niter;
-        options.m_lucalgo(algo);
+        options.setMLucalgo(algo);
         EmbeddedNMFDriver<T> nmfRunner(options);
         nmfRunner.callNMF();
         std::array<arma::mat, 3>  outlist;
