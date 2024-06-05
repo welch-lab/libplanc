@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-std::map<std::string, algotype> algomap{{"MU", MU},
+std::unordered_map<std::string, algotype> algomap{{"MU", MU},
                                         {"HALS", HALS},
                                         {"ANLSBPP", ANLSBPP},
                                         {"NAIVEANLSBPP", NAIVEANLSBPP},
@@ -15,4 +15,4 @@ std::map<std::string, algotype> algomap{{"MU", MU},
                                         {"R2", R2},
                                         {"PGD", PGD},
                                         {"PGNCG", PGNCG}};
-std::map<std::string, normtype> normmap{{"NONE", NONE}, {"L2NORM", L2NORM}, {"MAXNORM", MAXNORM}};
+std::unordered_map<std::string, normtype> normmap{{"NONE", NONE}, {"L2NORM", L2NORM}, {"MAXNORM", MAXNORM}};
