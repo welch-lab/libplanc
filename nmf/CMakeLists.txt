@@ -9,7 +9,6 @@ include(GenerateExportHeader)
 
 #add_library(sparse_nmf OBJECT SparseNMFDriver.cpp)
 #add_library(dense_nmf OBJECT NMFDriver.cpp)
-add_executable(plancnmf nmf_cmd.cpp)
 add_library(nmflib
         nmf_lib.cpp bppnmf.cpp
         ../common/utils.cc)
@@ -19,13 +18,14 @@ add_library(nmflib
 target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(nmflib PUBLIC HighFive progressWrapper utils hw_detect detect_blas)
 if(BUILD_EXECUTABLE)
+    add_executable(plancnmf nmf_cmd.cpp)
     find_package(argparse REQUIRED)
     target_link_libraries(plancnmf PRIVATE nmflib argparse::argparse)
     target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 generate_export_header(nmflib)
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
-install(TARGETS plancnmf nmflib
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+#install(TARGETS  plancnmf nmflib
+#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )

@@ -83,8 +83,64 @@ if(NOT(APPLE AND(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES arm64)))
     find_package(OpenMP)
 endif()
 
-add_library(utils OBJECT ${PROJECT_SOURCE_DIR}/common/utils.cpp)
+if(OpenMP_CXX_FOUND)
+    if(MSVC)
+        set(OpenMP_CXX_FLAGS "-openmp:llvm")
+        endif()
+    add_compile_options(${OpenMP_CXX_FLAGS})
+    add_link_options(${OpenMP_CXX_FLAGS})
+else()
+    add_compile_options("/clang:-fopenmp")
+    add_link_options("libomp.lib")
+endif()
 
+set(HIGHFIVE_EXAMPLES OFF CACHE INTERNAL BOOL)
+set(HIGHFIVE_BUILD_DOCS OFF CACHE INTERNAL BOOL)
+set(HIGHFIVE_USE_BOOST OFF CACHE INTERNAL BOOL)
+set(HIGHFIVE_UNIT_TESTS OFF CACHE INTERNAL BOOL)
+set(HIGHFIVE_HAS_CONCEPTS OFF CACHE INTERNAL BOOL)
+if((WIN32 OR APPLE) AND NOT DEFINED ENV{CONDA_BUILD})
+    set(HDF5_USE_STATIC_LIBRARIES ON CACHE INTERNAL BOOL)
+    set(HIGHFIVE_STATIC_HDF5 ON CACHE INTERNAL BOOL)
+endif()
+FetchContent_Declare(
+    HighFive
+    URL https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.9.0.tar.gz
+    URL_HASH SHA256=6301def8ceb9f4d7a595988612db288b448a3c0546f6c83417dab38c64994d7e
+)
+FetchContent_MakeAvailable(HighFive)
+# from https://gitlab.kitware.com/cmake/cmake/-/issues/18872#note_1090297
+# Since there is no compiler line to help us, add the additional required
+# libraries manually.
+set(_additional_libs sz z dl m)
+foreach(_additional_lib IN LISTS _additional_libs)
+    # If both static and shared are available, prefer static to avoid libdl
+    # annoyances ("Using 'dlopen' in statically linked applications requires
+    # at runtime the shared libraries from the glibc version used for
+    # linking")
+    if(HDF5_USE_STATIC_LIBRARIES)
+        set(_libnames ${_additional_lib} lib${_additional_lib}.a)
+    else()
+        set(_libnames ${_additional_lib})
+    endif(HDF5_USE_STATIC_LIBRARIES)
+    set(_libvar "LIB_${_additional_lib}")
+    find_library(${_libvar}
+            NAMES ${_libnames}
+            HINTS ${HDF5_ROOT}
+            PATH_SUFFIXES lib Lib
+            REQUIRED)
+    if(HDF5_FIND_DEBUG)
+        message(STATUS "${_additional_lib} (${_libvar}): ${${_libvar}}")
+    endif(HDF5_FIND_DEBUG)
+    if(${${_libvar}} STREQUAL "${_libvar}-NOTFOUND")
+        message(FATAL_ERROR "${_additional_lib} not found, required for HDF5 install")
+    endif()
+    list(APPEND HDF5_LIBRARIES ${${_libvar}})
+endforeach()
+list(REMOVE_DUPLICATES HDF5_LIBRARIES)
+
+add_library(utils OBJECT ${PROJECT_SOURCE_DIR}/common/utils.cpp)
+target_link_libraries(utils PUBLIC HighFive)
 
 if(BUILD_RCPP)
     find_r_module(Rcpp)
@@ -119,16 +175,7 @@ else()
     get_property(ARMA_DEPS TARGET armadillo PROPERTY INTERFACE_LINK_LIBRARIES)
     target_link_libraries(utils PUBLIC progressWrapper ${ARMA_DEPS})
 endif()
-if(OpenMP_CXX_FOUND)
-    if(MSVC)
-        set(OpenMP_CXX_FLAGS "-openmp:llvm")
-        endif()
-    add_compile_options(${OpenMP_CXX_FLAGS})
-    add_link_options(${OpenMP_CXX_FLAGS})
-else()
-    add_compile_options("/clang:-fopenmp")
-    add_link_options("libomp.lib")
-endif()
+
 
 if(WIN32)
     # prioritize Git Patch on Windows as other Patches may be very old and incompatible.
@@ -280,6 +327,7 @@ endif()
 if(APPLE)
     target_link_libraries(hw_detect INTERFACE "-framework Foundation" "-framework IOKit" "-framework OpenCL")
 endif()
+
 set(PLANC_COMMON ${PROJECT_SOURCE_DIR}/common)
 set(NNLS_SRC ${PROJECT_SOURCE_DIR}/nnls)
 message(STATUS "NNLS_SOURCE_DIR =  ${NNLS_SRC}")
