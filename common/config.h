@@ -28,9 +28,46 @@
 #define ARMA_USE_BLAS
 #define ARMA_USE_LAPACK
 // #endif
+#ifdef USING_R
+#include <RcppArmadillo.h>
+#include <progress.hpp>
+#endif
 #ifndef USING_R
 #define ULONG ULONG_FAKE
 #include "progressWrapper.h"
 #undef ULONG
 #undef FILE_CREATE
+#endif
+
+
+#ifndef ERR
+#ifdef USING_R
+#define ERR Rcpp::Rcerr
+#else
+#define ERR std::cerr
+#endif
+#endif
+
+#ifndef WARN
+#ifdef USING_R
+#define WARN Rcpp::Rcerr
+#else
+#define WARN std::cerr
+#endif
+#endif
+
+#ifndef INFO
+#ifdef USING_R
+#define INFO Rcpp::Rcout
+#else
+#define INFO std::cout
+#endif
+#endif
+
+#ifndef OUTPUT
+#ifdef USING_R
+#define OUTPUT Rcpp::Rcout
+#else
+#define OUTPUT std::cout
+#endif
 #endif

@@ -1,6 +1,7 @@
 #pragma once
 #include "config.h"
 #include <unordered_map>
+#include <string>
 
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
@@ -19,44 +20,14 @@ extern std::unordered_map<std::string, normtype> normmap;
 
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
-#include <armadillo>
+
 #include <cmath>
 #include <iostream>
 #include <vector>
 
 // using namespace std;
 
-#ifndef ERR
-#ifdef USING_R
-#define ERR Rcpp::Rcerr
-#else
-#define ERR std::cerr
-#endif
-#endif
 
-#ifndef WARN
-#ifdef USING_R
-#define WARN Rcpp::Rcerr
-#else
-#define WARN std::cerr
-#endif
-#endif
-
-#ifndef INFO
-#ifdef USING_R
-#define INFO Rcpp::Rcout
-#else
-#define INFO std::cout
-#endif
-#endif
-
-#ifndef OUTPUT
-#ifdef USING_R
-#define OUTPUT Rcpp::Rcout
-#else
-#define OUTPUT std::cout
-#endif
-#endif
 
 constexpr auto EPSILON_1EMINUS16 = 0.00000000000000001;
 constexpr auto EPSILON_1EMINUS8=0.00000001;
