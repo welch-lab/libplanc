@@ -4,7 +4,8 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-#include "nmf.hpp"
+#include <memory>
+#include <nmf.hpp>
 #include "bppnnls.hpp"
 #include "hals.hpp"
 
