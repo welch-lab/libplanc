@@ -6,7 +6,7 @@
 #define DETECT_BLAS_H
 #include <stdbool.h>
 
-typedef int(*openblas_handle_t)(void);
+typedef void* openblas_handle_t;
 openblas_handle_t get_openblas_handle(void);
 
 typedef int(*openblas_init_t)(void);

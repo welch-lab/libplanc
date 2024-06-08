@@ -8,7 +8,7 @@
 #endif
 
 openblas_handle_t get_openblas_handle(void) {
-    const openblas_handle_t blas_handle = (openblas_handle_t)dlopen(0, RTLD_NOW);
+    openblas_handle_t blas_handle = (openblas_handle_t)dlopen(0, RTLD_NOW);
     return blas_handle;
 }
 

@@ -15,10 +15,10 @@ planc::nmflib::nmflib() {
 
 void planc::nmflib::openblas_pthread_off(openblas_handle_t libloc) {
     if (is_openmp()) {
-        if (const std::function<int()> openblas_parallel = get_openblas_parallel(libloc))
+        if (const std::function openblas_parallel = get_openblas_parallel(libloc))
             {
                 if (openblas_parallel() == 1) {
-                    const std::function<void(int)> openblas_set = get_openblas_set(libloc);
+                    const std::function openblas_set = get_openblas_set(libloc);
                     openblas_set(1);
                 }
             }
@@ -26,10 +26,10 @@ void planc::nmflib::openblas_pthread_off(openblas_handle_t libloc) {
 }
 
 void planc::nmflib::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
-    if (const std::function<int()> openblas_parallel = get_openblas_parallel(libloc))
+    if (const std::function openblas_parallel = get_openblas_parallel(libloc))
     {
         if (openblas_parallel() == 1) {
-            const std::function<void(int)> openblas_set = get_openblas_set(libloc);
+            const std::function openblas_set = get_openblas_set(libloc);
             openblas_set(0);
         }
     }
