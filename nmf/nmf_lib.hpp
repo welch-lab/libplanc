@@ -24,17 +24,20 @@ namespace planc {
 
         template<typename T>
         int NMFLIB_EXPORT runINMF(params opts);
-
-    private:
         static void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
         static void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);
     };
 
-    enum NMFLIB_EXPORT runNMFindex {outW, outH, objErr};
+    //enum NMFLIB_EXPORT runNMFindex {outW, outH, objErr};
+    struct NMFLIB_EXPORT nmfOutput {
+      arma::mat outW;
+      arma::mat outH;
+      double objErr;
+    };
     //extern std::map<std::string, runNMFindex> NMFindexmap;
 
     template<typename T>
-    std::array<arma::mat, 3>  NMFLIB_EXPORT nmf(const T& x,
+    nmfOutput NMFLIB_EXPORT nmf(const T& x,
                                                                  const arma::uword &k,
                                                                  const arma::uword &niter = 30,
                    const std::string &algo = "anlsbpp",
@@ -47,10 +50,10 @@ namespace planc {
         options.setMLucalgo(algo);
         EmbeddedNMFDriver<T> nmfRunner(options);
         nmfRunner.callNMF();
-        std::array<arma::mat, 3>  outlist;
-        outlist[outW] = nmfRunner.getLeftLowRankFactor();
-        outlist[outH] = nmfRunner.getRightLowRankFactor();
-        outlist[objErr] = nmfRunner.objErr();
+        nmfOutput outlist{};
+        outlist.outW = nmfRunner.getLlf();
+        outlist.outH = nmfRunner.getRlf();
+        outlist.objErr = nmfRunner.getobjErr();
         return outlist;
     }
 

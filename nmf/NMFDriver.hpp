@@ -28,6 +28,7 @@ protected:
     std::string m_h_init_file_name;
     int m_num_it{};
     arma::mat LLF{};
+    double objErr;
 public:
     const arma::mat &getLlf() const {
         return LLF;
@@ -35,6 +36,12 @@ public:
 
     const arma::mat &getRlf() const {
         return RLF;
+    }
+    const double &getobjErr() const {
+      return objErr;
+    }
+    void setObjErr(double objerr) {
+      objErr = objerr;
     }
 
 protected:
@@ -71,7 +78,7 @@ protected:
     static const int kbetaSp = 10;
     template<class NMFTYPE>
     void CallNMF();
-    void commonParams(const params& pc) {
+    virtual void commonParams(const params& pc) {
         this->m_nmfalgo = pc.getMLucalgo();
         this->m_input_normalization = pc.getMInputNormalization();
         this->m_k = pc.getMK();
@@ -459,6 +466,7 @@ switch (this->m_nmfalgo)
             INFO << "time taken:" << t2 << std::endl;
             this->LLF = nmfAlgorithm.getLeftLowRankFactor();
             this->RLF = nmfAlgorithm.getRightLowRankFactor();
+            this->objErr = nmfAlgorithm.objErr();
             outRes(nmfAlgorithm);
         }
 

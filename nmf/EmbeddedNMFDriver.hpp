@@ -9,7 +9,7 @@
 namespace planc {
 
     template <typename T>
-    class EmbeddedNMFDriver : NMFDriver<T> {
+    class EmbeddedNMFDriver : public NMFDriver<T> {
     protected:
         T Winit;
         T Hinit;
@@ -17,8 +17,8 @@ namespace planc {
         void parseParams(const internalParams<T>& pc) {
             this->A = pc.getMAMat();
             this->Winit = pc.getMWInitMat();
-            this->MInit = pc.getMHInitMat();
-            commonParams(pc);
+            this->Hinit = pc.getMHInitMat();
+            this->commonParams(pc);
         }
 
     private:
@@ -52,13 +52,9 @@ namespace planc {
         void outRes(NMFTYPE nmfA) {}
 
     public:
-        explicit EmbeddedNMFDriver<T>(internalParams<T> pc)
+        explicit EmbeddedNMFDriver<T>(internalParams<T> pc) : NMFDriver<T>(pc)
         {
             this->parseParams(pc);
-        }
-
-        void callNMF() override {
-            EmbeddedNMFDriver::NMFDriver.callNMF();
         }
     };
 
