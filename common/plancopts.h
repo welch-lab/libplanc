@@ -149,7 +149,7 @@ namespace planc {
             m_adj_rand = mAdjRand;
         }
 
-        virtual const std::string &getMAfileName() const {
+        const std::string &getMAfileName() const {
             return m_Afile_name;
         }
 
@@ -157,7 +157,7 @@ namespace planc {
             m_Afile_name = mAfileName;
         }
 
-        virtual const std::string &getMOutputfileName() const {
+        const std::string &getMOutputfileName() const {
             return m_outputfile_name;
         }
 
@@ -173,7 +173,7 @@ namespace planc {
             m_Sfile_name = mSfileName;
         }
 
-        virtual const std::string &getMHInitFileName() const {
+        const std::string &getMHInitFileName() const {
             return m_h_init_file_name;
         }
 
@@ -181,11 +181,11 @@ namespace planc {
             m_h_init_file_name = mHInitFileName;
         }
 
-        virtual const std::string &getMWInitFileName() const {
+        const std::string &getMWInitFileName() const {
             return M_W_init_file_name;
         }
 
-        virtual void setMWInitFileName(const std::string &MWInitFileName) {
+        void setMWInitFileName(const std::string &MWInitFileName) {
             M_W_init_file_name = MWInitFileName;
         }
 
@@ -430,15 +430,15 @@ namespace planc {
     template<typename T>
     struct internalParams : params {
         // matrix pointers for direct passage
-        T& m_a_mat;
-        arma::mat& m_h_init_mat;
+        const T& m_a_mat;
+        const arma::mat& m_h_init_mat;
 
-        internalParams(T &mAMat, arma::mat &mHInitMat, arma::mat &mWInitMat) : m_a_mat(mAMat), m_h_init_mat(mHInitMat),
+        internalParams(const T &mAMat, const arma::mat &mHInitMat, const arma::mat &mWInitMat) : m_a_mat(mAMat), m_h_init_mat(mHInitMat),
                                                                                m_w_init_mat(mWInitMat) {}
 
         explicit internalParams(T &mAMat) : m_a_mat(mAMat) {}
 
-        T &getMAMat() const {
+        [[nodiscard]] const T &getMAMat() const {
             return m_a_mat;
         }
 
@@ -446,7 +446,7 @@ namespace planc {
             m_a_mat = mAMat;
         }
 
-        [[nodiscard]] arma::mat &getMHInitMat() const {
+        [[nodiscard]] const arma::mat &getMHInitMat() const {
             return m_h_init_mat;
         }
 
@@ -454,7 +454,7 @@ namespace planc {
             m_h_init_mat = mHInitMat;
         }
 
-        [[nodiscard]] arma::mat &getMWInitMat() const {
+        [[nodiscard]] const arma::mat &getMWInitMat() const {
             return m_w_init_mat;
         }
 
@@ -462,11 +462,11 @@ namespace planc {
             m_w_init_mat = mWInitMat;
         }
 
-        arma::mat& m_w_init_mat;
-        [[nodiscard]] const std::string & getMAfileName() const override = delete;
-        [[nodiscard]] const std::string & getMOutputfileName() const override = delete;
-        [[nodiscard]] const std::string & getMHInitFileName() const override = delete;
-        [[nodiscard]] const std::string & getMWInitFileName() const override = delete;
+        const arma::mat& m_w_init_mat;
+        [[nodiscard]] const std::string & getMAfileName() const = delete;
+        [[nodiscard]] const std::string & getMOutputfileName() const = delete;
+        [[nodiscard]] const std::string & getMHInitFileName() const = delete;
+        [[nodiscard]] const std::string & getMWInitFileName() const = delete;
     };
 }
 
