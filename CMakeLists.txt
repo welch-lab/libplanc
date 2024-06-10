@@ -335,3 +335,8 @@ message(STATUS "NMF_SOURCE_DIR =  ${NMF_SOURCE_DIR}")
 message(STATUS "NMFLIB_COMMON =  ${PLANC_COMMON}")
 
 add_subdirectory(nmf)
+
+if(BUILD_RCPP)
+list(JOIN BLAS_LIBRARIES " " BLAS_LIBS)
+configure_file(../Makevars.in ../Makevars @ONLY)
+endif()
