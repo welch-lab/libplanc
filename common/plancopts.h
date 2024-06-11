@@ -431,8 +431,8 @@ namespace planc {
     struct internalParams : params {
         // matrix pointers for direct passage
         const T& m_a_mat;
-        const arma::mat& m_h_init_mat;
-
+        arma::mat m_h_init_mat;
+        arma::mat m_w_init_mat;
         internalParams(const T &mAMat, const arma::mat &mHInitMat, const arma::mat &mWInitMat) : m_a_mat(mAMat), m_h_init_mat(mHInitMat),
                                                                                m_w_init_mat(mWInitMat) {}
 
@@ -462,7 +462,7 @@ namespace planc {
             m_w_init_mat = mWInitMat;
         }
 
-        const arma::mat& m_w_init_mat;
+
         [[nodiscard]] const std::string & getMAfileName() const = delete;
         [[nodiscard]] const std::string & getMOutputfileName() const = delete;
         [[nodiscard]] const std::string & getMHInitFileName() const = delete;
