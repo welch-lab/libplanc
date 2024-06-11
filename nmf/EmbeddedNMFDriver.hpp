@@ -22,7 +22,7 @@ namespace planc {
         }
 
     private:
-        void loadWHInit(arma::mat W, arma::mat H) override {
+        void loadWHInit(arma::mat& W, arma::mat& H) override {
             if (!Winit.is_empty()) {
                 W = this->Winit;
                 if (W.n_rows != this->m_m || W.n_cols != this->m_k) {
