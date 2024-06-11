@@ -384,7 +384,7 @@ switch (this->m_nmfalgo)
                 }
             }
 
-            NMFTYPE nmfAlgorithm(A.t(), W, H);
+            NMFTYPE nmfAlgorithm(A, W, H);
             nmfAlgorithm.num_iterations(this->m_num_it);
             nmfAlgorithm.symm_reg(this->m_symm_reg);
             nmfAlgorithm.updalgo(this->m_nmfalgo);
