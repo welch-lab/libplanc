@@ -36,14 +36,15 @@ namespace planc {
     };
     //extern std::map<std::string, runNMFindex> NMFindexmap;
 
-    template<typename T>
-    nmfOutput NMFLIB_EXPORT nmf(const T& x,
-                                                                 const arma::uword &k,
-                                                                 const arma::uword &niter = 30,
-                   const std::string &algo = "anlsbpp",
-                   const int& nCores = 2,
-                   const arma::mat& Winit = arma::mat(1, 1, arma::fill::none),
-                   const arma::mat& Hinit = arma::mat(1, 1, arma::fill::none)) {
+    template <typename T>
+    nmfOutput NMFLIB_EXPORT nmf(const T &x,
+                                const arma::uword &k,
+                                const arma::uword &niter = 30,
+                                const std::string &algo = "anlsbpp",
+                                const int &nCores = 2,
+                                const arma::mat &Winit = arma::mat(),
+                                const arma::mat &Hinit = arma::mat())
+    {
         internalParams<T> options(x, Winit, Hinit);
         options.m_k = k;
         options.m_num_it = niter;
@@ -56,7 +57,6 @@ namespace planc {
         outlist.objErr = nmfRunner.getobjErr();
         return outlist;
     }
-
 }
 
 #endif //PLANC_NMF_LIB_HPP
