@@ -13,11 +13,11 @@ namespace planc {
     protected:
         T Winit;
         T Hinit;
-
         void parseParams(const internalParams<T>& pc) {
             this->A = pc.getMAMat();
             this->Winit = pc.getMWInitMat();
             this->Hinit = pc.getMHInitMat();
+            this->m_Afile_name = "internal";
             this->commonParams(pc);
         }
 
