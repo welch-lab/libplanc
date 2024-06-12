@@ -11,8 +11,8 @@ namespace planc {
     template <typename T>
     class EmbeddedNMFDriver : public NMFDriver<T> {
     protected:
-        T Winit;
-        T Hinit;
+        arma::mat Winit;
+        arma::mat Hinit;
         void parseParams(const internalParams<T>& pc) {
             this->A = pc.getMAMat();
             this->Winit = pc.getMWInitMat();
