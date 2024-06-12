@@ -96,8 +96,8 @@ namespace planc {
         void setMLucalgo(std::string mLucalgo) {
             try {
                 m_lucalgo = algomap.at(mLucalgo);
-            } catch(std::out_of_range&) {
-                std::throw_with_nested(R"(Please choose `algo` from "anlsbpp", "admm", "hals" or "mu".)");
+            } catch(const std::out_of_range& e) {
+                std::throw_with_nested(std::runtime_error("Please choose `algo` from \"anlsbpp\", \"admm\", \"hals\" or \"mu\"."));
             }
         }
 
@@ -433,8 +433,8 @@ namespace planc {
         const T& m_a_mat;
         arma::mat m_h_init_mat;
         arma::mat m_w_init_mat;
-        internalParams(const T &mAMat, const arma::mat &mHInitMat, const arma::mat &mWInitMat) : m_a_mat(mAMat), m_h_init_mat(mHInitMat),
-                                                                               m_w_init_mat(mWInitMat) {}
+        internalParams(const T &mAMat, const arma::mat &mWInitMat, const arma::mat &mHInitMat) : m_a_mat(mAMat), m_w_init_mat(mWInitMat),
+                                                                               m_h_init_mat(mHInitMat) {}
 
         explicit internalParams(T &mAMat) : m_a_mat(mAMat) {}
 
