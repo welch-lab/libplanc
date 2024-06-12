@@ -51,6 +51,8 @@ namespace planc {
         template<class NMFTYPE>
         void outRes(NMFTYPE nmfA) {}
 
+        void setSeed(int) override {}
+
     public:
         explicit EmbeddedNMFDriver<T>(internalParams<T> pc) : NMFDriver<T>(pc)
         {

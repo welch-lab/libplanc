@@ -144,7 +144,7 @@ protected:
     }
     void genDense(double t2) {
         {
-            arma::arma_rng::set_seed(planc::NMFDriver<arma::mat>::kW_seed_idx);
+            setSeed(planc::NMFDriver<arma::mat>::kW_seed_idx);
             std::string rand_prefix("rand_");
             std::string type = this->m_Afile_name.substr(rand_prefix.size());
             assert(type == "normal" || type == "lowrank" || type == "uniform");
@@ -207,7 +207,7 @@ protected:
     }
     void genSparse(double t2)
     {
-        arma::arma_rng::set_seed(planc::NMFDriver<arma::sp_mat>::kW_seed_idx);
+        setSeed(planc::NMFDriver<arma::sp_mat>::kW_seed_idx);
         std::string rand_prefix("rand_");
         std::string type = this->m_Afile_name.substr(rand_prefix.size());
         assert(type == "normal" || type == "lowrank" || type == "uniform");
@@ -311,6 +311,9 @@ protected:
             H = arma::randu<arma::mat>(this->m_n, this->m_k);
         }
     }
+    virtual void setSeed(int seed) {
+        arma::arma_rng::set_seed(seed);
+    }
 
 public:
 explicit NMFDriver<T>(params pc)
@@ -368,7 +371,7 @@ switch (this->m_nmfalgo)
             }
 
             // Set parameters and call NMF
-            arma::arma_rng::set_seed(this->m_initseed);
+            setSeed(this->m_initseed);
             arma::mat W;
             arma::mat H;
             loadWHInit(W, H);
@@ -431,7 +434,7 @@ switch (this->m_nmfalgo)
             }
 
             // Set parameters and call NMF
-            arma::arma_rng::set_seed(this->m_initseed);
+            setSeed(this->m_initseed);
             arma::mat W;
             arma::mat H;
             loadWHInit(W, H);
