@@ -410,6 +410,7 @@ switch (this->m_nmfalgo)
             INFO << "time taken:" << t2 << std::endl;
             this->LLF = nmfAlgorithm.getLeftLowRankFactor();
             this->RLF = nmfAlgorithm.getRightLowRankFactor();
+            this->objErr = nmfAlgorithm.objErr();
             outRes(nmfAlgorithm);
         }
 
