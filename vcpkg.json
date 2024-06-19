@@ -24,8 +24,12 @@
     "version>=" : "2.10.0"
   }, {
     "name" : "openblas",
-    "features": ["simplethread"],
+    "features" : [ "simplethread" ],
     "version>=" : "0.3.27"
+  }, {
+    "name" : "pybind11",
+    "version>=" : "2.12.0#1",
+    "platform" : "!uwp & !mingw"
   } ],
   "builtin-baseline" : "c4af3593e1f1aa9e14a560a09e45ea2cb0dfd74d"
 }
