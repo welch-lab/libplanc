@@ -58,6 +58,22 @@ template<> int planc::nmflib::runINMF<arma::sp_mat>(planc::params opts) {
     return 0;
 };
 
+template<typename T>
+planc::nmfOutput planc::nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
+              const arma::mat &Winit, const arma::mat &Hinit) {
+    internalParams<T> options(x, Winit, Hinit);
+    options.m_k = k;
+    options.m_num_it = niter;
+    options.setMLucalgo(algo);
+    EmbeddedNMFDriver<T> nmfRunner(options);
+    nmfRunner.callNMF();
+    nmfOutput outlist{};
+    outlist.outW = nmfRunner.getLlf();
+    outlist.outH = nmfRunner.getRlf();
+    outlist.objErr = nmfRunner.getobjErr();
+    return outlist;
+}
+
 //std::map<std::string, planc::runNMFindex> NMFindexmap{{"W", planc::outW},
 //                                                      {"H", planc::outH},
 //                                                      {"objErr", planc::objErr}};

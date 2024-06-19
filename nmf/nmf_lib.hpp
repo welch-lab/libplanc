@@ -17,7 +17,7 @@ extern "C" {
 namespace planc {
     class NMFLIB_EXPORT nmflib {
     public:
-        NMFLIB_EXPORT nmflib();
+        nmflib();
 
         template<typename T>
         int NMFLIB_EXPORT runNMF(params opts);
@@ -43,20 +43,7 @@ namespace planc {
                                 const std::string &algo = "anlsbpp",
                                 const int &nCores = 2,
                                 const arma::mat &Winit = arma::mat(),
-                                const arma::mat &Hinit = arma::mat())
-    {
-        internalParams<T> options(x, Winit, Hinit);
-        options.m_k = k;
-        options.m_num_it = niter;
-        options.setMLucalgo(algo);
-        EmbeddedNMFDriver<T> nmfRunner(options);
-        nmfRunner.callNMF();
-        nmfOutput outlist{};
-        outlist.outW = nmfRunner.getLlf();
-        outlist.outH = nmfRunner.getRlf();
-        outlist.objErr = nmfRunner.getobjErr();
-        return outlist;
-    }
+                                const arma::mat &Hinit = arma::mat());
 }
 
 #endif //PLANC_NMF_LIB_HPP
