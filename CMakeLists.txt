@@ -15,6 +15,7 @@ include(FetchContent)
 include(ExternalProject)
 include(CheckSymbolExists)
 include(CheckCXXSymbolExists)
+include(CheckCXXSourceRuns)
 include(cmake/FindRModule.cmake)
 
 # Adhere to GNU filesystem layout conventions
@@ -50,7 +51,7 @@ if(BUILD_RCPP)
     add_compile_definitions(USING_R)
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
     execute_process(COMMAND clang -v ERROR_VARIABLE CLANGID)
     string(REGEX MATCH "\\(.*\\)" CLANGPARSE ${CLANGID})
     if(CLANGPARSE MATCHES "\\(CLANG\\: AOCC.*")
@@ -108,7 +109,21 @@ FetchContent_Declare(
     URL https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.9.0.tar.gz
     URL_HASH SHA256=6301def8ceb9f4d7a595988612db288b448a3c0546f6c83417dab38c64994d7e
 )
-FetchContent_MakeAvailable(HighFive)
+FetchContent_Populate(HighFive)
+find_package(HDF5 REQUIRED)
+set(CMAKE_REQUIRED_LIBRARIES ${HDF5_LIBRARIES})
+set(HighFive_Includes "${HighFive_SOURCE_DIR}/include;${HDF5_INCLUDE_DIRS}")
+set(CMAKE_REQUIRED_INCLUDES "${HighFive_Includes}")
+set(test_hdf5_link "
+#include <highfive/highfive.hpp>
+int main() {
+return 0;
+}
+")
+check_cxx_source_runs("${test_hdf5_link}" HDF5_LINKS)
+unset(CMAKE_REQUIRED_LIBRARIES)
+unset(CMAKE_REQUIRED_INCLUDES)
+if(NOT HDF5_LINKS)
 # from https://gitlab.kitware.com/cmake/cmake/-/issues/18872#note_1090297
 # Since there is no compiler line to help us, add the additional required
 # libraries manually.
@@ -138,9 +153,9 @@ foreach(_additional_lib IN LISTS _additional_libs)
     list(APPEND HDF5_LIBRARIES ${${_libvar}})
 endforeach()
 list(REMOVE_DUPLICATES HDF5_LIBRARIES)
-
+endif()
 add_library(utils OBJECT ${PROJECT_SOURCE_DIR}/common/utils.cpp)
-target_link_libraries(utils PUBLIC HighFive)
+target_link_libraries(utils PUBLIC libheaders ${HDF5_LIBRARIES})
 
 if(BUILD_RCPP)
     find_r_module(Rcpp)
@@ -319,7 +334,8 @@ else()
 endif()
 
 add_library(detect_blas OBJECT ${PROJECT_SOURCE_DIR}/common/detect_blas.c)
-if(WIN32 AND MSVC)
+check_include_file(dlfcn.h HAS_DLFCN)
+if(WIN32 AND NOT HAS_DLFCN)
     find_package(dlfcn-win32 CONFIG REQUIRED)
     target_link_libraries(detect_blas PUBLIC dlfcn-win32::dl)
 endif()

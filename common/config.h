@@ -33,6 +33,7 @@
 #include <progress.hpp>
 #endif
 #ifndef USING_R
+#include <armadillo>
 #define ULONG ULONG_FAKE
 #include "progressWrapper.h"
 #undef ULONG

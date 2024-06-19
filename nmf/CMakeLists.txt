@@ -16,7 +16,7 @@ add_library(nmflib
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)
 target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(nmflib PUBLIC HighFive progressWrapper utils hw_detect detect_blas)
+target_link_libraries(nmflib PUBLIC progressWrapper utils hw_detect detect_blas)
 if(BUILD_EXECUTABLE)
     add_executable(plancnmf nmf_cmd.cpp)
     find_package(argparse REQUIRED)
