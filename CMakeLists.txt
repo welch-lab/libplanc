@@ -110,9 +110,10 @@ FetchContent_Declare(
     URL_HASH SHA256=6301def8ceb9f4d7a595988612db288b448a3c0546f6c83417dab38c64994d7e
 )
 FetchContent_Populate(HighFive)
+FetchContent_GetProperties(HighFive SOURCE_DIR HighFive_SOURCE_DIR)
 find_package(HDF5 REQUIRED)
 set(CMAKE_REQUIRED_LIBRARIES ${HDF5_LIBRARIES})
-set(HighFive_Includes "${HighFive_SOURCE_DIR}/include;${HDF5_INCLUDE_DIRS}")
+set(HighFive_Includes "${HighFive_SOURCE_DIR}/include" "${HDF5_INCLUDE_DIRS}")
 set(CMAKE_REQUIRED_INCLUDES "${HighFive_Includes}")
 set(test_hdf5_link "
 #include <highfive/highfive.hpp>
@@ -155,7 +156,8 @@ endforeach()
 list(REMOVE_DUPLICATES HDF5_LIBRARIES)
 endif()
 add_library(utils OBJECT ${PROJECT_SOURCE_DIR}/common/utils.cpp)
-target_link_libraries(utils PUBLIC libheaders ${HDF5_LIBRARIES})
+target_include_directories(utils PUBLIC ${HighFive_Includes})
+target_link_libraries(utils PUBLIC ${HDF5_LIBRARIES})
 
 if(BUILD_RCPP)
     find_r_module(Rcpp)
