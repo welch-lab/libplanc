@@ -30,6 +30,9 @@
     "name" : "pybind11",
     "version>=" : "2.12.0#1",
     "platform" : "!uwp & !mingw"
+  }, {
+    "name" : "py-numpy",
+    "platform" : "!uwp & !mingw"
   } ],
   "builtin-baseline" : "c4af3593e1f1aa9e14a560a09e45ea2cb0dfd74d"
 }

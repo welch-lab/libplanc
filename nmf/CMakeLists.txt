@@ -2,6 +2,7 @@
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 include(GenerateExportHeader)
+include(FetchContent)
 
 #include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
@@ -27,9 +28,15 @@ endif()
 generate_export_header(nmflib)
 find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11 CONFIG)
-if(pybind11_DIR)
+if(NOT BUILD_RCPP AND pybind11_DIR)
+    FetchContent_Declare(
+            carma
+            URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz
+            URL_HASH SHA256=A404687FB7C41880794CB215CB678BC59CDB0ECDF8BAA4336103E7834BA6750A
+    )
+    fetchcontent_makeavailable(carma)
     pybind11_add_module(pyplanc ../interfaces/pybind_interface.cpp)
-    target_link_libraries(pyplanc PRIVATE nmflib)
+    target_link_libraries(pyplanc PRIVATE carma nmflib)
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib
