@@ -9,11 +9,13 @@
 extern "C" {
 #include "detect_blas.h"
 }
-planc::nmflib::nmflib() {
+template<typename T>
+planc::nmflib<T>::nmflib() {
     openblas_pthread_off((get_openblas_handle()));
 }
 
-void planc::nmflib::openblas_pthread_off(openblas_handle_t libloc) {
+template<typename T>
+void planc::nmflib<T>::openblas_pthread_off(openblas_handle_t libloc) {
     if (is_openmp()) {
         if (const std::function openblas_parallel = get_openblas_parallel(libloc))
             {
@@ -25,7 +27,8 @@ void planc::nmflib::openblas_pthread_off(openblas_handle_t libloc) {
     }
 }
 
-void planc::nmflib::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
+template<typename T>
+void planc::nmflib<T>::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
     if (const std::function openblas_parallel = get_openblas_parallel(libloc))
     {
         if (openblas_parallel() == 1) {
@@ -36,36 +39,20 @@ void planc::nmflib::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp
 }
 }
 
-template<> int planc::nmflib::runNMF<arma::mat>(planc::params opts) {
-    planc::NMFDriver<arma::mat> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
-template<> int planc::nmflib::runNMF<arma::sp_mat>(planc::params opts) {
-    planc::NMFDriver<arma::sp_mat> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
-
-template<> int planc::nmflib::runINMF<arma::mat>(planc::params opts) {
-    planc::NMFDriver<arma::mat> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
-template<> int planc::nmflib::runINMF<arma::sp_mat>(planc::params opts) {
-    planc::NMFDriver<arma::sp_mat> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
-
 template<typename T>
-planc::nmfOutput planc::nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
-              const arma::mat &Winit, const arma::mat &Hinit) {
-    internalParams<T> options(x, Winit, Hinit);
+planc::nmfOutput planc::nmflib<T>::nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
+                         const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
+    return {};
+}
+
+template<>
+planc::nmfOutput planc::nmflib<arma::mat>::nmf(const arma::mat &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
+                         const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
+    internalParams<arma::mat> options(x, Winit, Hinit);
     options.m_k = k;
     options.m_num_it = niter;
     options.setMLucalgo(algo);
-    EmbeddedNMFDriver<T> nmfRunner(options);
+    EmbeddedNMFDriver<arma::mat> nmfRunner(options);
     nmfRunner.callNMF();
     nmfOutput outlist{};
     outlist.outW = nmfRunner.getLlf();
@@ -73,6 +60,39 @@ planc::nmfOutput planc::nmf(const T &x, const arma::uword &k, const arma::uword 
     outlist.objErr = nmfRunner.getobjErr();
     return outlist;
 }
+
+template<>
+planc::nmfOutput planc::nmflib<arma::sp_mat>::nmf(const arma::sp_mat &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
+                                               const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
+    internalParams<arma::sp_mat> options(x, Winit, Hinit);
+    options.m_k = k;
+    options.m_num_it = niter;
+    options.setMLucalgo(algo);
+    EmbeddedNMFDriver<arma::sp_mat> nmfRunner(options);
+    nmfRunner.callNMF();
+    nmfOutput outlist{};
+    outlist.outW = nmfRunner.getLlf();
+    outlist.outH = nmfRunner.getRlf();
+    outlist.objErr = nmfRunner.getobjErr();
+    return outlist;
+}
+
+template<typename T>
+int planc::nmflib<T>::runNMF(planc::params opts) {
+    planc::NMFDriver<T> myNMF(opts);
+    myNMF.callNMF();
+    return 0;
+};
+
+
+template<typename T>
+int planc::nmflib<T>::runINMF(planc::params opts) {
+    planc::NMFDriver<T> myNMF(opts);
+    myNMF.callNMF();
+    return 0;
+};
+
+
 
 //std::map<std::string, planc::runNMFindex> NMFindexmap{{"W", planc::outW},
 //                                                      {"H", planc::outH},
