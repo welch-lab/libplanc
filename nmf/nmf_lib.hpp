@@ -30,14 +30,13 @@ namespace planc {
         int NMFLIB_EXPORT runNMF(params opts);
 
         int NMFLIB_EXPORT runINMF(params opts);
-        static void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
-        static void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);
         static nmfOutput NMFLIB_EXPORT nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
-                                    const arma::mat &Winit, const arma::mat &Hinit);
+                                    const arma::mat &Winit = arma::mat(), const arma::mat &Hinit = arma::mat());
     };
 
 
-
+    extern void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
+    extern void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);
 
 
 

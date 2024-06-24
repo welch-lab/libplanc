@@ -14,8 +14,8 @@ planc::nmflib<T>::nmflib() {
     openblas_pthread_off((get_openblas_handle()));
 }
 
-template<typename T>
-void planc::nmflib<T>::openblas_pthread_off(openblas_handle_t libloc) {
+
+void planc::openblas_pthread_off(openblas_handle_t libloc) {
     if (is_openmp()) {
         if (const std::function openblas_parallel = get_openblas_parallel(libloc))
             {
@@ -27,8 +27,8 @@ void planc::nmflib<T>::openblas_pthread_off(openblas_handle_t libloc) {
     }
 }
 
-template<typename T>
-void planc::nmflib<T>::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
+
+void planc::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
     if (const std::function openblas_parallel = get_openblas_parallel(libloc))
     {
         if (openblas_parallel() == 1) {
