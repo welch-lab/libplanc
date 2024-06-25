@@ -26,9 +26,9 @@ if(BUILD_EXECUTABLE)
     target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 generate_export_header(nmflib)
-find_package(Python COMPONENTS Interpreter Development)
-find_package(pybind11 CONFIG)
-if(NOT BUILD_RCPP AND pybind11_DIR)
+if(SKBUILD)
+    set(PYBIND11_NEWPYTHON ON)
+    find_package(pybind11 CONFIG REQUIRED)
     FetchContent_Declare(
             carma
             URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz
@@ -37,6 +37,7 @@ if(NOT BUILD_RCPP AND pybind11_DIR)
     fetchcontent_makeavailable(carma)
     pybind11_add_module(pyplanc ../interfaces/pybind_interface.cpp)
     target_link_libraries(pyplanc PRIVATE carma nmflib)
+    install(TARGETS pyplanc LIBRARY DESTINATION .)
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib

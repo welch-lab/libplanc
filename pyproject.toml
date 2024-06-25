@@ -1,0 +1,15 @@
+[project]
+name = "pyplanc"
+version = "0.0.1"
+
+
+[build-system]
+requires = ["scikit-build-core>=0.9", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+minimum-version = "0.9"
+
+
+[tool.scikit-build.cmake]
+version = ">=3.16"
