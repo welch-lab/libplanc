@@ -20,9 +20,7 @@ build-frontend = "build"
 skip = ["*-win*", "*-manylinux_i686"]
 
 [tool.cibuildwheel.macos]
-environment = {
-MACOS_DEPLOYMENT_TARGET="10.14"
-}
+environment = {MACOS_DEPLOYMENT_TARGET="10.14"}
 before-all = "cat /opt/local/etc/macports/macports.conf"
 #before-all = "port install armadillo hwloc"
 test-command = "echo 'installed'"
