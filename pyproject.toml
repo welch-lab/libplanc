@@ -1,6 +1,7 @@
 [project]
 name = "pyplanc"
 version = "0.0.1"
+requires-python = ">=3.9"
 
 
 [build-system]
@@ -13,3 +14,24 @@ minimum-version = "0.9"
 
 [tool.scikit-build.cmake]
 version = ">=3.16"
+
+[tool.cibuildwheel]
+build-frontend = "build"
+skip = ["*-win*", "*-manylinux_i686"]
+
+[tool.cibuildwheel.macos]
+environment = {
+MACOS_DEPLOYMENT_TARGET="10.14"
+}
+before-all = "cat /opt/local/etc/macports/macports.conf"
+#before-all = "port install armadillo hwloc"
+test-command = "echo 'installed'"
+
+
+[tool.cibuildwheel.linux]
+before-all = "yum install hwloc-devel hdf5-devel armadillo-devel"
+test-command = "echo 'installed'"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-musllinux*"
+before-all = "apk add hwloc arnadillo hdf5"
