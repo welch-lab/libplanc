@@ -31,7 +31,7 @@ test-command = "echo 'installed'"
 
 
 [tool.cibuildwheel.linux]
-before-all = "yum install hwloc-devel hdf5-devel armadillo-devel"
+before-all = "yum install -y hwloc-devel hdf5-devel armadillo-devel"
 test-command = "echo 'installed'"
 
 [[tool.cibuildwheel.overrides]]
