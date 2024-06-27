@@ -10,7 +10,7 @@ build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 minimum-version = "0.9"
-
+build-dir = "build"
 
 [tool.scikit-build.cmake]
 version = ">=3.16"
@@ -33,6 +33,7 @@ test-command = "echo 'installed'"
 [tool.cibuildwheel.linux]
 before-all = "yum install -y epel-release hwloc-devel && yum install -y hdf5-devel armadillo-devel"
 test-command = "echo 'installed'"
+repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {dest_dir} {wheel}"
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-pypy_x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"

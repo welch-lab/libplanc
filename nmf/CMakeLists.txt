@@ -37,11 +37,10 @@ if(SKBUILD)
     fetchcontent_makeavailable(carma)
     pybind11_add_module(pyplanc ../python/pybind_interface.cpp)
     target_link_libraries(pyplanc PRIVATE carma nmflib)
-    install(TARGETS pyplanc LIBRARY DESTINATION .)
+    install(TARGETS pyplanc nmflib LIBRARY DESTINATION .)
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
-include(GNUInstallDirs)
-install(TARGETS nmflib
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+#install(TARGETS  plancnmf nmflib
+#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
