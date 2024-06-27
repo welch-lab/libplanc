@@ -15,7 +15,7 @@ namespace planc {
             this->m_input_normalization = NONE;
             this->m_compute_error = false;
             this->m_num_it = 20;
-            this->m_num_k_blocks = NULL;
+            this->m_num_k_blocks = 0;
             this->m_dim_tree = true;
             this->m_adj_rand = false;
             // file names
@@ -25,8 +25,8 @@ namespace planc {
             // std::string m_init_file_name;
             // nmf related values
             this->m_k = 20;
-            this->m_globalm = NULL;
-            this->m_globaln = NULL;
+            this->m_globalm = 0;
+            this->m_globaln = 0;
             this->m_initseed = 193957;
             // algo related values
             this->m_regW = arma::zeros<arma::fvec>(2);
