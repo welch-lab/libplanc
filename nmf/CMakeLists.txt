@@ -27,14 +27,6 @@ if(BUILD_EXECUTABLE)
 endif()
 generate_export_header(nmflib)
 if(SKBUILD)
-    set(PYBIND11_NEWPYTHON ON)
-    find_package(pybind11 CONFIG REQUIRED)
-    FetchContent_Declare(
-            carma
-            URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz
-            URL_HASH SHA256=A404687FB7C41880794CB215CB678BC59CDB0ECDF8BAA4336103E7834BA6750A
-    )
-    fetchcontent_makeavailable(carma)
     pybind11_add_module(pyplanc ../python/pybind_interface.cpp)
     target_link_libraries(pyplanc PRIVATE carma nmflib)
     install(TARGETS pyplanc LIBRARY DESTINATION .)

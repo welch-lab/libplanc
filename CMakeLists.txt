@@ -189,6 +189,19 @@ if(BUILD_RCPP)
     else()
         message(FATAL_ERROR "missing RcppProgress")
     endif()
+elseif(SKBUILD)
+    set(PYBIND11_NEWPYTHON ON)
+    find_package(pybind11 CONFIG REQUIRED)
+    FetchContent_Declare(
+        carma
+        URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz
+        URL_HASH SHA256=A404687FB7C41880794CB215CB678BC59CDB0ECDF8BAA4336103E7834BA6750A
+    )
+    fetchcontent_makeavailable(carma)
+    add_library(progressWrapper OBJECT ${PROJECT_SOURCE_DIR}/common/progressWrapper.cpp)
+    target_include_directories(progressWrapper PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/indicators/include")
+    target_include_directories(utils PUBLIC ${ARMADILLO_INCLUDE_DIRS})
+    target_link_libraries(utils PUBLIC progressWrapper ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 else()
     find_package(Armadillo CONFIG REQUIRED)
     find_package(indicators CONFIG)
