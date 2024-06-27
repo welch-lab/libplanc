@@ -35,7 +35,7 @@ if(SKBUILD)
             URL_HASH SHA256=A404687FB7C41880794CB215CB678BC59CDB0ECDF8BAA4336103E7834BA6750A
     )
     fetchcontent_makeavailable(carma)
-    pybind11_add_module(pyplanc ../interfaces/pybind_interface.cpp)
+    pybind11_add_module(pyplanc ../python/pybind_interface.cpp)
     target_link_libraries(pyplanc PRIVATE carma nmflib)
     install(TARGETS pyplanc LIBRARY DESTINATION .)
 endif()
