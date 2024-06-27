@@ -24,16 +24,16 @@ environment = {MACOS_DEPLOYMENT_TARGET="10.14"}
 before-all = [
     "echo \"buildfromsource always\" | tee -a /opt/local/etc/macports/macports.conf",
     "echo \"extra_env MACOS_DEPLOYMENT_TARGET\" | tee -a /opt/local/etc/macports/macports.conf",
-    "port install armadillo hdf5"
+    "port install armadillo hdf5 hwloc"
 ]
 #before-all = "port install armadillo hwloc"
 test-command = "echo 'installed'"
 
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y hdf5-devel armadillo-devel"
+before-all = "yum install -y hwloc-devel hdf5-devel armadillo-devel"
 test-command = "echo 'installed'"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add arnadillo hdf5"
+before-all = "apk add hwloc arnadillo hdf5"
