@@ -37,7 +37,7 @@ if(SKBUILD)
     fetchcontent_makeavailable(carma)
     pybind11_add_module(pyplanc ../python/pybind_interface.cpp)
     target_link_libraries(pyplanc PRIVATE carma nmflib)
-    install(TARGETS pyplanc nmflib LIBRARY DESTINATION .)
+    install(TARGETS pyplanc LIBRARY DESTINATION .)
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib
