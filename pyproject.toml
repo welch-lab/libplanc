@@ -43,4 +43,4 @@ musllinux-aarch64-image = "musllinux_1_2"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add hwloc armadillo hdf5"
+before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
