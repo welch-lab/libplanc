@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 
 
 [build-system]
-requires = ["scikit-build-core>=0.9", "pybind11", "numpy", "tqdm"]
+requires = ["scikit-build-core>=0.9", "pybind11", "numpy"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
