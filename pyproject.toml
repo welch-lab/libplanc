@@ -17,7 +17,7 @@ version = ">=3.16"
 
 [tool.cibuildwheel]
 build-frontend = "build"
-skip = ["*-win*", "*-manylinux_i686"]
+skip = ["*-win*", "*-manylinux*_i686"]
 
 [tool.cibuildwheel.macos]
 environment = {MACOS_DEPLOYMENT_TARGET="10.14"}
