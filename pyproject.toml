@@ -43,4 +43,5 @@ musllinux-aarch64-image = "musllinux_1_2"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add hwloc-dev armadillo-dev openblas-dev && ls /usr/lib/cmake"
+before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
+environment = {SKBUILD_CMAKE_DEFINE='Armadillo_DIR=/usr/lib/cmake'}
