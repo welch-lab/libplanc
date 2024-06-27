@@ -33,7 +33,6 @@ test-command = "echo 'installed'"
 [tool.cibuildwheel.linux]
 before-all = "yum install -y epel-release hwloc-devel && yum install -y hdf5-devel armadillo-devel"
 test-command = "echo 'installed'"
-repair-wheel-command = "LD_LIBRARY_PATH=/project/lib/ auditwheel repair -w {dest_dir} {wheel}"
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-pypy_x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
