@@ -13,8 +13,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: melusina-org/setup-macports@v1
+
+      - uses: actions/cache/restore@v4
+        name: Restore MacPorts Cache
+        id: cache
         if: runner.os == 'macOS'
+        with:
+          key: ${{runner.os}}=0
+          path: /opt/local
+
+      - uses: melusina-org/setup-macports@v1
+        if: runner.os == 'macOS' && steps.cache.outputs.cache-hit != 'true'
+
+      - uses: actions/cache/save@v4
+        name: Save MacPorts Cache
+        if: runner.os == 'macOS' && steps.cache.outputs.cache-hit != 'true'
+        with:
+            path: /opt/local/
+            #manual increment until i figure out how to deal
+            key: ${{runner.os}}-0
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.19.1
