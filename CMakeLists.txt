@@ -93,10 +93,10 @@ endif()
 if(OpenMP_CXX_FOUND)
     if(MSVC)
         set(OpenMP_CXX_FLAGS "-openmp:llvm")
-        endif()
+    endif()
     add_compile_options(${OpenMP_CXX_FLAGS})
     add_link_options(${OpenMP_CXX_FLAGS})
-else()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT APPLE)
     add_compile_options("/clang:-fopenmp")
     add_link_options("libomp.lib")
 endif()
@@ -211,23 +211,6 @@ else()
     target_link_libraries(utils PUBLIC progressWrapper ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif()
 
-
-if(WIN32)
-    # prioritize Git Patch on Windows as other Patches may be very old and incompatible.
-    find_package(Git)
-
-    if(Git_FOUND)
-        get_filename_component(GIT_DIR ${GIT_EXECUTABLE} DIRECTORY)
-        get_filename_component(GIT_DIR ${GIT_DIR} DIRECTORY)
-    endif()
-endif()
-
-find_program(PATCH
-        NAMES patch
-        HINTS ${GIT_DIR}
-        PATH_SUFFIXES usr/bin
-)
-
 if(MSVC)
     check_cxx_compiler_flag("/fp:fast" MSVC_FAST_FLOAT)
     if(MSVC_FAST_FLOAT)
@@ -316,8 +299,18 @@ find_package(HWLOC)
 if(HWLOC_FOUND)
     target_link_libraries(hw_detect PUBLIC "$<$<BOOL:pkgcfg_lib_HWLOC_hwloc>:${pkgcfg_lib_HWLOC_hwloc}>")
     target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
-elseif(BUILD_RCPP)
-    file(GLOB hwloc_patch_list LIST_DIRECTORIES FALSE "${CMAKE_CURRENT_SOURCE_DIR}../../../tools/patches/*.patch")
+elseif(MSVC)
+    FetchContent_Declare(hwloc
+    URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
+    URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
+    SOURCE_SUBDIR contrib/windows-cmake
+    )
+    set(HWLOC_ENABLE_TESTING INTERNAL BOOL OFF)
+    set(HWLOC_SKIP_LSTOPO INTERNAL BOOL ON)
+    set(HWLOC_SKIP_TOOLS INTERNAL BOOL ON)
+    FetchContent_MakeAvailable(hwloc)
+    target_link_libraries(hw_detect PUBLIC hwloc)
+else()
     set(cmd "sh")
     list(APPEND cmd ../hwloc/configure --with-pic --prefix=${hwloc_SOURCE_DIR}/out/ --disable-picky --enable-shared=no --enable-static=yes)
     list(APPEND cmd --disable-cairo --disable-libxml2 --disable-io --disable-plugin-dlopen --disable-plugin-ltdl --enable-embedded-mode)
@@ -326,12 +319,37 @@ elseif(BUILD_RCPP)
     elseif(PASSTHROUGH_CONFIGURE_ARGS)
         list(APPEND cmd ${PASSTHROUGH_CONFIGURE_ARGS})
     endif()
-    ExternalProject_Add(hwloc
+    if(BUILD_RCPP)
+        if(WIN32)
+            # prioritize Git Patch on Windows as other Patches may be very old and incompatible.
+            find_package(Git)
+
+            if(Git_FOUND)
+                get_filename_component(GIT_DIR ${GIT_EXECUTABLE} DIRECTORY)
+                get_filename_component(GIT_DIR ${GIT_DIR} DIRECTORY)
+            endif()
+        endif()
+
+        find_program(PATCH
+            NAMES patch
+            HINTS ${GIT_DIR}
+            PATH_SUFFIXES usr/bin
+        )
+        file(GLOB hwloc_patch_list LIST_DIRECTORIES FALSE "${CMAKE_CURRENT_SOURCE_DIR}../../../tools/patches/*.patch")
+        ExternalProject_Add(hwloc
             URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
             URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
             PATCH_COMMAND ${CMAKE_COMMAND} -E cat ${hwloc_patch_list} | ${PATCH} -p1 -l
             CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd}
-    )
+        )
+        else()
+        ExternalProject_Add(hwloc
+            URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
+            URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
+            BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
+            CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd}
+        )
+    endif()
     ExternalProject_Get_Property(hwloc SOURCE_DIR BINARY_DIR)
     target_include_directories(hw_detect PRIVATE "${BINARY_DIR}/include" "${SOURCE_DIR}/include")
     add_custom_command(TARGET hwloc POST_BUILD
@@ -342,8 +360,6 @@ elseif(BUILD_RCPP)
     if(APPLE)
         target_link_libraries(hw_detect INTERFACE "-framework Foundation" "-framework IOKit" "-framework OpenCL")
     endif()
-else()
-    message("Could not find hwloc" FATAL_ERROR)
 endif()
 
 add_library(detect_blas OBJECT ${PROJECT_SOURCE_DIR}/common/detect_blas.c)

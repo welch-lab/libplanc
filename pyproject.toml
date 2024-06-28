@@ -24,7 +24,7 @@ environment = {MACOS_DEPLOYMENT_TARGET="10.14"}
 before-all = [
     "echo \"buildfromsource always\" | tee -a /opt/local/etc/macports/macports.conf",
     "echo \"extra_env MACOS_DEPLOYMENT_TARGET\" | tee -a /opt/local/etc/macports/macports.conf",
-    "port install armadillo hdf5 hwloc"
+    "port install hdf5"
 ]
 #before-all = "port install armadillo hwloc"
 test-command = "echo 'installed'"
@@ -34,13 +34,13 @@ test-command = "echo 'installed'"
 before-all = "yum install -y epel-release hwloc-devel && yum install -y hdf5-devel armadillo-devel"
 test-command = "echo 'installed'"
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/lib/ auditwheel repair -w {dest_dir} {wheel}"
-manylinux-x86_64-image = "manylinux_2_28"
-manylinux-pypy_x86_64-image = "manylinux_2_28"
-manylinux-aarch64-image = "manylinux_2_28"
-manylinux-pypy_aarch64-image = "manylinux_2_28"
+#manylinux-x86_64-image = "manylinux_2_28"
+#manylinux-pypy_x86_64-image = "manylinux_2_28"
+#manylinux-aarch64-image = "manylinux_2_28"
+#manylinux-pypy_aarch64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
 musllinux-aarch64-image = "musllinux_1_2"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
+before-all = "apk add openblas-dev"
