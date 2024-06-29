@@ -26,7 +26,7 @@ build-frontend = "build[uv]"
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686"]
 
 [tool.cibuildwheel.macos]
-before-all = "curl -LsSf https://astral.sh/uv/install.sh | sh"
+before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh", "vcpkg integrate install"]
 test-command = "echo 'installed'"
 [tool.cibuildwheel.macos.environment]
 MACOS_DEPLOYMENT_TARGET = "10.14"
@@ -50,8 +50,12 @@ musllinux-aarch64-image = "musllinux_1_2"
 select = "*-musllinux*"
 before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux*"
+environment = {SKBUILD_CMAKE_DEFINE="CBLAS_H_DIR=/usr/include/openblas/"}
+
 [tool.cibuildwheel.windows]
-before-all = "pipx install uv"
+before-all = ["pipx install uv", "vcpkg integrate install"]
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 test-command = "echo 'installed'"
