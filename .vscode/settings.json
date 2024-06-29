@@ -99,5 +99,8 @@
         "span": "cpp",
         "typeindex": "cpp"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "editor.defaultFoldingRangeProvider": "charliermarsh.ruff",
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "notebook.defaultFormatter": "charliermarsh.ruff"
 }
