@@ -18,18 +18,19 @@ minimum-version = "0.9"
 
 [tool.scikit-build.cmake]
 version = ">=3.16"
-[tool.scikit-build.cmake.define]
-CMAKE_TOOLCHAIN_FILE = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
+#[tool.scikit-build.cmake.define]
+#CMAKE_TOOLCHAIN_FILE = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-skip = ["*-win*", "*-manylinux*_i686", "*-musllinux*_i686"]
+skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686"]
 
 [tool.cibuildwheel.macos]
+before-all = "curl -LsSf https://astral.sh/uv/install.sh | sh"
 test-command = "echo 'installed'"
 [tool.cibuildwheel.macos.environment]
 MACOS_DEPLOYMENT_TARGET = "10.14"
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$(VCPKG_ROOT)/scripts/buildsystems/vcpkg.cmake"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$(VCPKG_INSTALLATION_ROOT)/scripts/buildsystems/vcpkg.cmake"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOS_DEPLOYMENT_TARGET="11"
@@ -50,8 +51,9 @@ select = "*-musllinux*"
 before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
 [tool.cibuildwheel.windows]
+before-all = "powershell -c \"irm https://astral.sh/uv/install.ps1 | iex\""
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 test-command = "echo 'installed'"
 [tool.cibuildwheel.windows.environment]
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$(VCPKG_ROOT)/scripts/buildsystems/vcpkg.cmake"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$(VCPKG_INSTALLATION_ROOT)/scripts/buildsystems/vcpkg.cmake"
