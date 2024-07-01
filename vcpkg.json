@@ -19,7 +19,7 @@
   }, {
     "name" : "hwloc",
     "version>=" : "2.9.0",
-    "platform" : "!osx"
+    "platform" : "!(osx && arm64)"
   }, {
     "name" : "openblas",
     "features" : [ "simplethread" ],
