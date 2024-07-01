@@ -23,7 +23,7 @@ version = ">=3.16"
 
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686"]
+skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 
 [tool.cibuildwheel.macos]
 before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh",
