@@ -27,7 +27,7 @@ skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686"]
 
 [tool.cibuildwheel.macos]
 before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh",
-              "git clone --depth=1 https://github.com/microsoft/vcpkg.git",
+              "git clone https://github.com/microsoft/vcpkg.git",
               "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 test-command = "echo 'installed'"
 [tool.cibuildwheel.macos.environment]
@@ -36,6 +36,7 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmak
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOS_DEPLOYMENT_TARGET="11"
+environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y epel-release && yum install -y hdf5-devel openblas-devel"
