@@ -26,7 +26,10 @@ build-frontend = "build[uv]"
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686"]
 
 [tool.cibuildwheel.macos]
-before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh"]
+before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh",
+              "git clone --depth=1 https://github.com/microsoft/vcpkg.git",
+              "export VCPKG_INSTALLATION_ROOT=./vcpkg/bootstrap-vcpkg.sh",
+              "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 test-command = "echo 'installed'"
 [tool.cibuildwheel.macos.environment]
 MACOS_DEPLOYMENT_TARGET = "10.14"
