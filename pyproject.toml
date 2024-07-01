@@ -33,11 +33,11 @@ before-build = "brew install autoconf automake"
 test-command = "echo 'installed'"
 [tool.cibuildwheel.macos.environment]
 MACOS_DEPLOYMENT_TARGET = "10.14"
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=Release"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOS_DEPLOYMENT_TARGET="11"
-environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=Release"
+environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y epel-release && yum install -y hdf5-devel openblas-devel"
@@ -64,4 +64,4 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build\\Release"
 test-command = "echo 'installed'"
 [tool.cibuildwheel.windows.environment]
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=Release"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
