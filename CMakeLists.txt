@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+if(BUILD_RCPP)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11" CACHE STRING "Target MacOS Version")
+endif()
 mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # the settings below will be automatically configured by the rest of this script
