@@ -18,7 +18,8 @@
     "version>=" : "2.1.0"
   }, {
     "name" : "hwloc",
-    "version>=" : "2.10.0"
+    "version>=" : "2.9.0",
+    "platform" : "!osx"
   }, {
     "name" : "openblas",
     "features" : [ "simplethread" ],
