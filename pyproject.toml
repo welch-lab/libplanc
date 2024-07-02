@@ -96,12 +96,12 @@ before-all = ["git clone https://github.com/microsoft/vcpkg.git",
               "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 test-command = "echo 'installed'"
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/lib/ auditwheel repair -w {dest_dir} {wheel}"
-#manylinux-x86_64-image = "manylinux_2_28"
-#manylinux-pypy_x86_64-image = "manylinux_2_28"
-#manylinux-aarch64-image = "manylinux_2_28"
-#manylinux-pypy_aarch64-image = "manylinux_2_28"
-#musllinux-x86_64-image = "musllinux_1_2"
-#musllinux-aarch64-image = "musllinux_1_2"
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-pypy_x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
+manylinux-pypy_aarch64-image = "manylinux_2_28"
+musllinux-x86_64-image = "musllinux_1_2"
+musllinux-aarch64-image = "musllinux_1_2"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
 
 #[[tool.cibuildwheel.overrides]]
