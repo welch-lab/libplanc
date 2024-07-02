@@ -4,6 +4,49 @@ version = "0.0.1"
 requires-python = ">=3.10"
 readme = "python/README.md"
 license.file = "license.md"
+authors = [
+    { name = "Andrew Robbins", email = "andrew@robbinsa.me"},
+    { name = "Yichen Wang", email = "wayichen@umich.edu"},
+    { name = "Joshua Welch", email = "welchjd@umich.edu"},
+    { name = "Ramakrishnan Kannan", email = "kannanr@ornl.gov"}
+]
+maintainers = [
+    { name = "Andrew Robbins", email = "andrew@robbinsa.me"}
+]
+
+dependencies = [
+    "numpy",
+    "threadpoolctl"
+]
+
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: C++",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X",
+  "Intended Audience :: Science/Research"
+]
+
+[project.urls]
+Homepage = "https://welch-lab.github.io"
+Repository = "https://github.com/theAeon/planc"
+
+[project.optional-dependencies]
+test = [
+  "pytest >=6.0",
+  "pyyaml >=6.0"
+]
+dev = [
+    "rye"
+]
 
 [build-system]
 requires = ["scikit-build-core>=0.9", "pybind11>=2.12", "numpy>=2.0"]
