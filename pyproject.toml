@@ -92,7 +92,8 @@ environment.MACOSX_DEPLOYMENT_TARGET="11"
 environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
 
 [tool.cibuildwheel.linux]
-before-all = ["git clone https://github.com/microsoft/vcpkg.git",
+before-all = ["yum install -y zip",
+              "git clone https://github.com/microsoft/vcpkg.git",
               "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 test-command = "echo 'installed'"
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/lib/ auditwheel repair -w {dest_dir} {wheel}"
