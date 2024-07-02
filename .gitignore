@@ -14,3 +14,5 @@ vcpkg_installed/*
 /cmake-build-release-visual-studio
 /cmake-build-release-visual-studio-clang
 /cmake-build-release-wsl
+/build
+/dist
