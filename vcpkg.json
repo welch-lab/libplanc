@@ -9,7 +9,8 @@
     "version>=" : "3.0"
   }, {
     "name" : "armadillo",
-    "version>=" : "12.6.6"
+    "version>=" : "12.6.6",
+    "platform" : "!osx"
   }, {
     "name" : "highfive",
     "version>=" : "2.9.0"
@@ -22,11 +23,12 @@
   }, {
     "name" : "hwloc",
     "version>=" : "2.9.0",
-    "platform" : "!(osx)"
+    "platform" : "!osx"
   }, {
     "name" : "openblas",
     "features" : [ "simplethread" ],
-    "version>=" : "0.3.27"
+    "version>=" : "0.3.27",
+    "platform" : "!osx"
   } ],
   "builtin-baseline" : "c4af3593e1f1aa9e14a560a09e45ea2cb0dfd74d"
 }
