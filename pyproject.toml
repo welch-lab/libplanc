@@ -67,6 +67,12 @@ version = ">=3.16"
 #[tool.scikit-build.cmake.define]
 #CMAKE_TOOLCHAIN_FILE = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "python\tests",
+]
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
