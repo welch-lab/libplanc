@@ -58,7 +58,9 @@ rye = {}
 [tool.scikit-build]
 minimum-version = "0.9"
 build-dir = "build"
-
+sdist.exclude = [
+    '\bench', '\.idea', '\.github', '\.vscode', '\utilities', '\formatter'
+]
 
 [tool.scikit-build.cmake]
 version = ">=3.16"
