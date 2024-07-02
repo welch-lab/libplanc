@@ -104,6 +104,7 @@ manylinux-pypy_aarch64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
 musllinux-aarch64-image = "musllinux_1_2"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
+environment.VCPKG_FORCE_SYSTEM_BINARIES = 1
 
 #[[tool.cibuildwheel.overrides]]
 #select = "*-musllinux*"

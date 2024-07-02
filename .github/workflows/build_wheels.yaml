@@ -30,7 +30,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.1
         env:
           VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
-          CIBW_ENVIRONMENT_PASS_LINUX: VCPKG_BINARY_SOURCES
+          CIBW_ENVIRONMENT_PASS_LINUX: VCPKG_BINARY_SOURCES ACTIONS_CACHE_URL ACTIONS_RUNTIME_TOKEN
         #    ...
         # with:
         #   package-dir: .
