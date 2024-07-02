@@ -108,12 +108,12 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsyst
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = ["apk add build-base cmake ninja zip unzip curl git",
+before-all = ["apk add build-base cmake libtool zip unzip curl git",
+              "pipx install ninja",
               "git clone https://github.com/microsoft/vcpkg.git",
               "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
               "./vcpkg/vcpkg install"]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
-environment.VCPKG_FORCE_SYSTEM_BINARIES = 1
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
