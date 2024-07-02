@@ -14,6 +14,9 @@
     "name" : "highfive",
     "version>=" : "2.9.0"
   }, {
+    "name" : "indicators",
+    "version>=" : "2.3"
+  }, {
     "name" : "pkgconf",
     "version>=" : "2.1.0"
   }, {
