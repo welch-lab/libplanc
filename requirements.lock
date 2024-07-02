@@ -4,8 +4,45 @@
 # last locked with the following flags:
 #   pre: false
 #   features: []
-#   all-features: false
+#   all-features: true
 #   with-sources: false
 #   generate-hashes: false
 
 -e file:.
+click==7.1.2
+    # via rye
+colorama==0.4.6
+    # via pytest
+    # via rye
+importlib-metadata==0.23
+    # via rye
+iniconfig==2.0.0
+    # via pytest
+jinja2==2.10.3
+    # via settingscascade
+markupsafe==2.1.5
+    # via jinja2
+numpy==2.0.0
+    # via pyplanc
+packaging==24.1
+    # via pytest
+pluggy==1.5.0
+    # via pytest
+pytest==8.2.2
+    # via pyplanc
+pyyaml==6.0.1
+    # via pyplanc
+rye==0.3.2
+    # via pyplanc
+settingscascade==0.3.4
+    # via rye
+sortedcontainers==2.1.0
+    # via settingscascade
+threadpoolctl==3.5.0
+    # via pyplanc
+toml==0.10.2
+    # via rye
+virtualenv==16.7.12
+    # via rye
+zipp==3.19.2
+    # via importlib-metadata

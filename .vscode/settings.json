@@ -102,5 +102,6 @@
     "C_Cpp.errorSquiggles": "enabled",
     "editor.defaultFoldingRangeProvider": "charliermarsh.ruff",
     "editor.defaultFormatter": "charliermarsh.ruff",
-    "notebook.defaultFormatter": "charliermarsh.ruff"
+    "notebook.defaultFormatter": "charliermarsh.ruff",
+    "FSharp.suggestGitignore": false
 }

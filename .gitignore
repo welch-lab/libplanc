@@ -3,9 +3,9 @@
 *.md5
 *.dpth
 *.dep
-.vs/*
-out/*
-vcpkg_installed/*
+/.vs/
+/out/
+/vcpkg_installed
 /cmake-build-debug-mingw
 /cmake-build-debug-visual-studio
 /cmake-build-debug-visual-studio-clang
@@ -16,3 +16,6 @@ vcpkg_installed/*
 /cmake-build-release-wsl
 /build
 /dist
+/.venv
+/.mypy_cache
+/.python-version
