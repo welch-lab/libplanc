@@ -108,7 +108,7 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsyst
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = ["apk add zip",
+before-all = ["apk add build-base cmake ninja zip unzip curl git",
               "git clone https://github.com/microsoft/vcpkg.git",
               "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
               "./vcpkg/vcpkg install"]
