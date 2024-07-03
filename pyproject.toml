@@ -45,7 +45,7 @@ test = [
   "pyyaml >=6.0"
 ]
 dev = [
-    "rye"
+    "ruff"
 ]
 
 [build-system]
@@ -53,7 +53,9 @@ requires = ["scikit-build-core>=0.9", "pybind11>=2.12", "numpy>=2.0"]
 build-backend = "scikit_build_core.build"
 
 [tool]
-rye = {}
+rye = { dev-dependencies = [
+    "cibuildwheel>=2.19.2",
+] }
 
 [tool.scikit-build]
 minimum-version = "0.9"
