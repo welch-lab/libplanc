@@ -34,7 +34,10 @@ namespace py = pybind11;
 arma::mat nullMat = arma::mat{};
 
 template <typename T>
-using nmfCall = py::dict(*)(const T&, const arma::uword&, const arma::uword&, const std::string&, const int&, const arma::mat&, const arma::mat&);
+using nmfCall = py::dict(*)(const T&, const arma::uword&, const arma::uword&, const std::string&, const int&);
+
+template <typename T>
+using nmfFullCall = py::dict(*)(const T&, const arma::uword&, const arma::uword&, const std::string&, const int&, const arma::mat&, const arma::mat&);
 
 
 // T2 e.g. arma::sp_mat
@@ -61,6 +64,7 @@ py::dict nmf(const T2& x, const arma::uword &k,
 PYBIND11_MODULE(pyplanc, m) {
     m.doc() = "A python wrapper for planc-nmflib";
     using namespace py::literals;
-    m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
+    m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
+    m.def("nmf", static_cast<nmfFullCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
           py::kw_only(), "Winit"_a, "Hinit"_a);
 }
