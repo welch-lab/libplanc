@@ -1,7 +1,15 @@
 {
     "python.terminal.activateEnvironment": false,
     "files.associations": {
+        ".fantomasignore": "ignore",
+        "*.json.liquid": "json",
+        "*.yaml.liquid": "yaml",
+        "*.md.liquid": "markdown",
+        "*.js.liquid": "liquid-javascript",
+        "*.css.liquid": "liquid-css",
+        "*.scss.liquid": "liquid-scss",
         "NAMESPACE": "r",
+        "*.frag": "makefile",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -97,7 +105,8 @@
         "source_location": "cpp",
         "format": "cpp",
         "span": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "xstring": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.defaultFoldingRangeProvider": "charliermarsh.ruff",
