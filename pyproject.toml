@@ -79,6 +79,7 @@ testpaths = [
 build-frontend = "build[uv]"
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
+before-test = "uv pip install .[test]"
 
 [tool.cibuildwheel.macos]
 before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh",
