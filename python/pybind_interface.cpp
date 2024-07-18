@@ -11,6 +11,19 @@
 
 namespace py = pybind11;
 
+void limitpypythreads() {
+
+    py::object ThreadpoolController = py::module_::import("threadpoolctl").attr("ThreadpoolController");
+    py::object tpcontrol = ThreadpoolController();
+    py::object limit = tpcontrol.attr("limit");
+    py::object platformimpl = py::module_::import("platform").attr("python_implementation");
+     py::str platform = platformimpl();
+    if (static_cast<std::string>(platform) == "PyPy") {
+        using namespace pybind11::literals;
+        limit("limits"_a=1, "user_api"_a="blas");
+        limit("limits"_a=1, "user_api"_a="openmp");
+    }
+} // state does not unset, TODO find way to do on import/unload
 //Rcpp::List nmf(const SEXP& x, const arma::uword &k, const arma::uword &niter = 30,
 //               const std::string &algo = "anlsbpp",
 //               const int& nCores = 2,
@@ -45,6 +58,7 @@ template <typename T2>
 planc::nmfOutput nmf(const T2& x, const arma::uword &k,
              const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
              const int& nCores = 2, const arma::mat& Winit = nullMat, const arma::mat& Hinit = nullMat) {
+    limitpypythreads();
     planc::nmfOutput libcall = planc::nmflib<T2>::nmf(x, k, niter, algo, nCores, Winit, Hinit);
     return libcall;
 }
@@ -53,6 +67,7 @@ template <typename T2>
 planc::nmfOutput nmf(const T2& x, const arma::uword &k,
              const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
              const int& nCores = 2) {
+    limitpypythreads();
     planc::nmfOutput libcall = planc::nmflib<T2>::nmf(x, k, niter, algo, nCores);
     return libcall;
 }
