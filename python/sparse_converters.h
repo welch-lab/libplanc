@@ -1,6 +1,6 @@
 //MIT License
 //
-//Copyright (c) 2020 Niels Wouda
+//Copyright (c) 2020 Niels Wouda, 2024 Andrew Robbins
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 //
@@ -24,13 +24,12 @@ arma::SpMat<T> csc_to_sp_mat(py::handle &src,
                              // bool copy = false,
                              bool strict = false)
 {
-    // TODO decrefs
-    PyObject *colPtrRaw = src.attr("indptr").ptr();
-    PyObject *rowindRaw = src.attr("indices").ptr();
-    PyObject *dataRaw = src.attr("data").ptr();
+    py::array_t<arma::uword> colPtrArr = src.attr("indptr");
+    py::array_t<arma::uword> rowIndArr = src.attr("indices");
+    py::array_t<T> dataArr = src.attr("data");
     PyObject *shapePtr = src.attr("shape").ptr();
 
-    if (!colPtrRaw || !rowindRaw || !dataRaw || !shapePtr)
+    if (!colPtrArr || !rowIndArr || !dataArr || !shapePtr)
         throw std::runtime_error("Could not obtain scipy.sparse matrix data.");
 
     int row, col;
@@ -38,9 +37,9 @@ arma::SpMat<T> csc_to_sp_mat(py::handle &src,
 
     // I don't really understand why these *must* be copied. But I get bogus
     // data if I don't, so copy remains true.
-    arma::uvec colPtr = carma::arr_to_col<arma::uword>(colPtrRaw, true, strict);
-    arma::Col<T> data = carma::arr_to_col<T>(dataRaw, true, strict);
-    arma::uvec rowind = carma::arr_to_col<arma::uword>(rowindRaw, true, strict);
+    arma::uvec colPtr = carma::arr_to_col<arma::uword>(colPtrArr, true);
+    arma::Col<T> data = carma::arr_to_col<T>(dataArr, true);
+    arma::uvec rowind = carma::arr_to_col<arma::uword>(rowIndArr, true);
 
     return arma::SpMat<T>(rowind, colPtr, data, row, col);
 }
