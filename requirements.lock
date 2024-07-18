@@ -15,6 +15,7 @@ iniconfig==2.0.0
     # via pytest
 numpy==2.0.0
     # via pyplanc
+    # via scipy
 packaging==24.1
     # via pytest
 pluggy==1.5.0
@@ -24,6 +25,8 @@ pytest==8.2.2
 pyyaml==6.0.1
     # via pyplanc
 ruff==0.5.0
+    # via pyplanc
+scipy==1.14.0
     # via pyplanc
 threadpoolctl==3.5.0
     # via pyplanc
