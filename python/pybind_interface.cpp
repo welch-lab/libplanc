@@ -8,6 +8,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pytypes.h>
+#include "sparse_converters.h"
 
 namespace py = pybind11;
 
@@ -77,6 +78,9 @@ PYBIND11_MODULE(pyplanc, m) {
     using namespace py::literals;
     py::class_<planc::nmfOutput>(m, "nmfOutput").def_readwrite("W", &planc::nmfOutput::outW).def_readwrite("H", &planc::nmfOutput::outH).def_readwrite("objErr", &planc::nmfOutput::objErr);
     m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
+    m.def("nmf", static_cast<nmfCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
     m.def("nmf", static_cast<nmfFullCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
           py::kw_only(), "Winit"_a, "Hinit"_a);
+    m.def("nmf", static_cast<nmfFullCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
+      py::kw_only(), "Winit"_a, "Hinit"_a);
 }
