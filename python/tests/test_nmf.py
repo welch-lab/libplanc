@@ -48,21 +48,16 @@ class TestNMFDense:
         assert 1850 <= run_nmf.objErr and run_nmf.objErr <= 2650
 
 
+class TestNMFDenseFail:
+    @pytest.fixture(scope="class", params=["hello"])
+    def algoarg(self, request):
+        param = request.param
+        yield param
 
-# test_that("dense, nmf, anlsbpp", {
-#     # Working use
-#     res <- nmf(mat, k, niter = 100)
-#     expect_type(res, "list")
-#     expect_equal(nrow(res$W), m)
-#     expect_equal(ncol(res$W), k)
-#     expect_equal(nrow(res$H), n)
-#     expect_equal(ncol(res$H), k)
-#     expect_lte(res$objErr, 2025)
-
-#     # Using init W and H
-#     res <- nmf(mat, k, niter = 100, Winit = res$W, Hinit = res$H)
-#     expect_lte(res$objErr, 2025)
-
+    def test_bad_dense_algo_arg(self, nmf_dense_mat: numpy.typing.NDArray[np.float64], algoarg) -> pyplanc.nmfOutput:
+        with pytest.raises(RuntimeError) as e:
+            pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg)
+        assert 'Please choose `algo` from' in str(e.value)
 #     # Failing use
 #     expect_error({
 #       nmf(mat, k, algo = "hello")
