@@ -2,28 +2,39 @@
 // Created by andrew on 6/19/2024.
 //
 
-#include <carma>
 #include "config.h"
 #include <nmf_lib.hpp>
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
-#include <pybind11/pytypes.h>
-#include "sparse_converters.h"
+#include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
+#include <nanobind/typing.h>
+#include <nanobind/eval.h>
+#include <initializer_list>
+//#include "converters.h"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 void limitpypythreads() {
-
-    py::object ThreadpoolController = py::module_::import("threadpoolctl").attr("ThreadpoolController");
-    py::object tpcontrol = ThreadpoolController();
-    py::object limit = tpcontrol.attr("limit");
-    py::object platformimpl = py::module_::import("platform").attr("python_implementation");
-     py::str platform = platformimpl();
-    if (static_cast<std::string>(platform) == "PyPy") {
-        using namespace pybind11::literals;
-        limit("limits"_a=1, "user_api"_a="blas");
-        limit("limits"_a=1, "user_api"_a="openmp");
-    }
+    nb::object scope = nb::module_::import_("__main__").attr("__dict__");
+    nb::exec(R"(
+    import threadpoolctl.ThreadpoolController
+    from platform import python_implementation
+    tpcontrol = ThreadpoolController()
+    platform = python_implementation()
+    if platform == "PyPy":
+        tpcontrol.limit(limits=1, user_api="blas")
+        tpcontrol.limit(limits=1, user_api="openmp")
+    )", scope
+    );
+    // nb::callable ThreadpoolController = nb::module_::import_("threadpoolctl").attr("ThreadpoolController");
+    // nb::object tpcontrol = ThreadpoolController();
+    // nb::callable limit = tpcontrol.attr("limit");
+    // nb::callable platformimpl = nb::module_::import_("platform").attr("python_implementation");
+    // nb::str platform = platformimpl();
+    // if (static_cast<std::string>(platform) == "PyPy") {
+    //     using namespace nb::literals;
+    //     limit("limits"_a=1, "user_api"_a="blas");
+    //     limit("limits"_a=1, "user_api"_a="openmp");
+    // }
 } // state does not unset, TODO find way to do on import/unload
 //Rcpp::List nmf(const SEXP& x, const arma::uword &k, const arma::uword &niter = 30,
 //               const std::string &algo = "anlsbpp",
@@ -45,42 +56,61 @@ void limitpypythreads() {
 //    return outlist;
 //}
 
-arma::mat nullMat = arma::mat{};
+typedef nb::ndarray<double, nb::ndim<2>> DenseNBArray;
 
-template <typename T>
-using nmfCall = planc::nmfOutput(*)(const T&, const arma::uword&, const arma::uword&, const std::string&, const int&);
+auto armashape = [](arma::mat in) {
+    return std::initializer_list<arma::uword>({in.n_rows, in.n_cols});
+};
 
-template <typename T>
-using nmfFullCall =  planc::nmfOutput(*)(const T&, const arma::uword&, const arma::uword&, const std::string&, const int&, const arma::mat&, const arma::mat&);
+struct NBNMFOutput {
+    nb::ndarray<nb::numpy, double, nb::ndim<2>> W;
+    nb::ndarray<nb::numpy, double, nb::ndim<2>> H;
+    double objErr;
+};
 
-
-// T2 e.g. arma::sp_mat
-template <typename T2>
-planc::nmfOutput nmf(const T2& x, const arma::uword &k,
-             const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
-             const int& nCores = 2, const arma::mat& Winit = nullMat, const arma::mat& Hinit = nullMat) {
-    limitpypythreads();
-    planc::nmfOutput libcall = planc::nmflib<T2>::nmf(x, k, niter, algo, nCores, Winit, Hinit);
-    return libcall;
+arma::mat denseToArmadillo(DenseNBArray nda) {
+    return arma::mat(nda.data(), nda.shape(0), nda.shape(1));
 }
 
-template <typename T2>
-planc::nmfOutput nmf(const T2& x, const arma::uword &k,
+nb::ndarray<nb::numpy, double, nb::ndim<2>> armaToNP(arma::mat out) {
+    nb::capsule owner(out.memptr(), [](void *p) noexcept {
+       delete[] (double *) p;
+    });
+    return nb::ndarray<nb::numpy, double, nb::ndim<2>>(out.memptr(), armashape(out), owner);
+}
+
+using denseNmfCall = NBNMFOutput(*)(DenseNBArray, const arma::uword&, const arma::uword&, const std::string&, const int&);
+//using sparseNmfCall = planc::nmfOutput(*)(nb::ndarray<double, nb::shape<-1, -1>>, const arma::uword&, const arma::uword&, const std::string&, const int&);
+
+
+using denseNmfFullCall =  NBNMFOutput(*)(DenseNBArray, const arma::uword&, const arma::uword&, const std::string&, const int&, DenseNBArray, DenseNBArray);
+//using sparseNmfFullCall =  planc::nmfOutput(*)(nb::ndarray<double, nb::shape<-1, -1>>, const arma::uword&, const arma::uword&, const std::string&, const int&, DenseNBArray, DenseNBArray);
+
+
+NBNMFOutput nmf(DenseNBArray nda, const arma::uword &k,
+             const arma::uword& niter, const std::string& algo,
+             const int& nCores, DenseNBArray Winit, DenseNBArray Hinit) {
+    limitpypythreads();
+    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(nda), k, niter, algo, nCores, denseToArmadillo(Winit), denseToArmadillo(Hinit));
+    return {armaToNP(libcall.outH), armaToNP(libcall.outW), libcall.objErr};
+}
+
+NBNMFOutput nmf(DenseNBArray nda, const arma::uword &k,
              const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
              const int& nCores = 2) {
     limitpypythreads();
-    planc::nmfOutput libcall = planc::nmflib<T2>::nmf(x, k, niter, algo, nCores);
-    return libcall;
+    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(nda), k, niter, algo, nCores);
+    return {armaToNP(libcall.outH), armaToNP(libcall.outW), libcall.objErr};
 }
 
-PYBIND11_MODULE(pyplanc, m) {
+NB_MODULE(pyplanc, m) {
     m.doc() = "A python wrapper for planc-nmflib";
-    using namespace py::literals;
-    py::class_<planc::nmfOutput>(m, "nmfOutput").def_readwrite("W", &planc::nmfOutput::outW).def_readwrite("H", &planc::nmfOutput::outH).def_readwrite("objErr", &planc::nmfOutput::objErr);
-    m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
-    m.def("nmf", static_cast<nmfCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
-    m.def("nmf", static_cast<nmfFullCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
-          py::kw_only(), "Winit"_a, "Hinit"_a);
-    m.def("nmf", static_cast<nmfFullCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
-      py::kw_only(), "Winit"_a, "Hinit"_a);
+    using namespace nb::literals;
+    nb::class_<NBNMFOutput>(m, "nmfOutput").def_rw("W", &NBNMFOutput::W).def_rw("H", &NBNMFOutput::H).def_rw("objErr", &NBNMFOutput::objErr);
+    m.def("nmf", static_cast<denseNmfCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
+//    m.def("nmf", static_cast<sparseNmfCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
+    m.def("nmf", static_cast<denseNmfFullCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
+          nb::kw_only(), "Winit"_a, "Hinit"_a);
+//    m.def("nmf", static_cast<nmfFullCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
+//      nb::kw_only(), "Winit"_a, "Hinit"_a);
 }

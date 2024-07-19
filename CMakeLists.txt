@@ -192,8 +192,10 @@ if(BUILD_RCPP)
         message(FATAL_ERROR "missing RcppProgress")
     endif()
 elseif(SKBUILD)
-    set(PYBIND11_NEWPYTHON ON)
-    find_package(pybind11 CONFIG REQUIRED)
+    #set(PYBIND11_NEWPYTHON ON)
+    find_package(Python COMPONENTS Interpreter Development
+    REQUIRED)
+    find_package(nanobind CONFIG REQUIRED)
     FetchContent_Declare(
         carma
         URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz

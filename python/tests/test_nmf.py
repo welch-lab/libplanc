@@ -1,9 +1,11 @@
+from pickle import TRUE
+from random import sample
 from typing import NamedTuple
 import pytest
 import numpy as np
 import numpy.typing
 import pyplanc
-
+import scipy.sparse
 
 class nmfparams(NamedTuple):
     m: int
@@ -58,43 +60,30 @@ class TestNMFDenseFail:
         with pytest.raises(RuntimeError) as e:
             pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg)
         assert 'Please choose `algo` from' in str(e.value)
-#     # Failing use
-#     expect_error({
-#       nmf(mat, k, algo = "hello")
-#     }, "Please choose `algo` from")
 
-# symmat <- t(mat) %*% mat
-# lambda <- 5
+# @pytest.fixture()
+# def nmf_sparse_mat(nmf_dense_mat):
+#     rs = np.random.default_rng(1)
+#     sparsity = .9
+#     matlen = nmf_dense_mat.size
+#     regenerate = True
+#     matsp = None
+#     while regenerate:
+#         zeroidx = rs.choice(
+#             matlen, round(sparsity * matlen), replace=False, shuffle=False
+#         )
+#         matsp = nmf_dense_mat.copy()
+#         matsp.flat[zeroidx] = 0
+#         matsp = scipy.sparse.csc_matrix(matsp)
+#         if np.sum(matsp.sum(axis=0) == 0) == 0 and np.sum(matsp.sum(axis=1) == 0) == 0:
+#             regenerate = False
+#     return matsp
 
-# test_that("dense, symNMF, anlsbpp", {
-#     res <- symNMF(symmat, k, niter = 100, lambda = lambda, algo = "anlsbpp")
-#     expect_lte(res$objErr, 4e7)
-
-#     res <- symNMF(symmat, k, niter = 100, lambda = lambda, algo = "anlsbpp",
-#                   Hinit = res$H)
-#     expect_lte(res$objErr, 4e7)
-
-#     expect_error({
-#       symNMF(mat, k, 100)
-#     }, "Input `x` is not square.")
-
-#     expect_error({
-#       symNMF(symmat, 1e4, 100)
-#     })
-
-#     expect_error({
-#       symNMF(symmat, k, 100, Hinit = t(res$H))
-#     }, "Hinit must be of size ")
-
-#     expect_error({
-#       symNMF(symmat, k, 100, algo = "hello")
-#     }, "Please choose `algo` from")
-# })
-
-# test_that("dense, symNMF, gnsym", {
-#   res <- symNMF(symmat, k, niter = 100, algo = "gnsym")
-#   expect_lte(res$objErr, 5.8e4)
-# })
+# class TestNMFSparse(TestNMFDense):
+#     @pytest.fixture(autouse=True)
+#     def run_nmf(self, nmf_sparse_mat: numpy.typing.NDArray[np.float64], algoarg) -> pyplanc.nmfOutput:
+#         res = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg)
+#         return res
 
 # library(Matrix)
 # # Sparsen the `mat`
@@ -152,6 +141,41 @@ class TestNMFDenseFail:
 #   res <- nmf(mat.sp, k, niter = 100, algo = "mu")
 #   expect_lte(res$objErr, 950)
 # })
+
+
+# symmat <- t(mat) %*% mat
+# lambda <- 5
+
+# test_that("dense, symNMF, anlsbpp", {
+#     res <- symNMF(symmat, k, niter = 100, lambda = lambda, algo = "anlsbpp")
+#     expect_lte(res$objErr, 4e7)
+
+#     res <- symNMF(symmat, k, niter = 100, lambda = lambda, algo = "anlsbpp",
+#                   Hinit = res$H)
+#     expect_lte(res$objErr, 4e7)
+
+#     expect_error({
+#       symNMF(mat, k, 100)
+#     }, "Input `x` is not square.")
+
+#     expect_error({
+#       symNMF(symmat, 1e4, 100)
+#     })
+
+#     expect_error({
+#       symNMF(symmat, k, 100, Hinit = t(res$H))
+#     }, "Hinit must be of size ")
+
+#     expect_error({
+#       symNMF(symmat, k, 100, algo = "hello")
+#     }, "Please choose `algo` from")
+# })
+
+# test_that("dense, symNMF, gnsym", {
+#   res <- symNMF(symmat, k, niter = 100, algo = "gnsym")
+#   expect_lte(res$objErr, 5.8e4)
+# })
+
 
 # symmat.sp <- Matrix::t(mat.sp) %*% mat.sp
 
