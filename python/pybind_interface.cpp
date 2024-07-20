@@ -6,9 +6,9 @@
 #include <nmf_lib.hpp>
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>
-#include <nanobind/typing.h>
 #include <nanobind/eval.h>
 #include <initializer_list>
+#include <utility>
 //#include "converters.h"
 
 namespace nb = nanobind;
@@ -58,10 +58,6 @@ void limitpypythreads() {
 
 typedef nb::ndarray<double, nb::ndim<2>> DenseNBArray;
 
-auto armashape = [](arma::mat in) {
-    return std::initializer_list<arma::uword>({in.n_rows, in.n_cols});
-};
-
 struct NBNMFOutput {
     nb::ndarray<nb::numpy, double, nb::ndim<2>> W;
     nb::ndarray<nb::numpy, double, nb::ndim<2>> H;
@@ -69,14 +65,14 @@ struct NBNMFOutput {
 };
 
 arma::mat denseToArmadillo(DenseNBArray nda) {
-    return arma::mat(nda.data(), nda.shape(0), nda.shape(1));
+        return {nda.data(), nda.shape(0), nda.shape(1)};
 }
 
 nb::ndarray<nb::numpy, double, nb::ndim<2>> armaToNP(arma::mat out) {
     nb::capsule owner(out.memptr(), [](void *p) noexcept {
        delete[] (double *) p;
     });
-    return nb::ndarray<nb::numpy, double, nb::ndim<2>>(out.memptr(), armashape(out), owner);
+    return {out.memptr(), {out.n_rows, out.n_cols}, owner};
 }
 
 using denseNmfCall = NBNMFOutput(*)(DenseNBArray, const arma::uword&, const arma::uword&, const std::string&, const int&);
@@ -91,7 +87,7 @@ NBNMFOutput nmf(DenseNBArray nda, const arma::uword &k,
              const arma::uword& niter, const std::string& algo,
              const int& nCores, DenseNBArray Winit, DenseNBArray Hinit) {
     limitpypythreads();
-    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(nda), k, niter, algo, nCores, denseToArmadillo(Winit), denseToArmadillo(Hinit));
+    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(std::move(nda)), k, niter, algo, nCores, denseToArmadillo(std::move(Winit)), denseToArmadillo(std::move(Hinit)));
     return {armaToNP(libcall.outH), armaToNP(libcall.outW), libcall.objErr};
 }
 
@@ -99,7 +95,7 @@ NBNMFOutput nmf(DenseNBArray nda, const arma::uword &k,
              const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
              const int& nCores = 2) {
     limitpypythreads();
-    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(nda), k, niter, algo, nCores);
+    planc::nmfOutput libcall = planc::nmflib<arma::mat>::nmf(denseToArmadillo(std::move(nda)), k, niter, algo, nCores);
     return {armaToNP(libcall.outH), armaToNP(libcall.outW), libcall.objErr};
 }
 
