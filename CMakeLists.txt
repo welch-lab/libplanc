@@ -193,19 +193,20 @@ if(BUILD_RCPP)
     endif()
 elseif(SKBUILD)
     #set(PYBIND11_NEWPYTHON ON)
-    find_package(Python COMPONENTS Interpreter Development
-    REQUIRED)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
     find_package(nanobind CONFIG REQUIRED)
+    set(HEADER_ONLY CACHE INTERNAL BOOL ON)
     FetchContent_Declare(
-        carma
-        URL https://github.com/RUrlus/carma/archive/refs/tags/v0.8.0.tar.gz
-        URL_HASH SHA256=A404687FB7C41880794CB215CB678BC59CDB0ECDF8BAA4336103E7834BA6750A
+        armadillo
+        URL https://phoenixnap.dl.sourceforge.net/project/arma/armadillo-14.0.1.tar.xz
+        URL_HASH SHA256=8346F1E7567BCB3A28DD770097208E78D33A5D41E0A71AF2A7E7FD997F17DB44
     )
-    fetchcontent_makeavailable(carma)
+    FetchContent_Populate(armadillo)
+    FetchContent_GetProperties(armadillo SOURCE_DIR armadillo_SOURCE_DIR)
     find_package(indicators CONFIG REQUIRED)
     add_library(progressWrapper OBJECT ${PROJECT_SOURCE_DIR}/common/progressWrapper.cpp)
     target_link_libraries(progressWrapper PUBLIC indicators::indicators)
-    target_link_libraries(utils PUBLIC armadillo::armadillo)
+    target_include_directories(utils PUBLIC "${armadillo_SOURCE_DIR}/include")
     target_link_libraries(utils PUBLIC progressWrapper ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 else()
     find_package(Armadillo CONFIG REQUIRED)
