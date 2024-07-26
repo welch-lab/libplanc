@@ -16,8 +16,8 @@ maintainers = [
 
 dependencies = [
     "numpy>=1.23.5, <2.3",
-    "threadpoolctl>=3.4.0, <4.0",
-    "scipy>=1.13.0, <2.0"
+    "threadpoolctl>=3.4.0, <4.0"
+    #"scipy>=1.13.0, <2.0"
 ]
 
 classifiers = [
