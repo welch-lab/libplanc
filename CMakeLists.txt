@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16...3.30 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16...3.29 FATAL_ERROR)
 if(BUILD_RCPP)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11" CACHE STRING "Target MacOS Version")
 endif()
