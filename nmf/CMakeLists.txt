@@ -1,6 +1,5 @@
 #Copyright 2016 Ramakrishnan Kannan
 
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 include(GenerateExportHeader)
 include(FetchContent)
 
@@ -27,7 +26,7 @@ if(BUILD_EXECUTABLE)
 endif()
 generate_export_header(nmflib)
 if(SKBUILD)
-    nanobind_add_module(pyplanc ../python/pybind_interface.cpp)
+    nanobind_add_module(pyplanc NB_STATIC ../python/pybind_interface.cpp)
     #target_include_directories(pyplanc PRIVATE "python")
     target_link_libraries(pyplanc PRIVATE nmflib)
     install(TARGETS pyplanc LIBRARY DESTINATION .)
