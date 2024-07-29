@@ -1,8 +1,7 @@
+cmake_minimum_required(VERSION 3.21...3.29 FATAL_ERROR)
 #Copyright 2016 Ramakrishnan Kannan
-
 include(GenerateExportHeader)
 include(FetchContent)
-
 #include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
 # the settings below will be automatically configured by the rest of this script
@@ -30,7 +29,7 @@ if(SKBUILD)
     #target_include_directories(pyplanc PRIVATE "python")
     target_link_libraries(pyplanc PRIVATE nmflib)
     install(TARGETS pyplanc LIBRARY DESTINATION .)
-    install(TARGETS nmflib RUNTIME DESTINATION . ARCHIVE DESTINATION . LIBRARY DESTINATION .)
+    install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../")
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib
