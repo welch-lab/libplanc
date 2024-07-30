@@ -108,6 +108,7 @@ musllinux-aarch64-image = "musllinux_1_2"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=release"
 environment.CC = "gcc"
 environment.CXX = "g++"
+environment.VCPKG_INSTALL_OPTIONS = "--debug"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 
