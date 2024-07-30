@@ -22,16 +22,15 @@ struct ScipySparseCSC{
 };
 
 inline arma::uvec unwrapIndices(const SparseIndexVec& indVec) {
-    return {indVec.data(), indVec.size()};
+    return arma::uvec(indVec.data(), indVec.size());
 }
 inline arma::vec unwrapData(const SparseDataVec& dataVec) {
-    return {dataVec.data(), dataVec.size()};
+    return arma::vec(dataVec.data(), dataVec.size());
 }
 
 inline arma::sp_mat sparseToArmadillo(const ScipySparseCSC& nda) {
-    return {unwrapIndices(nda.indices), unwrapIndices(nda.indptr), unwrapData(nda.data), nda.shape.first, nda.shape.second};
+    return arma::sp_mat(unwrapIndices(nda.indices), unwrapIndices(nda.indptr), unwrapData(nda.data), nda.shape.first, nda.shape.second);
 }
-
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
