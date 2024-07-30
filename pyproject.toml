@@ -111,16 +111,22 @@ environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 
+
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = ["apk add build-base cmake libtool zip unzip curl git",
               "pipx install ninja"]
+environment.CC = "/usr/bin/gcc"
+environment.CXX = "/usr/bin/g++"
+environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg"
+environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE;VCPKG_INSTALL_OPTIONS=--debug"
+
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
 #[[tool.cibuildwheel.overrides]]
 #select = "*-manylinux*"
-#environment = {SKBUILD_CMAKE_DEFINE="CBLAS_H_DIR=/usr/include/openblas/"}
+#
 
 [tool.cibuildwheel.windows]
 before-all = ["pipx install uv"]
