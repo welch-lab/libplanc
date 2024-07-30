@@ -97,7 +97,7 @@ environment.MACOSX_DEPLOYMENT_TARGET="11"
 environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
 
 [tool.cibuildwheel.linux]
-before-all = ["yum install -y zip"]
+before-all = ["yum install -y zip curl"]
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {dest_dir} {wheel}"
 #manylinux-x86_64-image = "manylinux_2_28"
 #manylinux-pypy_x86_64-image = "manylinux_2_28"
