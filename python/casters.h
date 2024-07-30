@@ -12,7 +12,7 @@ namespace nb = nanobind;
 
 
 typedef nb::ndarray<double, nb::ndim<1>> SparseDataVec;
-typedef nb::ndarray<uint64_t, nb::ndim<1>> SparseIndexVec;
+typedef nb::ndarray<arma::uword, nb::ndim<1>> SparseIndexVec;
 
 struct ScipySparseCSC{
     SparseDataVec data;
@@ -22,15 +22,16 @@ struct ScipySparseCSC{
 };
 
 inline arma::uvec unwrapIndices(const SparseIndexVec& indVec) {
-    return arma::uvec(indVec.data(), indVec.size());
+    return {indVec.data(), indVec.size()};
 }
 inline arma::vec unwrapData(const SparseDataVec& dataVec) {
-    return arma::vec(dataVec.data(), dataVec.size());
+    return {dataVec.data(), dataVec.size()};
 }
 
 inline arma::sp_mat sparseToArmadillo(const ScipySparseCSC& nda) {
-    return arma::sp_mat(unwrapIndices(nda.indices), unwrapIndices(nda.indptr), unwrapData(nda.data), nda.shape.first, nda.shape.second);
+    return {unwrapIndices(nda.indices), unwrapIndices(nda.indptr), unwrapData(nda.data), nda.shape.first, nda.shape.second};
 }
+
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
