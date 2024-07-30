@@ -115,12 +115,11 @@ environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIM
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
 before-all = ["apk add build-base cmake libtool zip unzip curl git",
-              "pipx install ninja"]
-environment.CC = "/usr/bin/gcc"
-environment.CXX = "/usr/bin/g++"
-environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE;VCPKG_INSTALL_OPTIONS=--debug"
-
+    "pipx install ninja",
+    "git clone https://github.com/microsoft/vcpkg.git",
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
+    "./vcpkg/vcpkg install"]
+environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
