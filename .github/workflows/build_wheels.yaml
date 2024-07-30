@@ -4,6 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build_wheels:
@@ -11,6 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         os: [windows-latest, ubuntu-latest, macos-13, macos-14]
