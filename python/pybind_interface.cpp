@@ -5,6 +5,7 @@
 #include "config.h"
 #include <nmf_lib.hpp>
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
 #include "pybind_interface.hpp"
 
 namespace nb = nanobind;
