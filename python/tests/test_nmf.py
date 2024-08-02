@@ -20,7 +20,8 @@ def nmf_params() -> nmfparams:
 @pytest.fixture(scope="class")
 def nmf_dense_mat(nmf_params: nmfparams) -> numpy.typing.NDArray[np.float64]:
     rs = np.random.default_rng(1)
-    mat = rs.random((nmf_params[0], nmf_params[1]), np.float64)
+    mat = np.empty((nmf_params[0], nmf_params[1]), np.float64, order="F")
+    rs.random((nmf_params[0], nmf_params[1]), np.float64, mat)
     return mat
 
 @pytest.fixture(scope="module", params=["anlsbpp", "admm", "hals", "mu"])
