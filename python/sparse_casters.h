@@ -59,10 +59,6 @@ template <typename T, typename eT = typename T::elem_type> constexpr bool is_arm
 template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<T> &&  is_ndarray_scalar_v<typename T::elem_type>>> {
     using eT = typename T::elem_type;
     using StorageIndex = arma::uword;
-    //using SparseMap = Eigen::Map<T>;
-
-    // static_assert(arma::SpMat<eT>::vec_state == 0,
-    //               "nanobind: Sparse caster only implemented for matrices");
 
     using NDArray = ndarray<numpy, eT, shape<-1>>;
     using StorageIndexNDArray = ndarray<numpy, StorageIndex, shape<-1>>;
