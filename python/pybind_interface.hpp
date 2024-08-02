@@ -31,19 +31,4 @@ planc::nmfOutput<eT> nmf(const T& x, const arma::uword &k,
 
 }
 
-// template <typename T, typename eT = typename T::elem_type>
-// planc::nmfOutput<T> zzznmf(const ScipySparseCSC& nda, const arma::uword &k,
-//              const arma::uword& niter, const std::string& algo,
-//              const int& nCores, const arma::Mat<eT>& Winit, const arma::mat& Hinit) {
-//     return planc::nmflib<arma::Mat<eT>>::nmf(sparseToArmadillo(nda), k, niter, algo, nCores, Winit, Hinit);
-// }
-//
-//
-// template <typename T, typename eT = typename T::elem_type>
-// planc::nmfOutput<T> nmf(const ScipySparseCSC& nda, const arma::uword &k,
-//              const arma::uword& niter = 30, const std::string& algo = "anlsbpp",
-//              const int& nCores = 2) {
-//     return planc::nmflib<arma::Mat<eT>>::nmf(sparseToArmadillo(nda), k, niter, algo, nCores);
-// }
-
 #endif //PYBIND_INTERFACE_HPP

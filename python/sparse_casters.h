@@ -8,7 +8,7 @@
 /*
     nanobind/eigen/sparse.h: type casters for sparse Eigen matrices
 
-/* This type alias constructs an ndarray of relevant dtype and dimension for armadillo SpMat and batch initializes
+ * This type alias constructs an ndarray of relevant dtype and dimension for armadillo SpMat and batch initializes
  * the CSC array with its values using make_caster<ndarray> * 3.
  * This code is derived from https://github.com/wjakob/nanobind/blob/b0136fe6ac1967cb2399456adc346a1af06a3b88/include/nanobind/eigen/sparse.h
  * Copyright (c) 2023 Wenzel Jakob.  <wenzel.jakob@epfl.ch>, All rights reserved.
