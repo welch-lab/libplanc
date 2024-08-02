@@ -10,36 +10,13 @@
 namespace nb = nanobind;
 
 
-
-//typedef nb::ndarray<double, nb::ndim<1>> SparseDataVec;
-//typedef nb::ndarray<arma::uword, nb::ndim<1>> SparseIndexVec;
-
-//struct ScipySparseCSC{
-//    SparseDataVec data;
-//    SparseIndexVec indices;
-//     SparseIndexVec indptr;
-//     std::pair<arma::uword, arma::uword> shape;
-// };
-//
-// inline arma::uvec unwrapIndices(const SparseIndexVec& indVec) {
-//     return {indVec.data(), indVec.size()};
-// }
-// inline arma::vec unwrapData(const SparseDataVec& dataVec) {
-//     return {dataVec.data(), dataVec.size()};
-// }
-//
-// inline arma::sp_mat sparseToArmadillo(const ScipySparseCSC& nda) {
-//     return {unwrapIndices(nda.indices), unwrapIndices(nda.indptr), unwrapData(nda.data), nda.shape.first, nda.shape.second};
-// }
-
-
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
 
 
 /* This type alias constructs an ndarray of relevant dtype and dimension for armadillo vec/mat and populates auxillary
  * memory with its values using make_caster<ndarray>. Should probably check continuity and if the size is fixed.
- * This code is derived from https://github.com/wjakob/nanobind/blob/master/include/nanobind/eigen/dense.h
+ * This code is derived from https://github.com/wjakob/nanobind/blob/b0136fe6ac1967cb2399456adc346a1af06a3b88/include/nanobind/eigen/dense.h
  * Copyright (c) 2023 Wenzel Jakob.  <wenzel.jakob@epfl.ch>, All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

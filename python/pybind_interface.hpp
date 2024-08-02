@@ -4,8 +4,8 @@
 
 #ifndef PYBIND_INTERFACE_HPP
 #define PYBIND_INTERFACE_HPP
-#include "casters.h"
-
+#include "dense_casters.h"
+#include "sparse_casters.h"
 
 
 template <typename T, typename eT = typename T::elem_type>

@@ -59,8 +59,8 @@ NB_MODULE(pyplanc, m) {
     nb::class_<planc::nmfOutput<double>>(m, "nmfOutput").def_rw("W", &planc::nmfOutput<double>::outW).def_rw("H", &planc::nmfOutput<double>::outH).def_rw("objErr", &planc::nmfOutput<double>::objErr,  nb::rv_policy::move);
     //nb::class_<ScipySparseCSC>(m, "sparseCSCArray").def_rw("data", &ScipySparseCSC::data).def_rw("indices", &ScipySparseCSC::indices).def_rw("indptr", &ScipySparseCSC::indptr).def_rw("shape", &ScipySparseCSC::shape).def(nb::init_implicit<arma::sp_mat>());
     m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
-    //m.def("nmf", static_cast<sparseNmfCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
+    m.def("nmf", static_cast<nmfCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
     m.def("nmf", static_cast<nmfFullCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
           nb::kw_only(), "Winit"_a, "Hinit"_a);
-    //m.def("nmf", static_cast<sparseNmfFullCall>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a, "Hinit"_a);
+    m.def("nmf", static_cast<nmfFullCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a, "Hinit"_a);
 }
