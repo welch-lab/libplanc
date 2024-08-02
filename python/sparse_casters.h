@@ -59,7 +59,6 @@ template <typename T, typename eT = typename T::elem_type> constexpr bool is_arm
 template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<T> &&  is_ndarray_scalar_v<typename T::elem_type>>> {
     using eT = typename T::elem_type;
     using StorageIndex = arma::uword;
-    using Index = StorageIndex;
     //using SparseMap = Eigen::Map<T>;
 
     // static_assert(arma::SpMat<eT>::vec_state == 0,
@@ -100,13 +99,13 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
         StorageIndexNDArray& outer_indices = indptr_caster.value;
 
         object shape_o = obj.attr("shape"), nnz_o = obj.attr("nnz");
-        Index rows, cols, nnz;
+        StorageIndex rows, cols, nnz;
         try {
             if (len(shape_o) != 2)
                 return false;
-            rows = cast<Index>(shape_o[0]);
-            cols = cast<Index>(shape_o[1]);
-            nnz = cast<Index>(nnz_o);
+            rows = cast<StorageIndex>(shape_o[0]);
+            cols = cast<StorageIndex>(shape_o[1]);
+            nnz = cast<StorageIndex>(nnz_o);
         } catch (const python_error &) {
             return false;
         }
@@ -134,7 +133,7 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
             return handle();
         }
 
-        const Index rows = v.n_rows, cols = v.n_cols;
+        const StorageIndex rows = v.n_rows, cols = v.n_cols;
         const size_t data_shape[] = { (size_t) v.n_nonzero };
         const size_t outer_indices_shape[] = { (size_t) (cols + 1) };
 
