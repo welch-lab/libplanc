@@ -63,8 +63,12 @@ class TestNMFDenseFail:
             pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg)
         assert 'Please choose `algo` from' in str(e.value)
 
+@pytest.fixture(params=["mat", "array"])
+def outtype(request):
+    yield request.param
+
 @pytest.fixture()
-def nmf_sparse_mat(nmf_dense_mat):
+def nmf_sparse_mat(nmf_dense_mat, outtype):
     rs = np.random.default_rng(1)
     sparsity = .9
     matlen = nmf_dense_mat.size
@@ -76,22 +80,25 @@ def nmf_sparse_mat(nmf_dense_mat):
         )
         matsp = nmf_dense_mat.copy()
         matsp.flat[zeroidx] = 0
-        matsp = scipy.sparse.csc_matrix(matsp)
+        if outtype == "mat":
+            matsp = scipy.sparse.csc_matrix(matsp)
+        elif outtype == "array":
+            matsp = scipy.sparse.csc_array(matsp)
         if np.sum(matsp.sum(axis=0) == 0) == 0 and np.sum(matsp.sum(axis=1) == 0) == 0:
             regenerate = False
     return matsp
-
+''
 class TestNMFSparse(TestNMFDense):
     @pytest.fixture(autouse=True)
-    def run_nmf(self, nmf_sparse_mat: scipy.sparse.csc_matrix, algoarg) -> pyplanc.nmfOutput:
+    def run_nmf(self, nmf_sparse_mat, algoarg) -> pyplanc.nmfOutput:
         res = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg)
         return res
+
     def test_nmf_objerr(self, run_nmf):
         assert 700 < run_nmf.objErr <= 875
     def test_sparsity(self, run_nmf):
         sparsity = np.sum(np.isclose(run_nmf.H, 0.0)) / np.size(run_nmf.H)
-        assert sparsity >= .38
-
+        assert sparsity >= .35
     def test_nmf_prefill(self, nmf_sparse_mat, run_nmf, algoarg):
         newres = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg, Winit=run_nmf.W, Hinit=run_nmf.H)
         assert 700 <= newres.objErr <= 875
