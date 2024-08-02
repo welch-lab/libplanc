@@ -1,3 +1,4 @@
+import math
 from pickle import TRUE
 from random import sample
 from typing import NamedTuple
@@ -5,7 +6,7 @@ import pytest
 import numpy as np
 import numpy.typing
 import pyplanc
-#import scipy.sparse
+import scipy.sparse
 
 class nmfparams(NamedTuple):
     m: int
@@ -36,19 +37,19 @@ class TestNMFDense:
         res = pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg)
         return res
 
-    def test_dense_nmf_prefill(self, nmf_dense_mat, run_nmf, algoarg):
+    def test_nmf_prefill(self, nmf_dense_mat, run_nmf, algoarg):
         newres = pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg, Winit=run_nmf.W, Hinit=run_nmf.H)
-        assert 1850 <= newres.objErr and newres.objErr <= 2650
+        assert 1850 <= newres.objErr <= 2650
 
-    def test_anlsbpp_type(self, run_nmf: pyplanc.nmfOutput):
+    def test_nmf_type(self, run_nmf: pyplanc.nmfOutput):
         assert isinstance(run_nmf, pyplanc.nmfOutput)
 
-    def test_dense_nmf_shape(self, run_nmf: pyplanc.nmfOutput, nmf_params: nmfparams):
+    def test_nmf_shape(self, run_nmf: pyplanc.nmfOutput, nmf_params: nmfparams):
         assert run_nmf.W.shape == (nmf_params.m, 10)
         assert run_nmf.H.shape == (nmf_params.n, 10)
 
-    def test_dense_nmf_objerr(self, run_nmf):
-        assert 1850 <= run_nmf.objErr and run_nmf.objErr <= 2650
+    def test_nmf_objerr(self, run_nmf):
+        assert 1850 <= run_nmf.objErr <= 2650
 
 
 class TestNMFDenseFail:
@@ -62,86 +63,50 @@ class TestNMFDenseFail:
             pyplanc.nmf(x=nmf_dense_mat, k=10, niter=100, algo=algoarg)
         assert 'Please choose `algo` from' in str(e.value)
 
-# @pytest.fixture()
-# def nmf_sparse_mat(nmf_dense_mat):
-#     rs = np.random.default_rng(1)
-#     sparsity = .9
-#     matlen = nmf_dense_mat.size
-#     regenerate = True
-#     matsp = None
-#     while regenerate:
-#         zeroidx = rs.choice(
-#             matlen, round(sparsity * matlen), replace=False, shuffle=False
-#         )
-#         matsp = nmf_dense_mat.copy()
-#         matsp.flat[zeroidx] = 0
-#         matsp = scipy.sparse.csc_matrix(matsp)
-#         if np.sum(matsp.sum(axis=0) == 0) == 0 and np.sum(matsp.sum(axis=1) == 0) == 0:
-#             regenerate = False
-#     return matsp
+@pytest.fixture()
+def nmf_sparse_mat(nmf_dense_mat):
+    rs = np.random.default_rng(1)
+    sparsity = .9
+    matlen = nmf_dense_mat.size
+    regenerate = True
+    matsp = None
+    while regenerate:
+        zeroidx = rs.choice(
+            matlen, round(sparsity * matlen), replace=False, shuffle=False
+        )
+        matsp = nmf_dense_mat.copy()
+        matsp.flat[zeroidx] = 0
+        matsp = scipy.sparse.csc_matrix(matsp)
+        if np.sum(matsp.sum(axis=0) == 0) == 0 and np.sum(matsp.sum(axis=1) == 0) == 0:
+            regenerate = False
+    return matsp
 
-# class TestNMFSparse(TestNMFDense):
-#     @pytest.fixture(autouse=True)
-#     def run_nmf(self, nmf_sparse_mat: numpy.typing.NDArray[np.float64], algoarg) -> pyplanc.nmfOutput:
-#         res = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg)
-#         return res
+class TestNMFSparse(TestNMFDense):
+    @pytest.fixture(autouse=True)
+    def run_nmf(self, nmf_sparse_mat: scipy.sparse.csc_matrix, algoarg) -> pyplanc.nmfOutput:
+        res = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg)
+        return res
+    def test_nmf_objerr(self, run_nmf):
+        assert 700 < run_nmf.objErr <= 875
+    def test_sparsity(self, run_nmf):
+        sparsity = np.sum(np.isclose(run_nmf.H, 0.0)) / np.size(run_nmf.H)
+        assert sparsity >= .38
 
-# library(Matrix)
-# # Sparsen the `mat`
-# sparsity <- .9
-# regenerate <- TRUE
-# while (regenerate) {
-#     zero.idx <- sample(length(mat), round(sparsity * length(mat)))
-#     mat.sp <- mat
-#     mat.sp[zero.idx] <- 0
-#     mat.sp <- as(mat.sp, "CsparseMatrix")
-#     # Make sure there is no col/row that has all zero
-#     if (sum(Matrix::colSums(mat.sp) == 0) == 0 &&
-#         sum(Matrix::rowSums(mat.sp) == 0) == 0) {
-#       regenerate <- FALSE
-#     }
-# }
-
-# test_that("sparse, nmf, anlsbpp", {
-#   set.seed(1)
-#   res1 <- nmf(mat.sp, k, niter = 100)
-#   expect_type(res1, "list")
-#   expect_equal(nrow(res1$W), m)
-#   expect_equal(ncol(res1$W), k)
-#   expect_equal(nrow(res1$H), n)
-#   expect_equal(ncol(res1$H), k)
-#   expect_lte(res1$objErr, 800)
-#   set.seed(1)
-#   res2 <- nmf(as.matrix(mat.sp), k, niter = 100)
-#   expect_true(all.equal(res1, res2))
-#   # Using init W and H
-#   res <- nmf(mat.sp, k, niter = 100, Winit = res1$W, Hinit = res1$H)
-#   # Expected max objective error
-#   expect_lte(res$objErr, 800)
-#   # Expected min sparsity of W
-#   W.sparsity <- sum(res$W == 0) / length(res$W)
-#   cat("\nW sparsity:",W.sparsity,"\n")
-#   expect_gte(W.sparsity, .4)
+    def test_nmf_prefill(self, nmf_sparse_mat, run_nmf, algoarg):
+        newres = pyplanc.nmf(x=nmf_sparse_mat, k=10, niter=100, algo=algoarg, Winit=run_nmf.W, Hinit=run_nmf.H)
+        assert 700 <= newres.objErr <= 875
+    def test_consistency(self, nmf_sparse_mat, run_nmf, algoarg):
+        newmat = nmf_sparse_mat.toarray()
+        newres = pyplanc.nmf(x=newmat, k=10, niter=100, algo=algoarg)
+        assert numpy.isclose(run_nmf.W.all(), newres.W.all())
+        assert numpy.isclose(run_nmf.H.all(), newres.H.all())
+        assert math.isclose(run_nmf.objErr, newres.objErr, abs_tol=5)
 
 #   expect_error({
 #     nmf(mat, k, algo = "hello")
 #   }, "Please choose `algo` from")
 # })
 
-# test_that("sparse, nmf, admm", {
-#   res <- nmf(mat.sp, k, niter = 100, algo = "admm")
-#   expect_lte(res$objErr, 800)
-# })
-
-# test_that("sparse, nmf, hals", {
-#   res <- nmf(mat.sp, k, niter = 100, algo = "hals")
-#   expect_lte(res$objErr, 800)
-# })
-
-# test_that("sparse, nmf, mu", {
-#   res <- nmf(mat.sp, k, niter = 100, algo = "mu")
-#   expect_lte(res$objErr, 950)
-# })
 
 
 # symmat <- t(mat) %*% mat

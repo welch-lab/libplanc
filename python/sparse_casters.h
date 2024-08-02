@@ -55,7 +55,7 @@ template <typename T, typename eT = typename T::elem_type> constexpr bool is_arm
     is_arma_sparse_v<T>;
 
 
-/// Caster for Arma::SparseMatrix
+/// Caster for Arma::SpMat
 template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<T> &&  is_ndarray_scalar_v<typename T::elem_type>>> {
     using eT = typename T::elem_type;
     using StorageIndex = arma::uword;
