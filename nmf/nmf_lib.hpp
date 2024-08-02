@@ -51,10 +51,10 @@ namespace planc {
     };
 
     template<typename eT>
-    struct NMFLIB_EXPORT D : nmfOutput<eT> {};
+    struct NMFLIB_EXPORT InstOUT : nmfOutput<eT> {};
 
     template<typename T>
-    struct NMFLIB_EXPORT E : public nmflib<T>{};
+    struct NMFLIB_EXPORT InstCLASS : nmflib<T>{};
 
 
 
