@@ -65,16 +65,13 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
     // static_assert(arma::SpMat<eT>::vec_state == 0,
     //               "nanobind: Sparse caster only implemented for matrices");
 
-    static constexpr bool RowMajor = false;
-
     using NDArray = ndarray<numpy, eT, shape<-1>>;
     using StorageIndexNDArray = ndarray<numpy, StorageIndex, shape<-1>>;
 
     using Caster = make_caster<NDArray>;
     using StorageIndexCaster = make_caster<StorageIndexNDArray>;
 
-    NB_TYPE_CASTER(T, const_name<RowMajor>("scipy.sparse.csr_matrix[",
-                                           "scipy.sparse.csc_matrix[")
+    NB_TYPE_CASTER(T, const_name("scipy.sparse.csc_matrix[")
                    + make_caster<eT>::Name + const_name("]"))
 
     Caster data_caster;
@@ -83,7 +80,7 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
     bool from_python(handle src, uint8_t flags, cleanup_list *cleanup) noexcept {
         object obj = borrow(src);
         try {
-            object matrix_type = module_::import_("scipy.sparse").attr(RowMajor ? "csr_matrix" : "csc_matrix");
+            object matrix_type = module_::import_("scipy.sparse").attr("csc_matrix");
             if (!obj.type().is(matrix_type))
                 obj = matrix_type(obj);
         } catch (const python_error &) {
@@ -131,7 +128,7 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
 
         object matrix_type;
         try {
-            matrix_type = module_::import_("scipy.sparse").attr(RowMajor ? "csr_matrix" : "csc_matrix");
+            matrix_type = module_::import_("scipy.sparse").attr("csc_matrix");
         } catch (python_error &e) {
             e.restore();
             return handle();
@@ -139,7 +136,7 @@ template <typename T> struct type_caster<T, enable_if_t<is_arma_sparse_matrix_v<
 
         const Index rows = v.n_rows, cols = v.n_cols;
         const size_t data_shape[] = { (size_t) v.n_nonzero };
-        const size_t outer_indices_shape[] = { (size_t) ((RowMajor ? rows : cols) + 1) };
+        const size_t outer_indices_shape[] = { (size_t) (cols + 1) };
 
         T *src = std::addressof(const_cast<T &>(v));
         object owner;
