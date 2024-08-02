@@ -1,19 +1,8 @@
 //
 // Created by andrew on 12/12/2023.
 //
-#include "NMFDriver.hpp"
-#include "utils.hpp"
 #include "nmf_lib.hpp"
-
-
-extern "C" {
-#include "detect_blas.h"
-}
-template<typename T>
-planc::nmflib<T>::nmflib() {
-    openblas_pthread_off((get_openblas_handle()));
-}
-
+#include "nmf_lib.inl"
 
 void planc::openblas_pthread_off(openblas_handle_t libloc) {
     if (is_openmp()) {
@@ -39,58 +28,10 @@ void planc::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
 }
 }
 
-template<typename T>
-planc::nmfOutput planc::nmflib<T>::nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
-                         const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
-    return {};
-}
-
-template<>
-planc::nmfOutput planc::nmflib<arma::mat>::nmf(const arma::mat &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
-                         const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
-    internalParams<arma::mat> options(x, Winit, Hinit);
-    options.m_k = k;
-    options.m_num_it = niter;
-    options.setMLucalgo(algo);
-    EmbeddedNMFDriver<arma::mat> nmfRunner(options);
-    nmfRunner.callNMF();
-    nmfOutput outlist{};
-    outlist.outW = nmfRunner.getLlf();
-    outlist.outH = nmfRunner.getRlf();
-    outlist.objErr = nmfRunner.getobjErr();
-    return outlist;
-}
-
-template<>
-planc::nmfOutput planc::nmflib<arma::sp_mat>::nmf(const arma::sp_mat &x, const arma::uword &k, const arma::uword &niter, const std::string &algo,
-                                               const int &nCores, const arma::mat &Winit, const arma::mat &Hinit) {
-    internalParams<arma::sp_mat> options(x, Winit, Hinit);
-    options.m_k = k;
-    options.m_num_it = niter;
-    options.setMLucalgo(algo);
-    EmbeddedNMFDriver<arma::sp_mat> nmfRunner(options);
-    nmfRunner.callNMF();
-    nmfOutput outlist{};
-    outlist.outW = nmfRunner.getLlf();
-    outlist.outH = nmfRunner.getRlf();
-    outlist.objErr = nmfRunner.getobjErr();
-    return outlist;
-}
-
-template<typename T>
-int planc::nmflib<T>::runNMF(planc::params opts) {
-    planc::NMFDriver<T> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
 
 
-template<typename T>
-int planc::nmflib<T>::runINMF(planc::params opts) {
-    planc::NMFDriver<T> myNMF(opts);
-    myNMF.callNMF();
-    return 0;
-};
+
+
 
 
 

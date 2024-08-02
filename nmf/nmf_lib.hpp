@@ -6,45 +6,65 @@
 #define PLANC_NMF_LIB_HPP
 #include "nmflib_export.h"
 #include "plancopts.h"
-#include "bppnmf.hpp"
-#include "aoadmm.hpp"
-#include "mu.hpp"
+#include "utils.hpp"
 #include "EmbeddedNMFDriver.hpp"
 
 extern "C" {
 #include "detect_blas.h"
 }
+
+
 namespace planc {
-    struct NMFLIB_EXPORT nmfOutput {
-        arma::mat outW;
-        arma::mat outH;
-        double objErr;
-    };
-
-    template<typename T>
-    class nmflib {
-    public:
-        NMFLIB_EXPORT nmflib<T>();
-
-
-        int NMFLIB_EXPORT runNMF(params opts);
-
-        int NMFLIB_EXPORT runINMF(params opts);
-        static nmfOutput NMFLIB_EXPORT nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
-                                    const arma::mat &Winit = arma::mat(), const arma::mat &Hinit = arma::mat());
-    };
-
 
     extern void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
     extern void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);
+    template<typename eT>
+    struct NMFLIB_EXPORT nmfOutput {
+        nmfOutput() = default;
+        ~nmfOutput() = default;
+        arma::Mat<eT> outW;
+        arma::Mat<eT> outH;
+        double objErr;
+    };
+
+    template<typename T, typename eT = typename T::elem_type>
+    class NMFLIB_EXPORT nmflib {
+    public:
+        nmflib() {
+            openblas_pthread_off(get_openblas_handle());
+        }
+
+        ~nmflib() = default;
+
+        static struct nmfOutput<eT> nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
+            const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
+        static int runNMF(params opts) {
+            NMFDriver<T> myNMF(opts);
+            myNMF.callNMF();
+            return 0;
+        }
+        static int runINMF(params opts) {
+            NMFDriver<T> myNMF(opts);
+            myNMF.callNMF();
+            return 0;
+        }
+    };
+
+    template<typename eT>
+    struct NMFLIB_EXPORT D : nmfOutput<eT> {};
+
+    template<typename T>
+    struct NMFLIB_EXPORT E : public nmflib<T>{};
+
 
 
 
 
     //enum NMFLIB_EXPORT runNMFindex {outW, outH, objErr};
 
-    //extern std::map<std::string, runNMFindex> NMFindexmap;
-
+    //extern std::map<std::string, runNMFindex> NMFindexmap;ea
 }
 
+                                                    // template<typename T>
+                                                    // extern inline NMFLIB_EXPORT planc::nmflib<T> nmflib{};
 #endif //PLANC_NMF_LIB_HPP
