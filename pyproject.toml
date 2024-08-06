@@ -92,13 +92,15 @@ repair-wheel-command = "DYLD_LIBRARY_PATH=/Users/runner/work/planc/planc/build/ 
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
+environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOSX_DEPLOYMENT_TARGET="11"
 environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
+environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 
 [tool.cibuildwheel.linux]
-before-all = ["yum install -y zip curl"]
+before-all = ["yum install -y zip", "mkdir -p /host/tmp/vcpkg-binary"]
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {dest_dir} {wheel}"
 #manylinux-x86_64-image = "manylinux_2_28"
 #manylinux-pypy_x86_64-image = "manylinux_2_28"
@@ -110,6 +112,7 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/v
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
+environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
 environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 
 
@@ -121,6 +124,10 @@ before-all = ["apk add build-base cmake libtool zip unzip curl git",
     "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
     "./vcpkg/vcpkg install"]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
+environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
+environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
+environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
+
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
@@ -134,3 +141,5 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
+
