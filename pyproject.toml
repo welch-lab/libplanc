@@ -91,11 +91,11 @@ before-all = ["curl -LsSf https://astral.sh/uv/install.sh | sh",
 repair-wheel-command = "DYLD_LIBRARY_PATH=/Users/runner/work/planc/planc/build/ delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -vv {wheel}"
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.15"
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOSX_DEPLOYMENT_TARGET="11"
-environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
+environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 [tool.cibuildwheel.linux]
 before-all = ["yum install -y zip curl"]
@@ -106,7 +106,7 @@ repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {de
 #manylinux-pypy_aarch64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
 musllinux-aarch64-image = "musllinux_1_2"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE;VCPKG_INSTALL_OPTIONS=--debug"
+environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
@@ -120,7 +120,7 @@ before-all = ["apk add build-base cmake libtool zip unzip curl git",
     "git clone https://github.com/microsoft/vcpkg.git",
     "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
     "./vcpkg/vcpkg install"]
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
+environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
@@ -133,4 +133,4 @@ before-all = ["pipx install uv"]
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake;VCPKG_BUILD_TYPE=RELEASE"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
