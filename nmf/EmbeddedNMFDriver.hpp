@@ -43,24 +43,39 @@ namespace planc {
             }
         }
 
+    public:
         void loadMat(double t2) override {
             this->m_m = this->A.n_rows;
             this->m_n = this->A.n_cols;
         }
 
+    private:
         template<class NMFTYPE>
         void outRes(NMFTYPE nmfA) {}
 
         void setSeed(int) override {}
 
     public:
-        explicit EmbeddedNMFDriver<T>(internalParams<T> pc) : NMFDriver<T>(pc)
+        explicit EmbeddedNMFDriver(internalParams<T> pc) : NMFDriver<T>(pc)
         {
             this->parseParams(pc);
         }
     };
 
-
-
-}
+    template<typename T>
+    class symmEmbeddedNMFDriver final : public EmbeddedNMFDriver<T> {
+        arma::mat Winit;
+        arma::mat Hinit;
+        void parseParams(const internalSymmParams<T>& pc) {
+            this->A = pc.getMAMat();
+            this->Hinit = pc.getMHInitMat();
+            this->m_Afile_name = "internal";
+            this->commonParams(pc);
+            }
+    public:
+        explicit symmEmbeddedNMFDriver(internalSymmParams<T> pc) : EmbeddedNMFDriver<T>(pc)
+        {
+        }
+        };
+};
 #endif //PLANC_EMBEDDEDNMFDRIVER_H

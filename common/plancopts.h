@@ -9,6 +9,8 @@
 
 namespace planc {
     struct params {
+        virtual ~params() = default;
+
         params() {
             // common to all algorithms.
             this->m_lucalgo = ANLSBPP;
@@ -37,6 +39,7 @@ namespace planc {
             this->m_pr = 1;
             this->m_pc = 1;
             this->m_symm_reg = -1;
+            this->m_symm_flag = 0;
             this->m_tolerance = -1.;
             // dist ntf
             this->m_num_modes = 1;
@@ -88,12 +91,12 @@ namespace planc {
         arma::fvec m_regW;
         arma::fvec m_regH;
         float m_sparsity{};
-
-        algotype getMLucalgo() const {
+        int m_symm_flag{};
+        [[nodiscard]] algotype getMLucalgo() const {
             return m_lucalgo;
         }
 
-        void setMLucalgo(std::string mLucalgo) {
+        virtual void setMLucalgo(std::string mLucalgo) {
             try {
                 m_lucalgo = algomap.at(mLucalgo);
             } catch(const std::out_of_range& e) {
@@ -109,6 +112,14 @@ namespace planc {
             m_input_normalization = mInputNormalization;
         }
 
+        virtual void setMSymmFlag(int msymmflag) {
+            m_symm_flag = msymmflag;
+        }
+
+        int getMSymmFlag() const {
+            return m_symm_flag;
+        }
+
         bool isMComputeError() const {
             return m_compute_error;
         }
@@ -117,11 +128,11 @@ namespace planc {
             m_compute_error = mComputeError;
         }
 
-        int getMNumIt() const {
+        [[nodiscard]] virtual int getMNumIt() const {
             return m_num_it;
         }
 
-        void setMNumIt(int mNumIt) {
+        virtual void setMNumIt(int mNumIt) {
             m_num_it = mNumIt;
         }
 
@@ -149,7 +160,7 @@ namespace planc {
             m_adj_rand = mAdjRand;
         }
 
-        const std::string &getMAfileName() const {
+        [[nodiscard]] virtual const std::string &getMAfileName() const {
             return m_Afile_name;
         }
 
@@ -157,7 +168,7 @@ namespace planc {
             m_Afile_name = mAfileName;
         }
 
-        const std::string &getMOutputfileName() const {
+        virtual const std::string &getMOutputfileName() const {
             return m_outputfile_name;
         }
 
@@ -173,7 +184,7 @@ namespace planc {
             m_Sfile_name = mSfileName;
         }
 
-        const std::string &getMHInitFileName() const {
+        virtual const std::string &getMHInitFileName() const {
             return m_h_init_file_name;
         }
 
@@ -181,7 +192,7 @@ namespace planc {
             m_h_init_file_name = mHInitFileName;
         }
 
-        const std::string &getMWInitFileName() const {
+        virtual const std::string &getMWInitFileName() const {
             return M_W_init_file_name;
         }
 
@@ -189,11 +200,11 @@ namespace planc {
             M_W_init_file_name = MWInitFileName;
         }
 
-        arma::uword getMK() const {
+        [[nodiscard]] virtual arma::uword getMK() const {
             return m_k;
         }
 
-        void setMK(arma::uword mK) {
+        virtual void setMK(arma::uword mK) {
             m_k = mK;
         }
 
@@ -261,11 +272,11 @@ namespace planc {
             m_pc = mPc;
         }
 
-        double getMSymmReg() const {
+        [[nodiscard]] virtual double getMSymmReg() const {
             return m_symm_reg;
         }
 
-        void setMSymmReg(double mSymmReg) {
+        virtual void setMSymmReg(double mSymmReg) {
             m_symm_reg = mSymmReg;
         }
 
@@ -463,10 +474,33 @@ namespace planc {
         }
 
 
-        [[nodiscard]] const std::string & getMAfileName() const = delete;
-        [[nodiscard]] const std::string & getMOutputfileName() const = delete;
-        [[nodiscard]] const std::string & getMHInitFileName() const = delete;
-        [[nodiscard]] const std::string & getMWInitFileName() const = delete;
+        //[[nodiscard]] const std::string& & getMAfileName() const override{};
+        //[[nodiscard]] const std::string & getMOutputfileName() const override = delete;
+        //[[nodiscard]] const std::string & getMHInitFileName() const override = delete;
+        //[[nodiscard]] const std::string & getMWInitFileName() const override = delete;
+    };
+
+    struct symmParams : params {
+        void setMLucalgo(std::string mLucalgo) override {
+            try {
+                m_lucalgo = symmap.at(mLucalgo);
+            } catch(const std::out_of_range& e) {
+                std::throw_with_nested(std::runtime_error("Please choose `algo` from \"anlsbpp\", or \"gnsym\"."));
+            }
+        };
+    };
+    template<typename T>
+    struct internalSymmParams final : symmParams, internalParams<T> {
+        internalSymmParams(const T& mAMat, const arma::mat& mHInitMat)
+            : internalParams<T>(mAMat, mHInitMat, mHInitMat) {
+        }
+        using internalParams<T>::setMK;
+        using internalParams<T>::setMNumIt;
+        using symmParams::setMLucalgo;
+        using internalParams<T>::setMSymmReg;
+        using internalParams<T>::setMSymmFlag;
+
+
     };
 }
 

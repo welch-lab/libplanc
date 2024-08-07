@@ -34,6 +34,10 @@ planc::nmfOutput<double> (*ptrnmf)(const arma::Mat<double>&x, const arma::uword&
 planc::nmfOutput<double> (*ptrspnmf)(const arma::SpMat<double>&x, const arma::uword&k, const arma::uword&niter,
                                    const std::string&algo, const int&nCores, const arma::Mat<double>&Winit,
                                    const arma::Mat<double>&Hinit)(planc::nmflib<arma::sp_mat>::nmf);
+planc::nmfOutput<double> (*ptrsymnmf)(const arma::Mat<double>&x, const arma::uword&k, const arma::uword&niter, const double& lambda,
+                                   const std::string&algo, const int&nCores, const arma::Mat<double>&Hinit)(planc::nmflib<arma::mat>::symNMF);
+planc::nmfOutput<double> (*ptrspsymnmf)(const arma::SpMat<double>&x, const arma::uword&k, const arma::uword&niter, const double& lambda,
+                                   const std::string&algo, const int&nCores, const arma::Mat<double>&Hinit)(planc::nmflib<arma::sp_mat>::symNMF);
 
 
 //std::map<std::string, planc::runNMFindex> NMFindexmap{{"W", planc::outW},

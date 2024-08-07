@@ -42,4 +42,7 @@ NB_MODULE(pyplanc, m) {
     m.def("nmf", &planc::nmflib<arma::mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a= "anlsbpp", "ncores"_a=2,
           nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
     m.def("nmf", &planc::nmflib<arma::sp_mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
+    m.def("symNMF", &planc::nmflib<arma::sp_mat>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
+    m.def("symNMF", &planc::nmflib<arma::mat>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
+
 }

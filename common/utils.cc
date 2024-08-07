@@ -27,4 +27,10 @@ std::unordered_map<std::string, algotype> algomap{{"MU", MU},
                                                   {"r2", R2},
                                                   {"pgd", PGD},
                                                   {"pgncg", PGNCG}};
+
+std::unordered_map<std::string, algotype> symmap{
+                                                  {"ANLSBPP", ANLSBPP},
+                                                  {"GNSYM", GNSYM},
+                                                  {"anlsbpp", ANLSBPP},
+                                                  {"gnsym", GNSYM}};
 std::unordered_map<std::string, normtype> normmap{{"NONE", NONE}, {"L2NORM", L2NORM}, {"MAXNORM", MAXNORM}};

@@ -30,6 +30,8 @@ protected:
     arma::mat LLF{};
     double objErr;
 public:
+    virtual ~NMFDriver() = default;
+
     const arma::mat &getLlf() const {
         return LLF;
     }

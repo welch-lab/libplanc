@@ -13,6 +13,8 @@
 enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM,
         NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
 extern std::unordered_map<std::string, algotype> algomap;
+extern std::unordered_map<std::string, algotype> symmap;
+
 
 enum normtype { NONE, L2NORM, MAXNORM };
 extern std::unordered_map<std::string, normtype> normmap;

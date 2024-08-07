@@ -38,6 +38,8 @@ namespace planc {
 
         static struct nmfOutput<eT> nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
+        static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
+                         const arma::Mat<eT>& Hinit);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);
             myNMF.callNMF();
