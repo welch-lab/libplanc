@@ -439,7 +439,7 @@ namespace planc {
         int m_cpc{};
     };
     template<typename T>
-    struct internalParams : params {
+    struct internalParams : virtual params {
         // matrix pointers for direct passage
         const T& m_a_mat;
         arma::mat m_h_init_mat;
@@ -480,7 +480,7 @@ namespace planc {
         //[[nodiscard]] const std::string & getMWInitFileName() const override = delete;
     };
 
-    struct symmParams : params {
+    struct symmParams : virtual params {
         void setMLucalgo(std::string mLucalgo) override {
             try {
                 m_lucalgo = symmap.at(mLucalgo);
