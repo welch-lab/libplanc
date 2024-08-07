@@ -6,7 +6,9 @@
 #include <nmf_lib.hpp>
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
-#include "pybind_interface.hpp"
+#include "dense_casters.h"
+#include "sparse_casters.h"
+
 
 namespace nb = nanobind;
 // void limitpypythreads() {
@@ -37,9 +39,7 @@ NB_MODULE(pyplanc, m) {
     m.doc() = "A python wrapper for planc-nmflib";
     using namespace nb::literals;
     nb::class_<planc::nmfOutput<double>>(m, "nmfOutput").def_rw("W", &planc::nmfOutput<double>::outW).def_rw("H", &planc::nmfOutput<double>::outH).def_rw("objErr", &planc::nmfOutput<double>::objErr,  nb::rv_policy::move);
-    m.def("nmf", static_cast<nmfCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
-    m.def("nmf", static_cast<nmfCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2);
-    m.def("nmf", static_cast<nmfFullCall<arma::mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,
-          nb::kw_only(), "Winit"_a, "Hinit"_a);
-    m.def("nmf", static_cast<nmfFullCall<arma::sp_mat>>(nmf), "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a, "Hinit"_a);
+    m.def("nmf", &planc::nmflib<arma::mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a= "anlsbpp", "ncores"_a=2,
+          nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
+    m.def("nmf", &planc::nmflib<arma::sp_mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
 }
