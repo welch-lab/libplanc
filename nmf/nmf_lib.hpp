@@ -8,6 +8,7 @@
 #include "plancopts.h"
 #include "utils.hpp"
 #include "EmbeddedNMFDriver.hpp"
+#include "bppinmf.hpp"
 
 extern "C" {
 #include "detect_blas.h"
@@ -26,7 +27,27 @@ namespace planc {
         arma::Mat<eT> outH;
         double objErr;
     };
-
+    template<typename eT>
+    struct NMFLIB_EXPORT inmfOutput {
+        inmfOutput() = default;
+        ~inmfOutput() = default;
+        arma::Mat<eT> outW;
+        std::vector<arma::Mat<eT>> outHList;
+        std::vector<arma::Mat<eT>> outVList;
+        double objErr;
+    };
+    template<typename T, class... strlocs>
+    std::vector<std::unique_ptr<T>> NMFLIB_NO_EXPORT initMemMatPtr(strlocs... objectList)
+    {
+        std::vector<std::unique_ptr<T>> matPtrVec;
+        for (arma::uword i = 0; i < objectList.size(); ++i)
+        {
+            T E = T(objectList[i]);
+            std::unique_ptr<T> ptr = std::make_unique<T>(E);
+            matPtrVec.push_back(std::move(ptr));
+        }
+        return matPtrVec;
+    }
     template<typename T, typename eT = typename T::elem_type>
     class NMFLIB_EXPORT nmflib {
     public:
@@ -40,6 +61,14 @@ namespace planc {
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
         static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
                          const arma::Mat<eT>& Hinit);
+        template<class...vecs>
+        static struct inmfOutput<eT> bppinmf(vecs...objectList, arma::uword k, double lambda,
+                                          arma::uword niter, bool verbose, const int& ncores);
+        template<class...vecs>
+        static struct inmfOutput<eT> bppinmf(vecs...objectList, arma::uword k, double lambda,
+                   arma::uword niter, bool verbose,
+                   std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,
+                   const int& ncores);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);
             myNMF.callNMF();

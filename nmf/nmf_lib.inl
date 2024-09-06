@@ -44,4 +44,26 @@ namespace planc {
         outlist.objErr = nmfRunner.getobjErr();
         return outlist;
     }
+    template <typename T, typename eT> template<class...vecs>
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(vecs... objectList, arma::uword k, double lambda,
+                   arma::uword niter, bool verbose, const int& ncores)
+    {
+        std::vector<std::unique_ptr<T>> matPtrVec;
+        matPtrVec = initMemMatPtr<T>(objectList);
+        BPPINMF<T> solver(matPtrVec, k, lambda);
+        solver.optimizeALS(niter, verbose, ncores);
+        return {solver.getW(), solver.getAllH(), solver.getAllV(), solver.objErr()};
+    }
+    template <typename T, typename eT> template<class...vecs>
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(vecs... objectList, arma::uword k, double lambda,
+                       arma::uword niter, bool verbose,
+                       std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,
+                       const int& ncores)
+    {
+        std::vector<std::unique_ptr<T>> matPtrVec;
+        matPtrVec = initMemMatPtr<T>(objectList);
+        BPPINMF<T> solver(matPtrVec, k, lambda, HinitList, VinitList, Winit);
+        solver.optimizeALS(niter, verbose, ncores);
+        return {solver.getW(), solver.getAllH(), solver.getAllV(), solver.objErr()};
+    }
 }

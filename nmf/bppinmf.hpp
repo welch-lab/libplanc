@@ -3,6 +3,11 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+#ifdef USING_R
+#include <Progress.hpp>
+#else
+#include "progressWrapper.h"
+#endif
 #include "bppnnls.hpp"
 #include "inmf.hpp"
 
@@ -135,13 +140,17 @@ private:
 
 public:
     BPPINMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda) {
-
     }
 
     void optimizeALS(unsigned int niter, bool verbose = true, const int& ncores = 0) {
         // execute private functions here
         if (verbose) {
-            Rcpp::Rcerr << "INMF started, niter=" << niter << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "INMF started, niter=" << niter << std::endl;
         }
         this->objective_err = this->computeObjectiveError();
         auto start = std::chrono::high_resolution_clock::now();
@@ -160,8 +169,18 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         if (verbose) {
             auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-            Rcpp::Rcerr << "Total time:      " << duration.count() << " sec" << std::endl;
-            Rcpp::Rcerr << "Objective error: " << this->objective_err << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "Total time:      " << duration.count() << " sec" << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "Objective error: " << this->objective_err << std::endl;
         }
     }
 };

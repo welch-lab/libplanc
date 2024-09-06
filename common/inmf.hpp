@@ -5,13 +5,11 @@
 #endif
 #include <memory>
 #include <vector>
-#include <memory>
 #include "utils.hpp"
-
+#include "data.hpp"
 
 
 namespace planc {
-
     template <typename T>
     class INMF {
     protected:
@@ -153,28 +151,18 @@ namespace planc {
     public:
         INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
-            // this->initHWV();
+        this->initW();
+        this->initV();
+        this->INMF::initH();
         }
-        // INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda,
-        //      std::vector<std::unique_ptr<arma::mat>>& Hinit,
-        //      std::vector<std::unique_ptr<arma::mat>>& Vinit,
-        //      arma::mat& Winit) {
-        //     this->constructObject(Ei, k, lambda);
-        //     this->W = std::make_unique<arma::mat>(Winit);
-
-        //     for (arma::uword i = 0; i < this->nDatasets; ++i) {
-        //         this->Hi.push_back(std::move(Hinit[i]));
-        //         arma::mat* Vptr = Vinit[i].get();
-        //         std::unique_ptr<arma::mat> VTptr = std::unique_ptr<arma::mat>(new arma::mat);
-        //         *VTptr = Vptr->t();
-        //         this->Vi.push_back(std::move(Vinit[i]));
-        //         this->ViT.push_back(std::move(VTptr));
-        //     }
-        //     std::unique_ptr<arma::mat> WTptr = std::unique_ptr<arma::mat>(new arma::mat);
-        //     *WTptr = this->W->t();
-        //     this->WT = std::move(WTptr);
-        // }
-        void initH(std::vector<arma::mat>& Hinit) {
+        INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, arma::mat HinitList,
+            arma::mat VinitList, arma::mat Winit,  bool makeTranspose = true) {
+            this->constructObject(Ei, k, lambda, makeTranspose);
+            this->initW(Winit);
+            this->initV(VinitList);
+            this->initH(HinitList);
+        }
+        virtual void initH(std::vector<arma::mat>& Hinit) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized H matrices" << std::endl;
 #endif
@@ -315,7 +303,7 @@ namespace planc {
         }
 
         std::vector<std::unique_ptr<arma::mat>> getAllH() {
-            return this->Hi;
+            return std::move(this->Hi);
         }
 
         arma::mat getVi(arma::uword i) {
@@ -323,14 +311,14 @@ namespace planc {
         }
 
         std::vector<std::unique_ptr<arma::mat>> getAllV() {
-            return this->Vi;
+            return std::move(this->Vi);
         }
 
         arma::mat getW() {
             return *(this->W.get());
         }
 
-        ~INMF() { clear(); }
+        virtual ~INMF() { clear(); }
         void clear() {
             if (!this->cleared) {
                 for (unsigned int i = 0; i < Ei.size(); ++i) {
@@ -357,7 +345,7 @@ namespace planc {
     }; // class INMF
 
     template<>
-    double INMF<H5Mat>::computeObjectiveError() {
+    inline double INMF<H5Mat>::computeObjectiveError() {
         double obj = 0;
         arma::mat* Wptr = this->W.get();
         arma::mat L(this->m, this->k); // (loading) L = W + V
@@ -389,7 +377,7 @@ namespace planc {
         return obj;
     }
     template<>
-    double INMF<H5SpMat>::computeObjectiveError() {
+    inline double INMF<H5SpMat>::computeObjectiveError() {
         double obj = 0;
         arma::mat* Wptr = this->W.get();
         arma::mat L(this->m, this->k); // (loading) L = W + V
