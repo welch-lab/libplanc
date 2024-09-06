@@ -157,13 +157,14 @@ public:
         unsigned int iter = 0;
         Progress p(niter, verbose);
         while (iter < niter ) {
+#ifdef USING_R
             Rcpp::checkUserInterrupt();
+#endif
             solveH(ncores);
             solveV(ncores);
             solveW(ncores);
             iter++;
-            if ( ! p.is_aborted() ) p.increment();
-            else break;
+            p.increment();
         }
         this->objective_err = this->computeObjectiveError();
         auto end = std::chrono::high_resolution_clock::now();
