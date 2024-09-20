@@ -266,7 +266,7 @@ namespace planc {
             H5Mat transposedMat(tmpfilename, "data");
             return transposedMat;
         } // End of H5Mat.t()
-        arma::mat H5Mat::operator*(const arma::mat &other) {
+        arma::mat operator*(const arma::mat &other) const {
             auto out = arma::mat(this->n_cols, other.n_rows);
             arma::uword numChunks = this->n_cols / this->colChunkSize;
             if (numChunks * this->colChunkSize < this->n_cols) numChunks++;
