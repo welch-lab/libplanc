@@ -36,8 +36,8 @@ namespace planc {
         std::vector<arma::Mat<eT>> outVList;
         double objErr;
     };
-    template<typename T, class... strlocs>
-    std::vector<std::unique_ptr<T>> NMFLIB_NO_EXPORT initMemMatPtr(strlocs... objectList)
+    template<class T, typename eT = typename T::elem_type>
+    std::vector<std::unique_ptr<T>> NMFLIB_NO_EXPORT initMemMatPtr(std::vector<T> objectList)
     {
         std::vector<std::unique_ptr<T>> matPtrVec;
         for (arma::uword i = 0; i < objectList.size(); ++i)
@@ -61,11 +61,9 @@ namespace planc {
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
         static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
                          const arma::Mat<eT>& Hinit);
-        template<class...vecs>
-        static struct inmfOutput<eT> bppinmf(vecs...objectList, arma::uword k, double lambda,
+        static struct inmfOutput<eT> bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
                                           arma::uword niter, bool verbose, const int& ncores);
-        template<class...vecs>
-        static struct inmfOutput<eT> bppinmf(vecs...objectList, arma::uword k, double lambda,
+        static struct inmfOutput<eT> bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
                    arma::uword niter, bool verbose,
                    std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,
                    const int& ncores);

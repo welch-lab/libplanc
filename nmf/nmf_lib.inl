@@ -44,18 +44,30 @@ namespace planc {
         outlist.objErr = nmfRunner.getobjErr();
         return outlist;
     }
-    template <typename T, typename eT> template<class...vecs>
-    inmfOutput<eT> nmflib<T, eT>::bppinmf(vecs... objectList, arma::uword k, double lambda,
+    template <typename T, typename eT>
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
                    arma::uword niter, bool verbose, const int& ncores)
     {
         std::vector<std::unique_ptr<T>> matPtrVec;
         matPtrVec = initMemMatPtr<T>(objectList);
         BPPINMF<T> solver(matPtrVec, k, lambda);
         solver.optimizeALS(niter, verbose, ncores);
-        return {solver.getW(), solver.getAllH(), solver.getAllV(), solver.objErr()};
+        std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
+        std::vector<arma::mat> resolvedH{};
+        for (unsigned int i = 0; i < allH.size(); ++i) {
+            arma::mat* ptr = allH[i].release();
+            resolvedH.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
+        std::vector<arma::mat> resolvedV{};
+        for (unsigned int i = 0; i < allV.size(); ++i) {
+            arma::mat* ptr = allV[i].release();
+            resolvedV.push_back(*ptr);
+        }
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr()};
     }
-    template <typename T, typename eT> template<class...vecs>
-    inmfOutput<eT> nmflib<T, eT>::bppinmf(vecs... objectList, arma::uword k, double lambda,
+    template <typename T, typename eT>
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
                        arma::uword niter, bool verbose,
                        std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,
                        const int& ncores)
@@ -64,6 +76,18 @@ namespace planc {
         matPtrVec = initMemMatPtr<T>(objectList);
         BPPINMF<T> solver(matPtrVec, k, lambda, HinitList, VinitList, Winit);
         solver.optimizeALS(niter, verbose, ncores);
-        return {solver.getW(), solver.getAllH(), solver.getAllV(), solver.objErr()};
+        std::vector<std::unique_ptr<T>> allH = solver.getAllH();
+        std::vector<T> resolvedH{};
+        for (unsigned int i = 0; i < allH.size(); ++i) {
+            T* ptr = allH[i].release();
+            resolvedH.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
+        std::vector<arma::mat> resolvedV{};
+        for (unsigned int i = 0; i < allV.size(); ++i) {
+            arma::mat* ptr = allV[i].release();
+            resolvedV.push_back(*ptr);
+        }
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr()};;
     }
 }

@@ -7,11 +7,13 @@
 #include <highfive/H5DataSpace.hpp>
 
 namespace planc {
-
     class H5Mat : public HighFive::File {
         // A contatiner only for a 2D dense matrix stored in an HDF5 file
         // with accessor function to columns of the matrix that reads and
         // returns a specified chunk of the matrix into memory
+        public:
+        typedef double elem_type;
+
         protected:
         std::string filename, datapath;
         std::vector<hsize_t> chunk_dims;
@@ -83,7 +85,7 @@ namespace planc {
 
         arma::uword n_cols, n_rows, colChunkSize, rowChunkSize;
 
-        arma::mat cols(arma::uword start, arma::uword end) {
+        arma::mat cols(arma::uword start, arma::uword end) const {
             try {
                 if (start < 0) {
                     throw std::invalid_argument(
@@ -264,26 +266,26 @@ namespace planc {
             H5Mat transposedMat(tmpfilename, "data");
             return transposedMat;
         } // End of H5Mat.t()
-
-        double normF() {
-            arma::uword nChunks = this->n_cols / this->colChunkSize;
-            if (nChunks * this->colChunkSize < this->n_cols) nChunks++;
-            double norm = 0;
-            for (arma::uword i = 0; i < nChunks; ++i) {
-                arma::uword start = i * this->colChunkSize;
-                arma::uword end = (i + 1) * this->colChunkSize - 1;
-                if (end > this->n_cols - 1) end = this->n_cols - 1;
-                arma::mat chunk = this->cols(start, end);
-                norm += arma::accu(chunk % chunk);
+        arma::mat H5Mat::operator*(const arma::mat &other) {
+            auto out = arma::mat(this->n_cols, other.n_rows);
+            arma::uword numChunks = this->n_cols / this->colChunkSize;
+            if (numChunks * this->colChunkSize < this->n_cols) numChunks++;
+            for (arma::uword j = 0; j < numChunks; ++j) {
+                arma::uword spanStart = j * this->colChunkSize;
+                arma::uword spanEnd = (j + 1) * this->colChunkSize - 1;
+                if (spanEnd > this->n_cols - 1) spanEnd = this->n_cols - 1;
+                out.rows(spanStart, spanEnd) = this->cols(spanStart, spanEnd).t() * other;
             }
-            return std::sqrt(norm);
+            return out;
         }
     }; // End of class H5Mat
-
     class H5SpMat : public HighFive::File  {
         protected:
         std::string filename, xPath, iPath, pPath;
+        public:
         arma::uword x_chunksize, i_chunksize, p_chunksize;
+        typedef double elem_type;
+
 
         private:
         // The `start` and `end` refer to the start and end of the corresponding
@@ -321,8 +323,8 @@ namespace planc {
             // iMemspace.close();
             return i;
         }
-
-        arma::vec getXByRange(arma::uword start, arma::uword end) {
+    public:
+        arma::vec getXByRange(arma::uword start, arma::uword end) const {
             arma::vec x(end - start + 1);
             std::vector<size_t> x_start;
             x_start.push_back(start);
@@ -338,7 +340,7 @@ namespace planc {
             // xMemspace.close();
             return x;
         }
-
+    private:
         static std::string increUniqName(const std::string& base) {
             int suffix = 0;
             std::string tempPath = base + std::to_string(suffix) + ".h5";
@@ -638,19 +640,48 @@ namespace planc {
             // H5SpMat transposedMat(this->filename, itempPath, ptempPath, xtempPath, this->n_cols, this->n_rows);
             return transposedMat;
         } // End of H5SpMat.t()
-
-        double normF() {
-            arma::uword nChunks = this->nnz / this->x_chunksize;
-            if (nChunks * this->x_chunksize < this->nnz) nChunks++;
-            double norm = 0;
-            for (arma::uword i = 0; i < nChunks; ++i) {
-                arma::uword start = i * this->x_chunksize;
-                arma::uword end = (i + 1) * this->x_chunksize - 1;
-                if (end > this->nnz - 1) end = this->nnz - 1;
-                arma::vec chunk = this->getXByRange(start, end);
-                norm += arma::accu(chunk % chunk);
-            }
-            return std::sqrt(norm);
+        arma::mat operator*(const arma::mat& other) {
+        arma::mat out(this->n_cols, other.n_rows);
+        arma::uword numChunks = this->n_cols / this->x_chunksize;
+        if (numChunks * this->x_chunksize < this->n_cols) numChunks++;
+        for (arma::uword j = 0; j < numChunks; ++j) {
+            arma::uword spanStart = j * this->x_chunksize;
+            arma::uword spanEnd = (j + 1) * this->x_chunksize - 1;
+            if (spanEnd > this->n_cols - 1) spanEnd = this->n_cols - 1;
+            out.rows(spanStart, spanEnd) = this->cols(spanStart, spanEnd).t() * other;
+        }
+            return out;
         }
     }; // End of class H5SpMat
 } // End of namespace planc
+namespace arma {
+    // always frobenius
+    template<typename>
+    double norm(const planc::H5Mat &X, const char* method) {
+        uword nChunks = X.n_cols / X.colChunkSize;
+        if (nChunks * X.colChunkSize < X.n_cols) nChunks++;
+        double lnorm = 0;
+        for (uword i = 0; i < nChunks; ++i) {
+            uword start = i * X.colChunkSize;
+            uword end = (i + 1) * X.colChunkSize - 1;
+            if (end > X.n_cols - 1) end = X.n_cols - 1;
+            mat chunk = X.cols(start, end);
+            lnorm += accu(chunk % chunk);
+        }
+        return std::sqrt(lnorm);
+    }
+    template<typename>
+    double norm(const planc::H5SpMat &X, const char* method) {
+        uword nChunks = X.nnz / X.x_chunksize;
+        if (nChunks * X.x_chunksize < X.nnz) nChunks++;
+        double norm = 0;
+        for (uword i = 0; i < nChunks; ++i) {
+            uword start = i * X.x_chunksize;
+            uword end = (i + 1) * X.x_chunksize - 1;
+            if (end > X.nnz - 1) end = X.nnz - 1;
+            vec chunk = X.getXByRange(start, end);
+            norm += accu(chunk % chunk);
+        }
+        return std::sqrt(norm);
+    }
+}
