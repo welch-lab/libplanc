@@ -55,7 +55,7 @@ build-backend = "scikit_build_core.build"
 
 [tool]
 rye = { dev-dependencies = [
-    "cibuildwheel>=2.19.2",
+    "cibuildwheel>=2.21.1",
 ] }
 
 [tool.scikit-build]
