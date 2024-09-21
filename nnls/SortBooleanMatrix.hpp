@@ -1,9 +1,6 @@
 #pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#include <utils.h>
-#include <vector>
-#include <algorithm>
 
 template <class T>
 class BooleanArrayComparator {

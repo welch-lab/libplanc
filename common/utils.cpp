@@ -2,16 +2,11 @@
 // Created by andrew on 11/28/2023.
 //
 #include "utils.hpp"
-#include <cassert>
 #include <chrono>
 #include <utility>
 #include <vector>
 #include <random>
 #include "data.hpp"
-
-extern "C" {
-#include "hw_detect.h"
-}
 
 void tic() {tictoc_stack.push(std::chrono::steady_clock::now()); }
 double toc()  {

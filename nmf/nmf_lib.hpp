@@ -5,10 +5,8 @@
 #ifndef PLANC_NMF_LIB_HPP
 #define PLANC_NMF_LIB_HPP
 #include "nmflib_export.h"
-#include "plancopts.h"
-#include "utils.hpp"
-#include "EmbeddedNMFDriver.hpp"
-#include "bppinmf.hpp"
+#include "NMFDriver.hpp"
+
 
 extern "C" {
 #include "detect_blas.h"

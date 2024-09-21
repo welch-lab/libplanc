@@ -1,6 +1,8 @@
 #pragma once
 
 #include "nmf_lib.hpp"
+#include "EmbeddedNMFDriver.hpp"
+#include "bppinmf.hpp"
 namespace planc {
     template<typename T, typename eT>
     nmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::nmf(const T& x, const arma::uword& k, const arma::uword& niter,

@@ -2,10 +2,6 @@
 /*Copyright 2016 Ramakrishnan Kannan*/
 
 #include "nnls.hpp"
-#include "utils.hpp"
-#include <set>
-#include <algorithm>
-#include <iomanip>
 #include "SortBooleanMatrix.hpp"
 
 template <class MATTYPE, class VECTYPE>

@@ -4,9 +4,6 @@
 
 #include <stack>
 #include "utils.h"
-#include <cstdio>
-#include <ctime>
-#include <typeinfo>
 
 extern "C" {
 #include "hw_detect.h"

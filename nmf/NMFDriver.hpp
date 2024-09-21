@@ -1,6 +1,5 @@
 #pragma once
 
-#include "utils.hpp"
 //#include "parsecommandline.hpp"
 #include "plancopts.h"
 #include "aoadmm.hpp"
@@ -8,9 +7,6 @@
 #include "mu.hpp"
 #include "hals.hpp"
 #include "bppnmf.hpp"
-#include <cstdio>
-#include <string>
-#include <utility>
 
 
 namespace planc {
