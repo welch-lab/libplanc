@@ -5,7 +5,9 @@
 #include "config.h"
 #include <nmf_lib.hpp>
 #include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 #include "dense_casters.h"
 #include "sparse_casters.h"
 
@@ -39,10 +41,14 @@ NB_MODULE(pyplanc, m) {
     m.doc() = "A python wrapper for planc-nmflib";
     using namespace nb::literals;
     nb::class_<planc::nmfOutput<double>>(m, "nmfOutput").def_rw("W", &planc::nmfOutput<double>::outW).def_rw("H", &planc::nmfOutput<double>::outH).def_rw("objErr", &planc::nmfOutput<double>::objErr,  nb::rv_policy::move);
-    m.def("nmf", &planc::nmflib<arma::mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a= "anlsbpp", "ncores"_a=2,
-          nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
-    m.def("nmf", &planc::nmflib<arma::sp_mat>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2,  nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat());
-    m.def("symNMF", &planc::nmflib<arma::sp_mat>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
-    m.def("symNMF", &planc::nmflib<arma::mat>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
-
+    nb::class_<planc::inmfOutput<double>>(m, "inmfOutput").def_rw("W", &planc::inmfOutput<double>::outW).def_rw("HList", &planc::inmfOutput<double>::outHList).def_rw("VList", &planc::inmfOutput<double>::outVList).def_rw("objErr", &planc::inmfOutput<double>::objErr,  nb::rv_policy::move);
+#define X(T) \
+    m.def("nmf", &planc::nmflib<T>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2, nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat()); \
+    m.def("symNMF", &planc::nmflib<T>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
+    #include "nmf_types.inc"
+#undef X
+#define X(T) \
+    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2);
+    #include "inmf_types.inc"
+#undef X
 }
