@@ -2,7 +2,6 @@
 
 #include "nmf_lib.hpp"
 #include "EmbeddedNMFDriver.hpp"
-#include "bppinmf.hpp"
 namespace planc {
     template<typename T, typename eT>
     nmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::nmf(const T& x, const arma::uword& k, const arma::uword& niter,
@@ -47,8 +46,8 @@ namespace planc {
         return outlist;
     }
     template <typename T, typename eT>
-    inmfOutput<eT> nmflib<T, eT>::bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
-                   arma::uword niter, bool verbose, const int& ncores)
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
+                   const arma::uword &niter, const bool &verbose, const int& ncores)
     {
         std::vector<std::unique_ptr<T>> matPtrVec;
         matPtrVec = initMemMatPtr<T>(objectList);

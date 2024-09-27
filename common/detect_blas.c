@@ -12,12 +12,12 @@ openblas_handle_t get_openblas_handle(void) {
     return blas_handle;
 }
 
-openblas_init_t get_openblas_parallel(openblas_handle_t libloc) {
+openblas_init_t get_openblas_parallel(const openblas_handle_t libloc) {
     const openblas_init_t parallel_address = (openblas_init_t)dlsym(libloc, "openblas_get_parallel");
     return parallel_address;
 }
 
-openblas_set_t get_openblas_set(openblas_handle_t libloc) {
+openblas_set_t get_openblas_set(const openblas_handle_t libloc) {
     const openblas_set_t set_address = (openblas_set_t)dlsym(libloc, "openblas_set_num_threads");
     return set_address;
 }

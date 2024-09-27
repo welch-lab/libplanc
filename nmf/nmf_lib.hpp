@@ -6,6 +6,8 @@
 #define PLANC_NMF_LIB_HPP
 #include "nmflib_export.h"
 #include "NMFDriver.hpp"
+#include "bppinmf.hpp"
+
 
 
 extern "C" {
@@ -59,8 +61,8 @@ namespace planc {
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
         static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
                          const arma::Mat<eT>& Hinit);
-        static struct inmfOutput<eT> bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
-                                          arma::uword niter, bool verbose, const int& ncores);
+        static struct inmfOutput<eT> bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
+                                          const arma::uword &niter, const bool &verbose, const int& ncores);
         static struct inmfOutput<eT> bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
                    arma::uword niter, bool verbose,
                    std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,

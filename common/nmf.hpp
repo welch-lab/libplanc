@@ -527,8 +527,8 @@ class NMF {
 
   /// Returns the last objective error calculated
   double objErr() { return this->objective_err; }
-  
-  ~NMF() { clear(); }
+
+  virtual ~NMF() { clear(); }
   /// Clear the memory for input matrix A, right low rank factor W
   /// and left low rank factor H
   void clear() {

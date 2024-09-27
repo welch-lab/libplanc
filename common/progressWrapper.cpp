@@ -17,6 +17,6 @@ Progress::Progress(unsigned long max, bool display_progress) {
             option::ShowPercentage{display_progress});
     }
 
-    void Progress::increment() {
+    void Progress::increment() const {
         wrappedBar->tick();
     }

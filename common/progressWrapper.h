@@ -13,7 +13,7 @@ private:
     std::unique_ptr<indicators::BlockProgressBar> wrappedBar;
 public:
     explicit Progress(unsigned long max, bool display_progress = true);
-    void increment();
+    void increment() const;
 };
 
 
