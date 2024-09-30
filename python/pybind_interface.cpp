@@ -48,7 +48,8 @@ NB_MODULE(pyplanc, m) {
     #include "nmf_types.inc"
 #undef X
 #define X(T) \
-    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2);
+    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2); \
+    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "HinitList"_a, "VinitList"_a, "&Winit"_a,"ncores"_a=2);
     #include "inmf_types.inc"
 #undef X
 }

@@ -8,7 +8,9 @@ template planc::nmfOutput<double> planc::nmflib<T, double>::symNMF(const T&x, co
 #include "nmf_types.inc"
 #undef X
 #define X(T) \
-template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(const std::vector<T> &objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const int &nCores);
+template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(const std::vector<T> &objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const int &nCores); \
+template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(const std::vector<T> &objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit, const int &nCores);
+
 #include "inmf_types.inc"
 #undef X
 void planc::openblas_pthread_off(openblas_handle_t libloc) {

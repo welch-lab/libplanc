@@ -63,9 +63,9 @@ namespace planc {
                          const arma::Mat<eT>& Hinit);
         static struct inmfOutput<eT> bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
                                           const arma::uword &niter, const bool &verbose, const int& ncores);
-        static struct inmfOutput<eT> bppinmf(std::vector<T> objectList, arma::uword k, double lambda,
-                   arma::uword niter, bool verbose,
-                   std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit,
+        static struct inmfOutput<eT> bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
+                   const arma::uword &niter, const bool &verbose,
+                   const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit,
                    const int& ncores);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);
