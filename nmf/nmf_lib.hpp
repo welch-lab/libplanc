@@ -6,8 +6,7 @@
 #define PLANC_NMF_LIB_HPP
 #include "nmflib_export.h"
 #include "NMFDriver.hpp"
-#include "bppinmf.hpp"
-
+#include <data.hpp>
 
 
 extern "C" {
