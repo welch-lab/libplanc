@@ -35,6 +35,12 @@ namespace planc {
         std::vector<arma::Mat<eT>> outVList;
         double objErr;
     };
+    template<typename eT>
+    struct NMFLIB_EXPORT uinmfOutput : inmfOutput<eT> {
+        uinmfOutput() = default;
+        ~uinmfOutput() = default;
+        std::vector<arma::Mat<eT>> outUList;
+    };
     template<class T, typename eT = typename T::elem_type>
     std::vector<std::unique_ptr<T>> NMFLIB_NO_EXPORT initMemMatPtr(std::vector<T> objectList)
     {
@@ -66,6 +72,11 @@ namespace planc {
                    const arma::uword &niter, const bool &verbose,
                    const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit,
                    const int& ncores);
+        static struct uinmfOutput<eT> uinmf(std::vector<T> objectList,
+                     std::vector<T> unsharedList,
+                     std::vector<int> whichUnshared,
+                     arma::uword k, const int& nCores, arma::vec lambda,
+                     arma::uword niter, bool verbose);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);
             myNMF.callNMF();

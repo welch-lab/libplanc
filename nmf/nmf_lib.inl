@@ -3,6 +3,7 @@
 #include "nmf_lib.hpp"
 #include "EmbeddedNMFDriver.hpp"
 #include "bppinmf.hpp"
+#include "uinmf.hpp"
 
 namespace planc {
     template<typename T, typename eT>
@@ -92,5 +93,39 @@ namespace planc {
             resolvedV.push_back(*ptr);
         }
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};;
+    }
+    template <typename T, typename eT>
+    uinmfOutput<eT> nmflib<T, eT>::uinmf(std::vector<T> objectList,
+                     std::vector<T> unsharedList,
+                     std::vector<int> whichUnshared,
+                     arma::uword k, const int& nCores, arma::vec lambda,
+                     arma::uword niter, bool verbose)
+    {
+        std::vector<std::unique_ptr<T>> matPtrVec;
+        std::vector<std::unique_ptr<T>> unsharedPtrVec;
+        matPtrVec = initMemMatPtr<T>(objectList);
+        unsharedPtrVec = initMemMatPtr<T>(unsharedList);
+        UINMF<T> solver(matPtrVec, unsharedPtrVec, whichUnshared, k, lambda);
+        solver.optimizeUANLS(niter, verbose, nCores);
+
+        std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
+        std::vector<arma::mat> resolvedH{};
+        for (unsigned int i = 0; i < allH.size(); ++i) {
+            arma::mat* ptr = allH[i].release();
+            resolvedH.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
+        std::vector<arma::mat> resolvedV{};
+        for (unsigned int i = 0; i < allV.size(); ++i) {
+            arma::mat* ptr = allV[i].release();
+            resolvedV.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allU = solver.getAllU();
+        std::vector<arma::mat> resolvedU{};
+        for (unsigned int i = 0; i < allU.size(); ++i) {
+            arma::mat* ptr = allU[i].release();
+            resolvedU.push_back(*ptr);
+        }
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedU};
     }
 }

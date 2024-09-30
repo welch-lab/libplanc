@@ -27,19 +27,24 @@ private:
     void sampleUandV() {
         // U and V must be sampled from the same random set of cells, thus put together
 #ifdef _VERBOSE
-            Rcpp::Rcout << "Initializing U and V matrices by sampling from input" << std::endl;
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+                << "Initializing U and V matrices by sampling from input" << std::endl;
 #endif
         std::unique_ptr<arma::mat> U;
         std::unique_ptr<arma::mat> V;
         for (arma::uword i = 0; i < this->nDatasets; ++i) {
             arma::uvec indices = arma::randperm(this->ncol_E[i]).head(this->k);
-            V = std::unique_ptr<arma::mat>(new arma::mat(this->m, this->k, arma::fill::zeros));
+            V = std::make_unique<arma::mat>(this->m, this->k, arma::fill::zeros);
             arma::mat* Vptr = V.get();
             *Vptr = this->Ei[i].get()->cols(indices);
             this->Vi.push_back(std::move(V));
             int uidx = this->whichUnshared[i];
             if (uidx == -1) continue; // skip if no U
-            U = std::unique_ptr<arma::mat>(new arma::mat(this->u[i], this->k, arma::fill::zeros));
+            U = std::make_unique<arma::mat>(this->u[i], this->k, arma::fill::zeros);
             arma::mat* Uptr = U.get();
             *Uptr = this->Pi[uidx].get()->cols(indices);
             this->Ui.push_back(std::move(U));
@@ -59,7 +64,12 @@ private:
 
     void initH() override {
 #ifdef _VERBOSE
-        Rcpp::Rcout << "Randomly initializing H matrices" << std::endl;
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "Randomly initializing H matrices" << std::endl;
 #endif
         std::unique_ptr<arma::mat> H;
         for (arma::uword i = 0; i < this->nDatasets; ++i) {
@@ -107,7 +117,12 @@ private:
 
     void solveH(int ncores) {
 #ifdef _VERBOSE
-        Rcpp::Rcout << "--Solving UINMF H--  ";
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "--Solving UINMF H--  ";
         std::chrono::system_clock::time_point iter_start_time = std::chrono::system_clock::now();
 #endif
         arma::mat* Wptr = this->W.get();
@@ -122,7 +137,7 @@ private:
             int uidx = this->whichUnshared[i];
             if (uidx >= 0) {
                 arma::mat* Uptr = this->Ui[uidx].get();
-                giventGiven += (*Uptr).t() * (*Uptr) * (1 + this->lambda_i[i]);
+                giventGiven += Uptr->t() * (*Uptr) * (1 + this->lambda_i[i]);
             }
             int dataSize = this->ncol_E[i];
             int numChunks = dataSize / this->INMF_CHUNK_SIZE;
@@ -136,11 +151,11 @@ private:
                 if (uidx >= 0) {
                     T* Pptr = this->Pi[uidx].get();
                     arma::mat* Uptr = this->Ui[uidx].get();
-                    giventInput += (*Uptr).t() * (*Pptr).cols(spanStart, spanEnd);
+                    giventInput += Uptr->t() * (*Pptr).cols(spanStart, spanEnd);
                 }
                 BPPNNLS<arma::mat, arma::vec> subProbH(giventGiven, giventInput, true);
                 subProbH.solveNNLS();
-                (*Hptr).rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
+                Hptr->rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
                 giventInput.clear();
             }
         }
@@ -148,21 +163,31 @@ private:
 #ifdef _VERBOSE
         std::chrono::system_clock::time_point iter_end_time = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = iter_end_time - iter_start_time;
-        Rcpp::Rcout << "Solving H took " << elapsed_seconds.count() << " sec" << std::endl;
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "Solving H took " << elapsed_seconds.count() << " sec" << std::endl;
 #endif
     }
 
 
     void solveV(int ncores) {
 #ifdef _VERBOSE
-        Rcpp::Rcout << "--Solving UINMF V--  ";
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "--Solving UINMF V--  ";
         std::chrono::system_clock::time_point iter_start_time = std::chrono::system_clock::now();
 #endif
         arma::mat* Wptr = this->W.get();
         arma::mat giventInput(this->k, this->INMF_CHUNK_SIZE);
         for (arma::uword i=0; i<this->nDatasets; ++i) {
             arma::mat* Hptr = this->Hi[i].get();\
-            giventGiven = (*Hptr).t() * (*Hptr);
+            giventGiven = Hptr->t() * (*Hptr);
             giventGiven *= 1 + this->lambda_i[i];
             arma::mat* Vptr = this->Vi[i].get();
             T* ETptr = this->EiT[i].get();
@@ -173,12 +198,11 @@ private:
                 int spanStart = j * this->INMF_CHUNK_SIZE;
                 int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                 if (spanEnd > this->m - 1) spanEnd = this->m - 1;
-                arma::mat giventInputTLS;
-                giventInputTLS = (*Hptr).t() * ETptr->cols(spanStart, spanEnd);
+                arma::mat giventInputTLS = (*Hptr).t() * ETptr->cols(spanStart, spanEnd);
                 giventInputTLS -= (*Hptr).t() * *Hptr * Wptr->rows(spanStart, spanEnd).t();
                 BPPNNLS<arma::mat, arma::vec> subProbV(giventGiven, giventInputTLS, true);
                 subProbV.solveNNLS();
-                (*Vptr).rows(spanStart, spanEnd) = subProbV.getSolutionMatrix().t();
+                Vptr->rows(spanStart, spanEnd) = subProbV.getSolutionMatrix().t();
             }
         }
         giventGiven.clear();
@@ -186,13 +210,23 @@ private:
 #ifdef _VERBOSE
         std::chrono::system_clock::time_point iter_end_time = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = iter_end_time - iter_start_time;
-        Rcpp::Rcout << "Solving V took " << elapsed_seconds.count() << " sec" << std::endl;
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "Solving V took " << elapsed_seconds.count() << " sec" << std::endl;
 #endif
     }
 
     void solveU(int ncores) {
 #ifdef _VERBOSE
-        Rcpp::Rcout << "--Solving UINMF U--  ";
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "--Solving UINMF U--  ";
         std::chrono::system_clock::time_point iter_start_time = std::chrono::system_clock::now();
 #endif
         arma::mat giventInput(this->k, this->INMF_CHUNK_SIZE);
@@ -201,7 +235,7 @@ private:
             if (uidx == -1) continue; // skip if no U
             arma::mat* Hptr = this->Hi[i].get();
             arma::mat* Uptr = this->Ui[uidx].get();
-            giventGiven = (*Hptr).t() * (*Hptr);
+            giventGiven = Hptr->t() * (*Hptr);
             giventGiven *= 1 + this->lambda_i[i];
             // T* Pptr = this->Pi[uidx].get();
             T* PTptr = this->PiT[uidx].get();
@@ -212,11 +246,10 @@ private:
                 int spanStart = j * this->INMF_CHUNK_SIZE;
                 int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                 if (spanEnd > this->u[i] - 1) spanEnd = this->u[i] - 1;
-                arma::mat giventInputTLS;
-                giventInputTLS = (*Hptr).t() * PTptr->cols(spanStart, spanEnd);
+                arma::mat giventInputTLS = (*Hptr).t() * PTptr->cols(spanStart, spanEnd);
                 BPPNNLS<arma::mat, arma::vec> subProbU(giventGiven, giventInputTLS, true);
                 subProbU.solveNNLS();
-                (*Uptr).rows(spanStart, spanEnd) = subProbU.getSolutionMatrix().t();
+                Uptr->rows(spanStart, spanEnd) = subProbU.getSolutionMatrix().t();
             }
         }
         giventGiven.clear();
@@ -224,13 +257,23 @@ private:
 #ifdef _VERBOSE
         std::chrono::system_clock::time_point iter_end_time = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = iter_end_time - iter_start_time;
-        Rcpp::Rcout << "Solving U took " << elapsed_seconds.count() << " sec" << std::endl;
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "Solving U took " << elapsed_seconds.count() << " sec" << std::endl;
 #endif
     }
 
     void solveW(int ncores) {
 #ifdef _VERBOSE
-        Rcpp::Rcout << "--Solving UINMF W--  ";
+#ifdef USING_R
+        Rcpp::Rcout
+#else
+        std::cout
+#endif
+        << "--Solving UINMF W--  ";
         std::chrono::system_clock::time_point iter_start_time = std::chrono::system_clock::now();
 #endif
         arma::mat* Wptr = this->W.get();
@@ -272,7 +315,12 @@ private:
 #ifdef _VERBOSE
         std::chrono::system_clock::time_point iter_end_time = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = iter_end_time - iter_start_time;
-        Rcpp::Rcout << "Solving W took " << elapsed_seconds.count() << " sec" << std::endl;
+#ifdef USING_R
+            Rcpp::Rcout
+#else
+            std::cout
+#endif
+        << "Solving W took " << elapsed_seconds.count() << " sec" << std::endl;
 #endif
     }
 
@@ -296,40 +344,63 @@ public:
 
     void optimizeUANLS(arma::uword niter=30, bool verbose=true, const int& ncores = 0) {
         if (verbose) {
-            Rcpp::Rcerr << "UINMF started, niter=" << niter << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "UINMF started, niter=" << niter << std::endl;
         }
-        auto start = std::chrono::high_resolution_clock::now();
+        const auto start = std::chrono::high_resolution_clock::now();
         this->sampleUandV();
         this->initW2();
         this->initH();
         Progress p(niter, verbose);
         for (unsigned int iter=0; iter<niter; iter++) {
+#ifdef USING_R
             Rcpp::checkUserInterrupt();
+#endif
             this->solveH(ncores);
             this->solveV(ncores);
             this->solveU(ncores);
             this->solveW(ncores);
-            if ( ! p.is_aborted() ) p.increment();
+#ifdef USING_R
+            if ( ! p.is_aborted() )
+#endif
+                p.increment();
+#ifdef USING_R
             else break;
+#endif
         }
         this->objective_err = this->computeObjectiveError();
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+        const auto end = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
         if (verbose) {
-            Rcpp::Rcerr << "Total time:      " << duration.count() << " sec" << std::endl;
-            Rcpp::Rcerr << "Objective error: " << this->objective_err << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "Total time:      " << duration.count() << " sec" << std::endl;
+#ifdef USING_R
+            Rcpp::Rcerr
+#else
+            std::cerr
+#endif
+            << "Objective error: " << this->objective_err << std::endl;
         }
     }
 
     arma::mat getUi(int uidx) {
-        return *(this->Ui[uidx].get());
+        return *(this->Ui[uidx]);
     }
 
     std::vector<std::unique_ptr<arma::mat>> getAllU() {
-        return this->Ui;
+        return std::move(this->Ui);
     }
 
-    ~UINMF() {
+    ~UINMF() override
+    {
         if (!this->uinmf_cleared) {
             for (unsigned int i = 0; i < this->Ui.size(); ++i) {
                 this->Ui[i].reset();
@@ -340,112 +411,112 @@ public:
      }
 }; // class UINMF
 
-template<>
-double UINMF<H5Mat>::computeObjectiveError() {
-    double obj = 0;
-    arma::mat* Wptr = this->W.get();
-    arma::mat L(this->m, this->k);
-    for (arma::uword i = 0; i < this->nDatasets; ++i) {
-        H5Mat* Eptr = this->Ei[i].get();
-        arma::mat* Hptr = this->Hi[i].get();
-        arma::mat* Vptr = this->Vi[i].get();
-        double sqnormE = Eptr->normF();
-        sqnormE *= sqnormE;
-        L = *Wptr + *Vptr;
-        arma::mat LtL = L.t() * L;
-        arma::mat HtH = Hptr->t() * *Hptr;
-        arma::mat VtV = Vptr->t() * *Vptr;
-        arma::mat EtL(this->ncol_E[i], this->k);
-        arma::uword numChunks = Eptr->n_cols / Eptr->colChunkSize;
-        if (numChunks * Eptr->colChunkSize < Eptr->n_cols) numChunks++;
-        for (arma::uword j = 0; j < numChunks; ++j) {
-            arma::uword spanStart = j * Eptr->colChunkSize;
-            arma::uword spanEnd = (j + 1) * Eptr->colChunkSize - 1;
-            if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
-            EtL.rows(spanStart, spanEnd) = Eptr->cols(spanStart, spanEnd).t() * L;
-        }
-        double TrLtLHtH = arma::trace(LtL * HtH);
-        double TrHtEtL = arma::trace(Hptr->t() * EtL);
-        double TrVtVHtH = arma::trace(VtV * HtH);
-        obj += sqnormE + TrLtLHtH - 2 * TrHtEtL  + this->lambda_i[i] * TrVtVHtH;
-
-        int uidx = this->whichUnshared[i];
-        if (uidx == -1) continue; // skip if no U
-        H5Mat* Pptr = this->Pi[uidx].get();
-        arma::mat* Uptr = this->Ui[uidx].get();
-        double sqnormP = Pptr->normF();
-        sqnormP *= sqnormP;
-        arma::mat UtU = Uptr->t() * *Uptr;
-        arma::mat PtU(this->ncol_E[i], this->k);
-        numChunks = Pptr->n_cols / Pptr->colChunkSize;
-        if (numChunks * Pptr->colChunkSize < Pptr->n_cols) numChunks++;
-        for (arma::uword j = 0; j < numChunks; ++j) {
-            arma::uword spanStart = j * Pptr->colChunkSize;
-            arma::uword spanEnd = (j + 1) * Pptr->colChunkSize - 1;
-            if (spanEnd > Pptr->n_cols - 1) spanEnd = Pptr->n_cols - 1;
-            PtU.rows(spanStart, spanEnd) = Pptr->cols(spanStart, spanEnd).t() * *Uptr;
-        }
-        double TrUtUHtH = arma::trace(UtU * HtH);
-        double TrHtUstU = arma::trace(Hptr->t() * PtU);
-        obj += sqnormP + (1+this->lambda_i[i]) * TrUtUHtH - 2 * TrHtUstU;
-    }
-    return obj;
-}
-
-template<>
-double UINMF<H5SpMat>::computeObjectiveError() {
-    double obj = 0;
-    arma::mat* Wptr = this->W.get();
-    arma::mat L(this->m, this->k);
-    for (arma::uword i = 0; i < this->nDatasets; ++i) {
-        H5SpMat* Eptr = this->Ei[i].get();
-
-        arma::mat* Hptr = this->Hi[i].get();
-        arma::mat* Vptr = this->Vi[i].get();
-
-        double sqnormE = Eptr->normF();
-        sqnormE *= sqnormE;
-
-        L = *Wptr + *Vptr;
-        arma::mat LtL = L.t() * L;
-        arma::mat HtH = Hptr->t() * *Hptr;
-        arma::mat VtV = Vptr->t() * *Vptr;
-
-        arma::mat EtL(this->ncol_E[i], this->k);
-        arma::uword numChunks = Eptr->n_cols / this->INMF_CHUNK_SIZE;
-        if (numChunks * this->INMF_CHUNK_SIZE < Eptr->n_cols) numChunks++;
-        for (arma::uword j = 0; j < numChunks; ++j) {
-            arma::uword spanStart = j * this->INMF_CHUNK_SIZE;
-            arma::uword spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
-            if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
-            EtL.rows(spanStart, spanEnd) = Eptr->cols(spanStart, spanEnd).t() * L;
-        }
-        double TrLtLHtH = arma::trace(LtL * HtH);
-        double TrHtEtL = arma::trace(Hptr->t() * EtL);
-        double TrVtVHtH = arma::trace(VtV * HtH);
-        obj += sqnormE + TrLtLHtH - 2 * TrHtEtL + this->lambda_i[i] * TrVtVHtH;
-
-        int uidx = this->whichUnshared[i];
-        if (uidx == -1) continue; // skip if no U
-        H5SpMat* Pptr = this->Pi[uidx].get();
-        arma::mat* Uptr = this->Ui[uidx].get();
-        double sqnormP = Pptr->normF();
-        sqnormP *= sqnormP;
-        arma::mat UtU = Uptr->t() * *Uptr;
-        arma::mat PtU(this->ncol_E[i], this->k);
-        // arma::uword numChunks = Pptr->n_cols / this->INMF_CHUNK_SIZE;
-        if (numChunks * this->INMF_CHUNK_SIZE < Eptr->n_cols) numChunks++;
-        for (arma::uword j = 0; j < numChunks; ++j) {
-            arma::uword spanStart = j * this->INMF_CHUNK_SIZE;
-            arma::uword spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
-            if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
-            PtU.rows(spanStart, spanEnd) = Pptr->cols(spanStart, spanEnd).t() * *Uptr;
-        }
-        double TrUtUHtH = arma::trace(UtU * HtH);
-        double TrHtPtU = arma::trace(Hptr->t() * PtU);
-        obj += sqnormP + (1+this->lambda_i[i]) * TrUtUHtH - 2 * TrHtPtU;
-    }
-    return obj;
-}
+// template<>
+// inline double UINMF<H5Mat>::computeObjectiveError() {
+//     double obj = 0;
+//     arma::mat* Wptr = this->W.get();
+//     arma::mat L(this->m, this->k);
+//     for (arma::uword i = 0; i < this->nDatasets; ++i) {
+//         H5Mat* Eptr = this->Ei[i].get();
+//         arma::mat* Hptr = this->Hi[i].get();
+//         arma::mat* Vptr = this->Vi[i].get();
+//         double sqnormE = Eptr->normF();
+//         sqnormE *= sqnormE;
+//         L = *Wptr + *Vptr;
+//         arma::mat LtL = L.t() * L;
+//         arma::mat HtH = Hptr->t() * *Hptr;
+//         arma::mat VtV = Vptr->t() * *Vptr;
+//         arma::mat EtL(this->ncol_E[i], this->k);
+//         arma::uword numChunks = Eptr->n_cols / Eptr->colChunkSize;
+//         if (numChunks * Eptr->colChunkSize < Eptr->n_cols) numChunks++;
+//         for (arma::uword j = 0; j < numChunks; ++j) {
+//             arma::uword spanStart = j * Eptr->colChunkSize;
+//             arma::uword spanEnd = (j + 1) * Eptr->colChunkSize - 1;
+//             if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
+//             EtL.rows(spanStart, spanEnd) = Eptr->cols(spanStart, spanEnd).t() * L;
+//         }
+//         double TrLtLHtH = arma::trace(LtL * HtH);
+//         double TrHtEtL = arma::trace(Hptr->t() * EtL);
+//         double TrVtVHtH = arma::trace(VtV * HtH);
+//         obj += sqnormE + TrLtLHtH - 2 * TrHtEtL  + this->lambda_i[i] * TrVtVHtH;
+//
+//         int uidx = this->whichUnshared[i];
+//         if (uidx == -1) continue; // skip if no U
+//         H5Mat* Pptr = this->Pi[uidx].get();
+//         arma::mat* Uptr = this->Ui[uidx].get();
+//         double sqnormP = Pptr->normF();
+//         sqnormP *= sqnormP;
+//         arma::mat UtU = Uptr->t() * *Uptr;
+//         arma::mat PtU(this->ncol_E[i], this->k);
+//         numChunks = Pptr->n_cols / Pptr->colChunkSize;
+//         if (numChunks * Pptr->colChunkSize < Pptr->n_cols) numChunks++;
+//         for (arma::uword j = 0; j < numChunks; ++j) {
+//             arma::uword spanStart = j * Pptr->colChunkSize;
+//             arma::uword spanEnd = (j + 1) * Pptr->colChunkSize - 1;
+//             if (spanEnd > Pptr->n_cols - 1) spanEnd = Pptr->n_cols - 1;
+//             PtU.rows(spanStart, spanEnd) = Pptr->cols(spanStart, spanEnd).t() * *Uptr;
+//         }
+//         double TrUtUHtH = arma::trace(UtU * HtH);
+//         double TrHtUstU = arma::trace(Hptr->t() * PtU);
+//         obj += sqnormP + (1+this->lambda_i[i]) * TrUtUHtH - 2 * TrHtUstU;
+//     }
+//     return obj;
+// }
+//
+// template<>
+// inline double UINMF<H5SpMat>::computeObjectiveError() {
+//     double obj = 0;
+//     arma::mat* Wptr = this->W.get();
+//     arma::mat L(this->m, this->k);
+//     for (arma::uword i = 0; i < this->nDatasets; ++i) {
+//         H5SpMat* Eptr = this->Ei[i].get();
+//
+//         arma::mat* Hptr = this->Hi[i].get();
+//         arma::mat* Vptr = this->Vi[i].get();
+//
+//         double sqnormE = Eptr->normF();
+//         sqnormE *= sqnormE;
+//
+//         L = *Wptr + *Vptr;
+//         arma::mat LtL = L.t() * L;
+//         arma::mat HtH = Hptr->t() * *Hptr;
+//         arma::mat VtV = Vptr->t() * *Vptr;
+//
+//         arma::mat EtL(this->ncol_E[i], this->k);
+//         arma::uword numChunks = Eptr->n_cols / this->INMF_CHUNK_SIZE;
+//         if (numChunks * this->INMF_CHUNK_SIZE < Eptr->n_cols) numChunks++;
+//         for (arma::uword j = 0; j < numChunks; ++j) {
+//             arma::uword spanStart = j * this->INMF_CHUNK_SIZE;
+//             arma::uword spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
+//             if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
+//             EtL.rows(spanStart, spanEnd) = Eptr->cols(spanStart, spanEnd).t() * L;
+//         }
+//         double TrLtLHtH = arma::trace(LtL * HtH);
+//         double TrHtEtL = arma::trace(Hptr->t() * EtL);
+//         double TrVtVHtH = arma::trace(VtV * HtH);
+//         obj += sqnormE + TrLtLHtH - 2 * TrHtEtL + this->lambda_i[i] * TrVtVHtH;
+//
+//         int uidx = this->whichUnshared[i];
+//         if (uidx == -1) continue; // skip if no U
+//         H5SpMat* Pptr = this->Pi[uidx].get();
+//         arma::mat* Uptr = this->Ui[uidx].get();
+//         double sqnormP = Pptr->normF();
+//         sqnormP *= sqnormP;
+//         arma::mat UtU = Uptr->t() * *Uptr;
+//         arma::mat PtU(this->ncol_E[i], this->k);
+//         // arma::uword numChunks = Pptr->n_cols / this->INMF_CHUNK_SIZE;
+//         if (numChunks * this->INMF_CHUNK_SIZE < Eptr->n_cols) numChunks++;
+//         for (arma::uword j = 0; j < numChunks; ++j) {
+//             arma::uword spanStart = j * this->INMF_CHUNK_SIZE;
+//             arma::uword spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
+//             if (spanEnd > Eptr->n_cols - 1) spanEnd = Eptr->n_cols - 1;
+//             PtU.rows(spanStart, spanEnd) = Pptr->cols(spanStart, spanEnd).t() * *Uptr;
+//         }
+//         double TrUtUHtH = arma::trace(UtU * HtH);
+//         double TrHtPtU = arma::trace(Hptr->t() * PtU);
+//         obj += sqnormP + (1+this->lambda_i[i]) * TrUtUHtH - 2 * TrHtPtU;
+//     }
+//     return obj;
+//}
 
 } // namespace planc

@@ -166,7 +166,13 @@ public:
             solveV(ncores);
             solveW(ncores);
             iter++;
-            p.increment();
+#ifdef USING_R
+            if ( ! p.is_aborted() )
+#endif
+                p.increment();
+#ifdef USING_R
+            else break;
+#endif
         }
         this->objective_err = this->computeObjectiveError();
         auto end = std::chrono::high_resolution_clock::now();
