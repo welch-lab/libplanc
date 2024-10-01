@@ -49,7 +49,7 @@ namespace planc {
         return outlist;
     }
     template <typename T, typename eT>
-    inmfOutput<eT> nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
+    inmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
                    const arma::uword &niter, const bool &verbose, const int& ncores)
     {
         std::vector<std::unique_ptr<T>> matPtrVec;
@@ -71,7 +71,7 @@ namespace planc {
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};
     }
     template <typename T, typename eT>
-    inmfOutput<eT> nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
+    inmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
                        const arma::uword &niter, const bool &verbose,
                        const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit,
                        const int& ncores)
@@ -95,7 +95,7 @@ namespace planc {
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};;
     }
     template <typename T, typename eT>
-    uinmfOutput<eT> nmflib<T, eT>::uinmf(std::vector<T> objectList,
+    uinmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::uinmf(std::vector<T> objectList,
                      std::vector<T> unsharedList,
                      std::vector<int> whichUnshared,
                      arma::uword k, const int& nCores, arma::vec lambda,
