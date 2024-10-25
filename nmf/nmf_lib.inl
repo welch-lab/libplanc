@@ -96,11 +96,11 @@ namespace planc {
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};;
     }
     template <typename T, typename eT>
-    uinmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::uinmf(std::vector<T> objectList,
-                     std::vector<T> unsharedList,
+    uinmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::uinmf(const std::vector<T> &objectList,
+                     const std::vector<T> &unsharedList,
                      std::vector<int> whichUnshared,
-                     arma::uword k, const int& nCores, arma::vec lambda,
-                     arma::uword niter, bool verbose)
+                     const arma::uword &k, const int& nCores, const arma::vec &lambda,
+                     const arma::uword &niter, const bool &verbose)
     {
         std::vector<std::unique_ptr<T>> matPtrVec;
         std::vector<std::unique_ptr<T>> unsharedPtrVec;
