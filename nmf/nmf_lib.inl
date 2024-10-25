@@ -132,7 +132,7 @@ namespace planc {
     template <typename T, typename eT>
     oinmfOutput<eT> nmflib<T,eT>::onlineINMF_S1_mem(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
     const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize,
-    const arma::uword &maxHALSIter, const bool &verbose = true) {
+    const arma::uword &maxHALSIter, const bool &verbose) {
         std::vector<std::unique_ptr<T>> matPtrVec = initMemMatPtr<T>(objectList);
         ONLINEINMF<T> solver(matPtrVec, k, lambda);
         solver.runOnlineINMF(minibatchSize, maxEpoch, maxHALSIter, verbose, nCores);
