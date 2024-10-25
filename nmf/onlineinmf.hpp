@@ -11,14 +11,19 @@
 #define CHUNK_SIZE 1000
 
 namespace planc {
-
+struct mem_type {
+    arma::mat operator()(arma::mat);
+    arma::mat operator()(H5Mat);
+    arma::sp_mat operator()(arma::sp_mat);
+    arma::sp_mat operator()(H5SpMat);
+};
 // T1: Input data type, one of arma::mat, arma::sp_mat, H5Mat or H5SpMat
 // T2: in-memory minibatch data type, matching T1,
 // has to be arma::mat, arma::sp_mat, arma::mat or arma::sp_mat, respectively
-template <typename T1, typename T2>
+template <typename T1>
 class ONLINEINMF : public INMF<T1> {
 private:
-
+    using T2 = std::invoke_result_t<mem_type, T1>;
     arma::mat giventGiven;
     std::vector<std::unique_ptr<arma::mat>> miniHi;    // each of size minibatchSizes[i] x k
     std::vector<std::unique_ptr<arma::mat>> Ai, Ai_old;    // each of size k x k
@@ -470,7 +475,6 @@ private:
         // Start the main loop
         auto start = std::chrono::high_resolution_clock::now();
         while (this->next()) {
-            if (this->iter % 5 == 0) Rcpp::checkUserInterrupt();
             // The `next()` function does:
             // 1. update the minibatch idx to be used for current iteration
             // 2. decide whether to stop the while loop
@@ -487,25 +491,28 @@ private:
             // Reset epoch change indicator
             this->epochNext = false;
 
-            if (!p.is_aborted()) p.increment();
-            else break;
+            p.increment();
         }
         this->solveH(ncores);
         this->objective_err = this->computeObjectiveError();
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+#ifdef USING_R
         if (verbose) {
             Rcpp::Rcerr << "Total iterations:  " << totalIters << std::endl;
             Rcpp::Rcerr << "Total time:        " << duration.count() << " sec" << std::endl;
             Rcpp::Rcerr << "Objective error:   " << this->objective_err << std::endl;
         }
+#endif
     }
 
     void projectNewData(const int& ncores) {
         // Main loop of online updating algorithm (S3)
         tic();
 #ifdef _VERBOSE
+#ifdef USING_R
         Rcpp::Rcout << "--Solving H with only W--  ";
+#endif
 #endif
         this->initNewH();
         arma::mat* Wptr = this->W.get();
@@ -538,7 +545,9 @@ private:
         }
         giventGiven.clear();
 #ifdef _VERBOSE
+#ifdef USING_R
         Rcpp::Rcout << toc() << " sec" << std::endl;
+#endif
 #endif
     }
 
@@ -557,8 +566,10 @@ public:
     // %%%%%%%%%%%%%%% Public initializers %%%%%%%%%%%%%%%%%%%%%%%
     void initA(std::vector<arma::mat>& Ainit) {
         // Set A matrices for existing datasets (S2)
+#ifdef USING_R
 #ifdef _VERBOSE
         Rcpp::Rcout << "Taking initialized A matrices" << std::endl;
+#endif
 #endif
         std::unique_ptr<arma::mat> A;
         std::unique_ptr<arma::mat> Aold;
@@ -609,8 +620,10 @@ public:
 
     void initB(std::vector<arma::mat>& Binit) {
         // Set B matrices for existing datasets (S2)
+#ifdef USING_R
 #ifdef _VERBOSE
     Rcpp::Rcout << "Taking initialized B matrices" << std::endl;
+#endif
 #endif
         try {
             if (Binit.size() != this->nDatasets) {
@@ -662,9 +675,11 @@ public:
     // Scenario 1: Online iNMF on all data as new factorization
     void runOnlineINMF(arma::uword minibatchSize = 5000, arma::uword inputmaxEpochs = 5,
                        arma::uword maxHALSIter = 1, bool verbose = true, const int& ncores = 0) {
+#ifdef USING_R
         if (verbose) {
             Rcpp::Rcerr << "Starting online iNMF scenario 1, factorize all datasets" << std::endl;
         }
+#endif
         this->dataIdxNew = this->dataIdx;
         this->nCellsNew = this->ncol_E;
         this->initW2();
@@ -698,17 +713,21 @@ public:
         //                                                             this->nDatasets - 1,
         //                                                             this->nDatasets)));
         if (!project) {
+#ifdef USING_R
             if (verbose) {
                 Rcpp::Rcerr << "Starting online iNMF scenario 2, " <<
                 "update factorization with new datasets" << std::endl;
             }
+#endif
             this->solveHALS(minibatchSize, inputmaxEpochs, maxHALSIter, verbose, ncores);
             this->objective_err = this->computeObjectiveError();
         } else {
+#ifdef USING_R
             if (verbose) {
                 Rcpp::Rcerr << "Starting online iNMF scenario 3, " <<
                 "project new datasets without updating existing factorization" << std::endl;
             }
+#endif
             this->projectNewData(ncores);
             // No factorization update, so no objective error
         }
@@ -721,7 +740,7 @@ public:
     }
 
     std::vector<std::unique_ptr<arma::mat>> getAllA() {
-        return this->Ai;
+        return std::move(this->Ai);
     }
 
     arma::mat getBi(arma::uword i) {
@@ -729,14 +748,14 @@ public:
     }
 
     std::vector<std::unique_ptr<arma::mat>> getAllB() {
-        return this->Bi;
+        return std::move(this->Bi);
     }
     // For getting H, W and V, use .getHi(), .getW(), .getVi() inherited from INMF class
 
 }; // class ONLINEINMF
 
 template<>
-void ONLINEINMF<H5Mat, arma::mat>::permuteChunkIdx(int i) {
+void ONLINEINMF<H5Mat>::permuteChunkIdx(int i) {
     // If T is H5Mat, need to get chunkSize to its `colChunkSize` attribute
     unsigned int colChunkSize = this->Ei[i]->colChunkSize;
     arma::uword dataSize = this->ncol_E[i];

@@ -4,6 +4,7 @@
 #include "EmbeddedNMFDriver.hpp"
 #include "bppinmf.hpp"
 #include "uinmf.hpp"
+#include "onlineinmf.hpp"
 
 namespace planc {
     template<typename T, typename eT>
@@ -119,7 +120,7 @@ namespace planc {
         for (unsigned int i = 0; i < allV.size(); ++i) {
             arma::mat* ptr = allV[i].release();
             resolvedV.push_back(*ptr);
-        }
+         }
         std::vector<std::unique_ptr<arma::mat>> allU = solver.getAllU();
         std::vector<arma::mat> resolvedU{};
         for (unsigned int i = 0; i < allU.size(); ++i) {
@@ -127,5 +128,42 @@ namespace planc {
             resolvedU.push_back(*ptr);
         }
         return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedU};
+    }
+    template <typename T, typename eT>
+    oinmfOutput<eT> nmflib<T,eT>::onlineINMF_S1_mem(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
+    const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize,
+    const arma::uword &maxHALSIter, const bool &verbose = true) {
+        std::vector<std::unique_ptr<T>> matPtrVec = initMemMatPtr<T>(objectList);
+        ONLINEINMF<T> solver(matPtrVec, k, lambda);
+        solver.runOnlineINMF(minibatchSize, maxEpoch, maxHALSIter, verbose, nCores);
+        std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
+        std::vector<arma::mat> resolvedH{};
+        for (unsigned int i = 0; i < allH.size(); ++i) {
+            arma::mat* ptr = allH[i].release();
+            resolvedH.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
+        std::vector<arma::mat> resolvedV{};
+        for (unsigned int i = 0; i < allV.size(); ++i) {
+            arma::mat* ptr = allV[i].release();
+            resolvedV.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allA = solver.getAllA();
+        std::vector<arma::mat> resolvedA{};
+        for (unsigned int i = 0; i < allA.size(); ++i) {
+            arma::mat* ptr = allA[i].release();
+            resolvedA.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allB = solver.getAllB();
+        std::vector<arma::mat> resolvedB{};
+        for (unsigned int i = 0; i < allB.size(); ++i) {
+            arma::mat* ptr = allB[i].release();
+            resolvedB.push_back(*ptr);
+        }
+        //std::vector<T> HList = solver.getAllH();
+        //std::vector<T> VList = solver.getAllV();
+        //std::vector<T> AList = solver.getAList();
+        //std::vector<T> BList = solver.getBList();
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedA, resolvedB};
     }
 }
