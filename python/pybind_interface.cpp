@@ -42,6 +42,10 @@ NB_MODULE(pyplanc, m) {
     using namespace nb::literals;
     nb::class_<planc::nmfOutput<double>>(m, "nmfOutput").def_rw("W", &planc::nmfOutput<double>::outW).def_rw("H", &planc::nmfOutput<double>::outH).def_rw("objErr", &planc::nmfOutput<double>::objErr,  nb::rv_policy::move);
     nb::class_<planc::inmfOutput<double>>(m, "inmfOutput").def_rw("W", &planc::inmfOutput<double>::outW).def_rw("HList", &planc::inmfOutput<double>::outHList).def_rw("VList", &planc::inmfOutput<double>::outVList).def_rw("objErr", &planc::inmfOutput<double>::objErr,  nb::rv_policy::move);
+    nb::class_<planc::uinmfOutput<double>>(m, "uinmfOutput").def_rw("W", &planc::uinmfOutput<double>::outW).def_rw("HList", &planc::uinmfOutput<double>::outHList).def_rw("VList", &planc::uinmfOutput<double>::outVList).def_rw("objErr", &planc::uinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("UList", &planc::uinmfOutput<double>::outUList);
+    nb::class_<planc::oinmfOutput<double>>(m, "oinmfOutput").def_rw("W", &planc::oinmfOutput<double>::outW).def_rw("HList", &planc::oinmfOutput<double>::outHList).def_rw("VList", &planc::oinmfOutput<double>::outVList).def_rw("objErr", &planc::oinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("AList", &planc::oinmfOutput<double>::outAList).def_rw("BList", &planc::oinmfOutput<double>::outBList);
+
+
 #define X(T) \
     m.def("nmf", &planc::nmflib<T>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2, nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat()); \
     m.def("symNMF", &planc::nmflib<T>::symNMF, "A function that calls symNMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "lambda"_a=0.0, "algo"_a="gnsym", "ncores"_a=2,  nb::kw_only(), "Hinit"_a = arma::mat());
