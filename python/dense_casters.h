@@ -46,7 +46,7 @@ NAMESPACE_BEGIN(detail)
 */
 
 /// Arma vec
-template <typename T, typename eT = typename T::elem_type> constexpr bool is_arma_v = T::is_row || T::is_col;
+template <typename T, typename eT = typename T::elem_type> constexpr bool is_arma_v = T::is_row || T::is_col || T::is_xvec;
 
 /// Detects Dense
 template <typename T, typename eT = typename T::elem_type> constexpr bool is_arma_dense_v = std::is_base_of_v<arma::Mat<eT>, T>;
@@ -84,9 +84,9 @@ struct type_caster<T, enable_if_t<is_arma_dense_v<T> &&
 
         const NDArrayConst &array = caster.value;
         if constexpr (ndim_v<T> == 1)
-            value.reshape(array.shape(0));
+            value.set_size(array.shape(0));
         else
-            value.reshape(array.shape(0), array.shape(1));
+            value.set_size(array.shape(0), array.shape(1));
 
         // The layout is contiguous & compatible thanks to array_for_arma_t<T>
         memcpy(value.memptr(), array.data(), array.size() * sizeof(eT));
