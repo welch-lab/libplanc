@@ -11,7 +11,7 @@ template planc::nmfOutput<double> planc::nmflib<T, double>::symNMF(const T&x, co
 template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(const std::vector<T> &objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const int &nCores); \
 template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(const std::vector<T> &objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit, const int &nCores); \
 template planc::uinmfOutput<double> planc::nmflib<T, double>::uinmf(const std::vector<T> &objectList, const std::vector<T> &unsharedList, std::vector<int> whichUnshared, const arma::uword &k, const int& nCores, const arma::vec &lambda, const arma::uword &niter, const bool &verbose); \
-template planc::oinmfOutput<double> planc::nmflib<T, double>::onlineINMF_S1_mem(const std::vector<T> &objectList, const arma::uword &k, const int &nCores, const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
+template planc::oinmfOutput<double> planc::nmflib<T, double>::oinmf_s1(const std::vector<T> &objectList, const arma::uword &k, const int &nCores, const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
 #include "inmf_types.inc"
 #undef X
 void planc::openblas_pthread_off(openblas_handle_t libloc) {

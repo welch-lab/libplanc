@@ -84,7 +84,7 @@ namespace planc {
                      std::vector<int> whichUnshared,
                      const arma::uword &k, const int &nCores, const arma::vec &lambda,
                      const arma::uword &niter, const bool &verbose);
-        static struct oinmfOutput<eT> onlineINMF_S1_mem(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
+        static struct oinmfOutput<eT> oinmf_s1(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
                      const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);

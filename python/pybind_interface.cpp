@@ -53,7 +53,9 @@ NB_MODULE(pyplanc, m) {
 #undef X
 #define X(T) \
     m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2); \
-    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "HinitList"_a, "VinitList"_a, "&Winit"_a,"ncores"_a=2);
+    m.def("bppinmf", nb::overload_cast<const std::vector<T>&, const arma::uword&, const double&, const arma::uword&, const bool&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "HinitList"_a, "VinitList"_a, "&Winit"_a,"ncores"_a=2); \
+    m.def("uinmf", &planc::nmflib<T>::uinmf, "A function that calls uinmf with the given arguments", "objectList"_a, "unsharedList"_a, "whichUnshared"_a, "k"_a=20, "nCores"_a=2, "lambda"_a=5, "niter"_a=30, "verbose"_a=false); \
+    m.def("oinmf_s1", &planc::nmflib<T>::oinmf_s1, "A function that calls oinmf_s1 with the given arguments", "objectList"_a, "k"_a, "ncores"_a=2, "lambda"_a=5, "maxEpoch"_a=5, "minibatchSize"_a=5000, "maxHALSIter"_a=1, "verbose"_a=false);
     #include "inmf_types.inc"
 #undef X
 }
