@@ -84,8 +84,16 @@ namespace planc {
                      std::vector<int> whichUnshared,
                      const arma::uword &k, const int &nCores, const arma::vec &lambda,
                      const arma::uword &niter, const bool &verbose);
-        static struct oinmfOutput<eT> oinmf_s1(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
+        static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
                      const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
+        static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList,
+                                            const std::vector<arma::mat> &Vinit, const arma::mat &Winit,
+                                            const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit,
+                                            const std::vector<T> &objectListNew,
+                                            const arma::uword &k, const int& nCores, const double &lambda, const arma::uword &maxEpoch,
+                                            const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
+        static std::vector<arma::Mat<eT>> oinmf_project(const std::vector<T> &objectList, const arma::mat &Winit,
+    const std::vector<T> &objectListNew, const arma::uword &k, const int& nCores, const double &lambda);
         static int runNMF(params opts) {
             NMFDriver<T> myNMF(opts);
             myNMF.callNMF();

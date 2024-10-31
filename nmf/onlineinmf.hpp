@@ -506,8 +506,31 @@ private:
 #endif
     }
 
-    void projectNewData(const int& ncores) {
+    void projectNewData(std::vector<std::unique_ptr<T1>>& E_new, const int& ncores) {
         // Main loop of online updating algorithm (S3)
+        // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
+        this->dataIdxPrev = this->dataIdx;
+        this->dataIdxNew = arma::linspace<arma::uvec>(this->nDatasets,
+                                                      this->nDatasets + E_new.size() - 1,
+                                                      E_new.size());
+        this->nCellsNew = arma::zeros<arma::uvec>(E_new.size());
+        for (arma::uword i = 0; i < E_new.size(); i++) {
+            T1* EnewPtr = E_new[i].get();
+            this->nCellsNew[i] = EnewPtr->n_cols;
+            this->ncol_E.push_back(EnewPtr->n_cols);
+            this->samplingIdx.push_back(arma::zeros<arma::uvec>(EnewPtr->n_cols));
+            this->Ei.push_back(std::move(E_new[i]));
+            this->nDatasets++;
+        }
+        this->epoch = arma::zeros<arma::uvec>(this->nDatasets);
+        this->epochPrev = arma::zeros<arma::uvec>(this->nDatasets);
+        this->dataIdx = arma::join_cols(this->dataIdxPrev, this->dataIdxNew);
+#ifdef USING_R
+        if (verbose) {
+            Rcpp::Rcerr << "Starting online iNMF scenario 3, " <<
+            "project new datasets without updating existing factorization" << std::endl;
+        }
+#endif
         tic();
 #ifdef _VERBOSE
 #ifdef USING_R
@@ -688,7 +711,7 @@ public:
 
     // Scenario 2, project == false (default): Online iNMF on new data, factorized upon existing factorization
     // Scenario 3, project == true:  Project new datasets without updating existing factorization
-    void runOnlineINMF(std::vector<std::unique_ptr<T1>>& E_new, bool project = false,
+    void runOnlineINMF(std::vector<std::unique_ptr<T1>>& E_new,
                        arma::uword minibatchSize = 5000, arma::uword inputmaxEpochs = 5,
                        arma::uword maxHALSIter = 1, bool verbose = true, const int& ncores = 0) {
         // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
@@ -712,7 +735,6 @@ public:
         // assert(arma::all(this->dataIdx == arma::linspace<arma::uvec>(0,
         //                                                             this->nDatasets - 1,
         //                                                             this->nDatasets)));
-        if (!project) {
 #ifdef USING_R
             if (verbose) {
                 Rcpp::Rcerr << "Starting online iNMF scenario 2, " <<
@@ -721,16 +743,7 @@ public:
 #endif
             this->solveHALS(minibatchSize, inputmaxEpochs, maxHALSIter, verbose, ncores);
             this->objective_err = this->computeObjectiveError();
-        } else {
-#ifdef USING_R
-            if (verbose) {
-                Rcpp::Rcerr << "Starting online iNMF scenario 3, " <<
-                "project new datasets without updating existing factorization" << std::endl;
-            }
-#endif
-            this->projectNewData(ncores);
             // No factorization update, so no objective error
-        }
 
     }
 
