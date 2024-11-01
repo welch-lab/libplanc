@@ -151,7 +151,6 @@ environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIM
 before-all = ["pipx install uv"]
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
-archs = ["AMD64", "ARM64"]
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
