@@ -505,7 +505,7 @@ private:
         }
 #endif
     }
-
+public:
     void projectNewData(std::vector<std::unique_ptr<T1>>& E_new, const int& ncores) {
         // Main loop of online updating algorithm (S3)
         // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
@@ -573,8 +573,6 @@ private:
 #endif
 #endif
     }
-
-public:
     ONLINEINMF(std::vector<std::unique_ptr<T1>>& Ei, arma::uword k, double lambda) : INMF<T1>(Ei, k, lambda, false) {
         this->dataIdx = arma::linspace<arma::uvec>(0, this->nDatasets - 1, this->nDatasets);
         this->minibatchSizes = arma::zeros<arma::uvec>(this->nDatasets);
@@ -587,7 +585,7 @@ public:
     }
 
     // %%%%%%%%%%%%%%% Public initializers %%%%%%%%%%%%%%%%%%%%%%%
-    void initA(std::vector<arma::mat>& Ainit) {
+    void initA(const std::vector<arma::mat>& Ainit) {
         // Set A matrices for existing datasets (S2)
 #ifdef USING_R
 #ifdef _VERBOSE
@@ -641,7 +639,7 @@ public:
         }
     }
 
-    void initB(std::vector<arma::mat>& Binit) {
+    void initB(const std::vector<arma::mat>& Binit) {
         // Set B matrices for existing datasets (S2)
 #ifdef USING_R
 #ifdef _VERBOSE

@@ -204,7 +204,7 @@ namespace planc {
                 this->Hi.push_back(std::move(H));
             }
         }
-        void initV(std::vector<arma::mat>& Vinit, bool transpose = true) {
+        void initV(const std::vector<arma::mat>& Vinit, bool transpose = true) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized V matrices" << std::endl;
 #endif

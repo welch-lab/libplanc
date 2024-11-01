@@ -168,7 +168,7 @@ namespace planc {
     }
 
 template <typename T, typename eT>
-oinmfOutput<eT> NMFLIB_EXPORT oinmf(const std::vector<T> &objectList,
+oinmfOutput<eT> NMFLIB_EXPORT nmflib<T,eT>::oinmf(const std::vector<T> &objectList,
     const std::vector<arma::mat> &Vinit, const arma::mat &Winit,
     const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit,
     const std::vector<T> &objectListNew,
@@ -212,7 +212,7 @@ oinmfOutput<eT> NMFLIB_EXPORT oinmf(const std::vector<T> &objectList,
         return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedA, resolvedB};
     }
 template <typename T, typename eT>
-std::vector<arma::Mat<eT>> NMFLIB_EXPORT oinmf_project(const std::vector<T> &objectList, const arma::mat &Winit,
+std::vector<arma::Mat<eT>> NMFLIB_EXPORT nmflib<T,eT>::oinmf_project(const std::vector<T> &objectList, const arma::mat &Winit,
     const std::vector<T> &objectListNew,
     const arma::uword &k, const int& nCores, const double &lambda) {
     std::vector<std::unique_ptr<T>> matPtrVec = initMemMatPtr<T>(objectList);
