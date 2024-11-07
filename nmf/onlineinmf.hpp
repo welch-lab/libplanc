@@ -525,12 +525,6 @@ public:
         this->epoch = arma::zeros<arma::uvec>(this->nDatasets);
         this->epochPrev = arma::zeros<arma::uvec>(this->nDatasets);
         this->dataIdx = arma::join_cols(this->dataIdxPrev, this->dataIdxNew);
-#ifdef USING_R
-        if (verbose) {
-            Rcpp::Rcerr << "Starting online iNMF scenario 3, " <<
-            "project new datasets without updating existing factorization" << std::endl;
-        }
-#endif
         tic();
 #ifdef _VERBOSE
 #ifdef USING_R
