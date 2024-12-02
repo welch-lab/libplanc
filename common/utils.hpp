@@ -152,15 +152,6 @@ void generate_rand_matrix(arma::sp_mat &A, const std::string& rtype,
 
 int debug_hook();
 
-template<typename T>
-arma::uword chunk_size_dense(arma::uword rank) {
-#ifdef _OPENMP
-    return (get_l1_data_cache() / (rank * sizeof(T)));
-#else
-    return (get_l2_data_cache() / (rank * sizeof(T)));
-#endif
-}
-
 
 template <class INPUTTYPE, class LRTYPE>
 double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,

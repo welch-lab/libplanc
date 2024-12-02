@@ -82,7 +82,30 @@ execute_process(COMMAND ${RSCRIPT_EXECUTABLE} --vanilla "-e" "file.path(R.home('
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 string(REGEX MATCHALL "\".*\"" R_MAKECONF "${R_MAKECONF}")
 string(REGEX REPLACE "\"" "" R_MAKECONF "${R_MAKECONF}")
-
+# find libR by way of makeconf
+execute_process(COMMAND sed -e "s/^LIBR = //" -e "t" -e "d" "${R_MAKECONF}"
+                OUTPUT_VARIABLE LIBR_STRING
+                ERROR_VARIABLE  LIBR_STRING
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+string(REGEX MATCHALL "\\$\\([A-Za-z0-9_]*\\)" MAKECONF_REPLACE ${LIBR_STRING})
+foreach(VAR IN LISTS MAKECONF_REPLACE)
+    string(SUBSTRING ${VAR} 2 -1 VARCLEAN)
+    string(REPLACE ")" "" VARCLEAN ${VARCLEAN})
+    execute_process(COMMAND sed -e "s/^${VARCLEAN} = //" -e "t" -e "d" "${R_MAKECONF}"
+            OUTPUT_VARIABLE TO_LIST
+            ERROR_VARIABLE  TO_LIST
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(fromENV $ENV{${VARCLEAN}})
+    if(TO_LIST)
+        cmake_path(CONVERT ${TO_LIST} TO_CMAKE_PATH_LIST TO_LIST)
+        string(REPLACE "${VAR}" "${TO_LIST}" LIBR_STRING "${LIBR_STRING}")
+    elseif(fromENV)
+        cmake_path(CONVERT $ENV{${VARCLEAN}} TO_CMAKE_PATH_LIST TO_LIST)
+        string(REPLACE "${VAR}" "${TO_LIST}" LIBR_STRING "${LIBR_STRING}")
+    else()
+        string(REPLACE "${VAR}" "" LIBR_STRING "${LIBR_STRING}")
+    endif()
+endforeach()
     # Some cleanup in location of R.
     string(REGEX MATCHALL "\".*\"" _R_INCLUDE_location "${_R_INCLUDE_location}")
     string(REGEX REPLACE "\"" "" _R_INCLUDE_location "${_R_INCLUDE_location}")
@@ -91,7 +114,7 @@ string(REGEX REPLACE "\"" "" R_MAKECONF "${R_MAKECONF}")
     set(R_LDFLAGS ${LIBR_STRING})
 
 mark_as_advanced(RSCRIPT_EXECUTABLE R_EXECUTABLE)
-set(_REQUIRED_R_VARIABLES R_EXECUTABLE RSCRIPT_EXECUTABLE R_INCLUDE_DIR)
+set(_REQUIRED_R_VARIABLES R_EXECUTABLE RSCRIPT_EXECUTABLE R_INCLUDE_DIR R_LDFLAGS)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(

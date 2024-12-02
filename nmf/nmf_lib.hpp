@@ -16,8 +16,11 @@ extern "C" {
 
 namespace planc {
 
-    extern void NMFLIB_NO_EXPORT openblas_pthread_off(openblas_handle_t);
-    extern void NMFLIB_NO_EXPORT openblas_pthread_on(openblas_handle_t);
+    extern void NMFLIB_EXPORT openblas_pthread_off(openblas_handle_t);
+    extern void NMFLIB_EXPORT openblas_pthread_on(openblas_handle_t);
+    extern unsigned int NMFLIB_EXPORT get_l1_data_cache();
+    extern unsigned int NMFLIB_EXPORT get_l2_data_cache();
+    extern unsigned int NMFLIB_EXPORT get_num_bound_threads();
     template<typename eT>
     struct NMFLIB_EXPORT nmfOutput {
         nmfOutput() = default;
@@ -68,7 +71,6 @@ namespace planc {
         }
 
         ~nmflib() = default;
-
         static struct nmfOutput<eT> nmf(const T &x, const arma::uword &k, const arma::uword &niter, const std::string &algo, const int &nCores,
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
         static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,

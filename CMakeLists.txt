@@ -398,7 +398,7 @@ list(TRANSFORM CMAKE_DEFINES PREPEND "-D")
 list(JOIN CMAKE_DEFINES " " CPPFLAGS)
 get_target_property(LIBHWLOC_LINK hw_detect LINK_LIBRARIES)
 list(JOIN LIBHWLOC_LINK " " LIBHWLOC_LINK)
-
+target_link_libraries(nmflib PRIVATE ${BLAS_LIBRARIES} ${LIBHWLOC_LINK} ${R_LDFLAGS} -lgfortran -lquadmath -lm)
 configure_file(../Makevars.in ../Makevars.gen @ONLY)
 file(GENERATE OUTPUT ../Makevars INPUT ../Makevars.gen)
 endif()

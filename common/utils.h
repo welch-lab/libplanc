@@ -2,7 +2,9 @@
 #include "config.h"
 #include <unordered_map>
 #include <string>
-
+extern "C" {
+#include "hw_detect.h"
+}
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
 
@@ -26,6 +28,15 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #include <cmath>
 #include <iostream>
 #include <vector>
+
+template<typename T>
+arma::uword chunk_size_dense(arma::uword rank) {
+#ifdef _OPENMP
+    return (get_l1_data_cache() / (rank * sizeof(T)));
+#else
+    return (get_l2_data_cache() / (rank * sizeof(T)));
+#endif
+}
 
 // using namespace std;
 

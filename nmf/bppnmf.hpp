@@ -24,7 +24,7 @@ class BPPNMF : public NMF<T> {
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
     double t2;
 #endif
-    this->ONE_THREAD_MATRIX_SIZE = chunk_size_dense<double>(this->W.n_cols);
+    this->ONE_THREAD_MATRIX_SIZE = chunk_size_dense<typename T::elem_type>(this->W.n_cols);
     int numChunks = input.n_cols / this->ONE_THREAD_MATRIX_SIZE;
     if (numChunks * this->ONE_THREAD_MATRIX_SIZE < input.n_cols) numChunks++;
 #if defined(_VERBOSE) || defined(COLLECTSTATS)

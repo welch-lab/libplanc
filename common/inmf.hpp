@@ -5,9 +5,10 @@
 #endif
 #include <memory>
 #include <vector>
-#include "utils.hpp"
 #include "data.hpp"
-
+#ifndef ARMA_64BIT_WORD
+#define ARMA_64BIT_WORD
+#endif
 
 namespace planc {
     template <typename T>
@@ -73,7 +74,7 @@ namespace planc {
 #endif
         }
             this->cleared = false;
-            this->INMF_CHUNK_SIZE = chunk_size_dense<double>(k);
+            this->INMF_CHUNK_SIZE = chunk_size_dense<typename T::elem_type>(k);
             this->nMax = 0;
             this->nSum = 0;
             this->nDatasets = 0;
