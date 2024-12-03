@@ -17,20 +17,8 @@ add_library(nmflib
 target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(nmflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nmflib PUBLIC utils hw_detect detect_blas)
-if(BUILD_EXECUTABLE)
-    add_executable(plancnmf nmf_cmd.cpp)
-    find_package(argparse REQUIRED)
-    target_link_libraries(plancnmf PRIVATE nmflib argparse::argparse)
-    target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${CMAKE_CURRENT_BINARY_DIR})
-endif()
 generate_export_header(nmflib)
-if(SKBUILD)
-    nanobind_add_module(pyplanc STABLE_ABI NB_STATIC ../python/pybind_interface.cpp)
-    #target_include_directories(pyplanc PRIVATE "python")
-    target_link_libraries(pyplanc PRIVATE nmflib)
-    install(TARGETS pyplanc LIBRARY DESTINATION .)
-    install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../")
-endif()
+
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib
 #        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
