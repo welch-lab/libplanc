@@ -314,7 +314,7 @@ protected:
     }
 
 public:
-explicit NMFDriver<T>(params pc)
+explicit NMFDriver(params pc)
 {
     this->parseParams(pc);
 }

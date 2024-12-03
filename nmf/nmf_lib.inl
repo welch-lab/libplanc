@@ -33,11 +33,6 @@ namespace planc {
         options.setMLucalgo(algo);
         options.setMSymmReg(lambda);
         options.setMSymmFlag(1);
-        arma::uword m = x.n_rows;
-        arma::uword n = x.n_cols;
-        // if (m != n) {
-        //     Rcpp::stop("Input `x` is not square.");
-        // }
         // if (k >= m) {
         //     Rcpp::stop("`k` must be less than `nrow(x)`");
         // }

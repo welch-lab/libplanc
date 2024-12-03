@@ -487,12 +487,12 @@ namespace planc {
             } catch(const std::out_of_range& e) {
                 std::throw_with_nested(std::runtime_error("Please choose `algo` from \"anlsbpp\", or \"gnsym\"."));
             }
-        };
+        }
     };
     template<typename T>
     struct internalSymmParams final : symmParams, internalParams<T> {
         internalSymmParams(const T& mAMat, const arma::mat& mHInitMat)
-            : internalParams<T>(mAMat, mHInitMat, mHInitMat) {
+            : internalParams<T>(mAMat, arma::mat{}, mHInitMat), symmParams() {
         }
         using internalParams<T>::setMK;
         using internalParams<T>::setMNumIt;
