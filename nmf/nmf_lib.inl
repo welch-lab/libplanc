@@ -48,8 +48,7 @@ namespace planc {
     inmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
                    const arma::uword &niter, const bool &verbose, const int& ncores)
     {
-        std::vector<std::unique_ptr<T>> matPtrVec;
-        matPtrVec = initMemMatPtr<T>(objectList);
+        std::vector<std::unique_ptr<T>> matPtrVec = initMemMatPtr<T>(objectList);
         BPPINMF<T> solver(matPtrVec, k, lambda);
         solver.optimizeALS(niter, verbose, ncores);
         std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
