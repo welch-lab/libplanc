@@ -14,6 +14,9 @@ enum normtype { NONE, L2NORM, MAXNORM };
 
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
+// Only applicable to SPARSE_NTF
+// CPU_ONLY: ALTO, PARTIAL: BLCO-mttkrp, FULL: BLCO-{mttkrp, update}
+enum gpuoffloadtype { CPU_ONLY, PARTIAL, FULL };
 // #if !defined(ARMA_64BIT_WORD)
 // #define ARMA_64BIT_WORD
 #define ARMA_DONT_USE_WRAPPER
@@ -52,6 +55,7 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 #define RAND_SEED_SPARSE 100
 #define WTRUE_SEED 1196089
 #define HTRUE_SEED 1230587
+#define MAX_NUM_MODES 5
 
 // defines for namespace confusion
 #define FMAT arma::fmat

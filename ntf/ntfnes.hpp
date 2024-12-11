@@ -6,7 +6,8 @@
 #include "ntf/auntf.hpp"
 
 namespace planc {
-class NTFNES : public AUNTF {
+template <class T>
+class NTFNES : public AUNTF <T> {
  private:
   // Update Variables
   NCPFactors m_prox_t;  // Proximal Term (H_*)
@@ -166,8 +167,8 @@ class NTFNES : public AUNTF {
   }
 
  public:
-  NTFNES(const Tensor &i_tensor, const int i_k, algotype i_algo)
-      : AUNTF(i_tensor, i_k, i_algo),
+  NTFNES(const T &i_tensor, const int i_k, algotype i_algo)
+      : AUNTF<T>(i_tensor, i_k, i_algo),
         m_prox_t(i_tensor.dimensions(), i_k, true),
         m_acc_t(i_tensor.dimensions(), i_k, true),
         m_grad_t(i_tensor.dimensions(), i_k, true),

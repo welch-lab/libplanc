@@ -10,7 +10,8 @@ namespace planc {
 
 #define ONE_THREAD_MATRIX_SIZE 2000
 
-class NTFANLSBPP : public AUNTF {
+template <class T>
+class NTFANLSBPP : public AUNTF<T>{
  protected:
   MAT update(const int mode) {
     MAT othermat(this->m_ncp_factors.factor(mode).t());
@@ -57,8 +58,8 @@ class NTFANLSBPP : public AUNTF {
   }
 
  public:
-  NTFANLSBPP(const Tensor &i_tensor, const int i_k, algotype i_algo)
-      : AUNTF(i_tensor, i_k, i_algo) {}
+  NTFANLSBPP(const T &i_tensor, const int i_k, algotype i_algo)
+      : AUNTF<T>(i_tensor, i_k, i_algo) {}
 };  // class NTFANLSBPP
 
 }  // namespace planc

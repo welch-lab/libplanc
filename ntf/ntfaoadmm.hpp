@@ -7,7 +7,8 @@
 
 namespace planc {
 
-class NTFAOADMM : public AUNTF {
+template <class T>
+class NTFAOADMM : public AUNTF <T> {
  private:
   // ADMM auxiliary variables
   NCPFactors m_ncp_aux;
@@ -77,8 +78,8 @@ class NTFAOADMM : public AUNTF {
   }
 
  public:
-  NTFAOADMM(const Tensor &i_tensor, const int i_k, algotype i_algo)
-      : AUNTF(i_tensor, i_k, i_algo),
+  NTFAOADMM(const T &i_tensor, const int i_k, algotype i_algo)
+      : AUNTF<T>(i_tensor, i_k, i_algo),
         m_ncp_aux(i_tensor.dimensions(), i_k, false),
         m_ncp_aux_t(i_tensor.dimensions(), i_k, true),
         m_temp_ncp_aux_t(i_tensor.dimensions(), i_k, true) {

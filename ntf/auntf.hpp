@@ -17,6 +17,7 @@
 #include "common/ncpfactors.hpp"
 #include "common/ntf_utils.hpp"
 #include "common/tensor.hpp"
+#include "common/sparse_tensor.hpp"
 #include "dimtree/ddt.hpp"
 
 namespace planc {
@@ -37,30 +38,31 @@ namespace planc {
 //                              const double *b, const int ldb,
 //                              const double beta, double *c,
 //                              const int ldc);
+template <class T>
 class AUNTF {
- protected:
-  planc::NCPFactors m_ncp_factors;
-  MAT *ncp_mttkrp_t;
-  MAT gram_without_one;
-  virtual MAT update(const int mode) = 0;
+  protected:
+    planc::NCPFactors m_ncp_factors;
+    MAT *ncp_mttkrp_t;
+    MAT gram_without_one;
+    virtual MAT update(const int mode) = 0;
 
- private:
-  const planc::Tensor &m_input_tensor;
-  int m_num_it;
-  int m_current_it;
-  bool m_compute_error;
+  private:
+    const T &m_input_tensor;
+    int m_num_it;
+    int m_current_it;
+    bool m_compute_error;
 
-  const int m_low_rank_k;
-  MAT *ncp_krp;
-  const algotype m_updalgo;
-  planc::Tensor *lowranktensor;
-  DenseDimensionTree *kdt;
-  bool m_enable_dim_tree;
-  // needed for acceleration algorithms.
-  bool m_accelerated;
-  double m_rel_error;
-  double m_normA;
-  std::vector<bool> m_stale_mttkrp;
+    const int m_low_rank_k;
+    MAT *ncp_krp;
+    const algotype m_updalgo;
+    planc::Tensor *lowranktensor;
+    DenseDimensionTree *kdt;
+    bool m_enable_dim_tree;
+    // needed for acceleration algorithms.
+    bool m_accelerated;
+    double m_rel_error;
+    double m_normA;
+    std::vector<bool> m_stale_mttkrp;
 
   // Ensure factor is unnormalised when calling this function
   void update_factor_mode(const int &current_mode, const MAT &factor) {
@@ -79,23 +81,28 @@ class AUNTF {
   }
   virtual void accelerate() {}
 
- public:
-  AUNTF(const planc::Tensor &i_tensor, const int i_k, algotype i_algo)
-      : m_ncp_factors(i_tensor.dimensions(), i_k, false),
-        m_input_tensor(i_tensor),
-        m_low_rank_k(i_k),
-        m_updalgo(i_algo) {
+  public:
+  AUNTF(const T &i_tensor, const int i_k, algotype i_algo)
+    : m_ncp_factors(i_tensor.dimensions(), i_k, false),
+    m_input_tensor(i_tensor),
+    m_low_rank_k(i_k),
+    m_updalgo(i_algo) {
     m_ncp_factors.normalize();
+    INFO << "Normalizing ncp_factors..." << std::endl;
     gram_without_one.zeros(i_k, i_k);
-    ncp_mttkrp_t = new MAT[i_tensor.modes()];
+
+    ncp_mttkrp_t = new MAT[i_tensor.modes()]; // basically mttkrp buffer
     ncp_krp = new MAT[i_tensor.modes()];
+
     for (int i = 0; i < i_tensor.modes(); i++) {
       UWORD current_size = TENSOR_NUMEL / TENSOR_DIM[i];
+
       ncp_krp[i].zeros(current_size, i_k);
       ncp_mttkrp_t[i].zeros(i_k, TENSOR_DIM[i]);
+
       this->m_stale_mttkrp.push_back(true);
     }
-    lowranktensor = new planc::Tensor(i_tensor.dimensions());
+
     m_compute_error = false;
     m_num_it = 20;
     m_normA = i_tensor.norm();
@@ -108,71 +115,130 @@ class AUNTF {
       ncp_krp[i].clear();
       ncp_mttkrp_t[i].clear();
     }
+
     delete[] ncp_krp;
     delete[] ncp_mttkrp_t;
     if (this->m_enable_dim_tree) {
       delete kdt;
     }
-    delete lowranktensor;
+    // delete lowranktensor;
   }
   NCPFactors &ncp_factors() { return m_ncp_factors; }
   void dim_tree(bool i_dim_tree) {
     this->m_enable_dim_tree = i_dim_tree;
     if (i_dim_tree) {
       this->kdt = new DenseDimensionTree(m_input_tensor, m_ncp_factors,
-                                         m_input_tensor.modes() / 2);
+        m_input_tensor.modes() / 2);
     }
   }
   double current_error() const { return this->m_rel_error; }
   void num_it(const int i_n) { this->m_num_it = i_n; }
+  
+  /* YONGSEOK: Just expanded separate version for computeSparseNTF
+    There is probably a better way to refactor this code
+    to both consume dense and sparse tensors but at the moment
+    where some computations are drastically different
+    such as computing explicit mttkrp and KR product we decide to separate
+  */
+  void computeSparseNTF() {
+    double wtime;
+    double wtime_gram;
+    double wtime_mttkrp;
+    double wtime_update;
+    double wtime_update_fm;
+    
+    for (m_current_it = 0; m_current_it < m_num_it; m_current_it++) {
+      INFO << "iter::" << this->m_current_it << std::endl;
+      for (int j = 0; j < this->m_input_tensor.modes(); j++) {
+        wtime = omp_get_wtime();
+        m_ncp_factors.gram_leave_out_one(j, &gram_without_one);
+        wtime_gram = omp_get_wtime() - wtime;
+        // INFO << "gram_without_" << j << "::" << arma::cond(gram_without_one)
+        //     << std::endl
+        //     << gram_without_one << std::endl;
+
+        wtime = omp_get_wtime();
+        m_input_tensor.mttkrp(j, m_ncp_factors.factors(), &ncp_mttkrp_t[j]);
+        wtime_mttkrp = omp_get_wtime() - wtime;
+
+        wtime = omp_get_wtime();
+        MAT factor = update(j);
+        wtime_update = omp_get_wtime() - wtime;
+
+        wtime = omp_get_wtime();
+        update_factor_mode(j, factor.t());
+        wtime_update_fm = omp_get_wtime() - wtime;
+
+        printf("[PERF-mode, gram, mttkrp, update, update_fm]\t%d\t%f\t%f\t%f\t%f\n", j, wtime_gram, wtime_mttkrp, wtime_update, wtime_update_fm);
+      } // for all modes
+
+      if (m_compute_error) {
+        // compute mttkrp for last mode
+        int last_mode = this->m_input_tensor.modes() - 1;
+        m_input_tensor.mttkrp(last_mode, m_ncp_factors.factors(), &ncp_mttkrp_t[last_mode]);
+
+        // ALTO mttkrp (gpu_offload=0) still operates over R x I mttkrp output
+        // So use the mttkrp.t() for correct error calculation. 
+        double temp_err = m_input_tensor.err(m_ncp_factors, ncp_mttkrp_t[last_mode].t(), last_mode);
+
+        // Partial GPU (only BLCO mttkrp, gpu_offload=1) operates over I x R, so use mttkrp (without transpose) for correct error calculation
+        // double temp_err = m_input_tensor.err(m_ncp_factors, ncp_mttkrp_t[last_mode], last_mode);
+
+        this->m_rel_error = temp_err;
+        INFO << "relative_error @it " << this->m_current_it
+            << "=" << temp_err << std::endl;
+      }
+    }
+  }
+
   void computeNTF() {
     for (m_current_it = 0; m_current_it < m_num_it; m_current_it++) {
       INFO << "iter::" << this->m_current_it << std::endl;
       for (int j = 0; j < this->m_input_tensor.modes(); j++) {
         m_ncp_factors.gram_leave_out_one(j, &gram_without_one);
-#ifdef NTF_VERBOSE
+    #ifdef NTF_VERBOSE
         INFO << "gram_without_" << j << "::" << arma::cond(gram_without_one)
-             << std::endl
-             << gram_without_one << std::endl;
-#endif
+            << std::endl
+            << gram_without_one << std::endl;
+    #endif
         if (this->m_stale_mttkrp[j]) {
           m_ncp_factors.krp_leave_out_one(j, &ncp_krp[j]);
-#ifdef NTF_VERBOSE
+    #ifdef NTF_VERBOSE
           INFO << "krp_leave_out_" << j << std::endl << ncp_krp[j] << std::endl;
-#endif
+    #endif
           if (this->m_enable_dim_tree) {
-            double multittv_time = 0;
-            double mttkrp_time = 0;
-            kdt->in_order_reuse_MTTKRP(j, ncp_mttkrp_t[j].memptr(), false,
-                                       multittv_time, mttkrp_time);
+          double multittv_time = 0;
+          double mttkrp_time = 0;
+          kdt->in_order_reuse_MTTKRP(j, ncp_mttkrp_t[j].memptr(), false,
+            multittv_time, mttkrp_time);
           } else {
-            m_input_tensor.mttkrp(j, ncp_krp[j], &ncp_mttkrp_t[j]);
+          m_input_tensor.mttkrp(j, ncp_krp[j], &ncp_mttkrp_t[j]);
           }
           this->m_stale_mttkrp[j] = false;
-#ifdef NTF_VERBOSE
+    #ifdef NTF_VERBOSE
           INFO << "mttkrp for factor" << j << std::endl
-               << ncp_mttkrp_t[j] << std::endl;
-#endif
+              << ncp_mttkrp_t[j] << std::endl;
+    #endif
         }
         // MAT factor = update(m_updalgo, gram_without_one, ncp_mttkrp_t[j], j);
         MAT factor = update(j);
-#ifdef NTF_VERBOSE
+    #ifdef NTF_VERBOSE
         INFO << "iter::" << i << "::factor:: " << j << std::endl
-             << factor << std::endl;
-#endif
+            << factor << std::endl;
+    #endif
         update_factor_mode(j, factor.t());
       }
       if (m_compute_error) {
         double temp_err = computeObjectiveError();
         this->m_rel_error = temp_err;
         INFO << "relative_error at it::" << this->m_current_it
-             << "::" << temp_err << std::endl;
+            << "::" << temp_err << std::endl;
       }
       if (this->m_accelerated) accelerate();
-#ifdef NTF_VERBOSE
+  #ifdef NTF_VERBOSE
       INFO << "ncp factors" << std::endl;
       m_ncp_factors.print();
-#endif
+  #endif
     }
   }
   void accelerated(const bool &set_acceleration) {
@@ -187,16 +253,17 @@ class AUNTF {
     int m_modes = this->m_input_tensor.modes();
     if (!trans) {
       for (int i = 0; i < m_modes; i++) {
-        update_factor_mode(i, new_factors.factor(i));
+      update_factor_mode(i, new_factors.factor(i));
       }
     } else {
       for (int i = 0; i < m_modes; i++) {
-        update_factor_mode(i, new_factors.factor(i).t());
+      update_factor_mode(i, new_factors.factor(i).t());
       }
     }
     m_ncp_factors.set_lambda(new_factors.lambda());
   }
   int current_it() const { return m_current_it; }
+
   double computeObjectiveError() {
     // current low rank tensor
     // UWORD krpsize = arma::prod(this->m_dimensions);
@@ -204,6 +271,8 @@ class AUNTF {
     // MAT krpleavingzero.zeros(krpsize, this->m_k);
     // krp_leave_out_one(0, &krpleavingzero);
     // MAT lowranktensor(this->m_dimensions[0], krpsize);
+    lowranktensor = new planc::Tensor(m_input_tensor.dimensions());
+
     // lowranktensor = this->ncp_factors[0] * trans(krpleavingzero);
 
     // compute current low rank tensor as above.
@@ -231,16 +300,17 @@ class AUNTF {
     char t = 'T';
 
     MAT unnorm_fac =
-        m_ncp_factors.factor(0) * arma::diagmat(m_ncp_factors.lambda());
+      m_ncp_factors.factor(0) * arma::diagmat(m_ncp_factors.lambda());
     // double *output_tensor = new double[ldc * n];
     dgemm_(&nt, &t, &m, &n, &k, &alpha, unnorm_fac.memptr(), &lda,
-           ncp_krp[0].memptr(), &ldb, &beta, &lowranktensor->m_data[0], &ldc);
+      ncp_krp[0].memptr(), &ldb, &beta, &lowranktensor->m_data[0], &ldc);
     // INFO << "lowrank tensor::" << std::endl;
     // lowranktensor->print();
     // for (int i=0; i < ldc*n; i++){
     //     INFO << i << ":" << output_tensor[i] << std::endl;
     // }
     double err = m_input_tensor.err(*lowranktensor);
+    INFO << "norm(X-M, 2): " << err << "norm(X, 2)" << this->m_normA << std::endl;
     err = std::sqrt(err / this->m_normA);
     return err;
   }

@@ -8,7 +8,8 @@
 
 namespace planc {
 
-class NTFHALS : public AUNTF {
+template <class T>
+class NTFHALS : public AUNTF <T> {
  protected:
   MAT update(const int mode) {
     MAT H(this->m_ncp_factors.factor(mode));
@@ -29,8 +30,8 @@ class NTFHALS : public AUNTF {
   }
 
  public:
-  NTFHALS(const Tensor &i_tensor, const int i_k, algotype i_algo)
-      : AUNTF(i_tensor, i_k, i_algo) {}
+  NTFHALS(const T &i_tensor, const int i_k, algotype i_algo)
+      : AUNTF<T>(i_tensor, i_k, i_algo) {}
 };  // class NTFHALS
 
 }  // namespace planc

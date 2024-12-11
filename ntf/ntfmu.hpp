@@ -6,7 +6,8 @@
 #include "ntf/auntf.hpp"
 
 namespace planc {
-class NTFMU : public AUNTF {
+template <class T>
+class NTFMU : public AUNTF <T> {
  protected:
   MAT update(const int mode) {
     MAT H(this->m_ncp_factors.factor(mode));
@@ -16,8 +17,8 @@ class NTFMU : public AUNTF {
   }
 
  public:
-  NTFMU(const Tensor &i_tensor, const int i_k, algotype i_algo)
-      : AUNTF(i_tensor, i_k, i_algo) {}
+  NTFMU(const T &i_tensor, const int i_k, algotype i_algo)
+      : AUNTF<T>(i_tensor, i_k, i_algo) {}
 };  // class NTFMU
 }  // namespace planc
 

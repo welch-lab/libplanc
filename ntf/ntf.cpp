@@ -18,11 +18,11 @@ namespace planc {
 
 class NTFDriver {
  public:
-  template <class NTFTYPE>
+  template <template<class T> class NTFType, class T>
   void callNTF(planc::ParseCommandLine pc) {
     int test_modes = pc.num_modes();
     UVEC dimensions(test_modes);
-    Tensor my_tensor(pc.dimensions());
+    T my_tensor(pc.dimensions());
     std::string rand_prefix("rand_");
     std::string filename = pc.input_file_name();
     std::cout << "Input filename = " << filename << std::endl;
@@ -31,7 +31,7 @@ class NTFDriver {
       my_tensor.read(pc.input_file_name());
       my_tensor.print();
     }
-    NTFTYPE ntfsolver(my_tensor, pc.lowrankk(), pc.lucalgo());
+    NTFType<T> ntfsolver(my_tensor, pc.lowrankk(), pc.lucalgo());
     ntfsolver.num_it(pc.iterations());
     ntfsolver.compute_error(pc.compute_error());
     if (pc.dim_tree()) {
@@ -51,19 +51,19 @@ int main(int argc, char* argv[]) {
   planc::NTFDriver ntfd;
   switch (pc.lucalgo()) {
     case MU:
-      ntfd.callNTF<planc::NTFMU>(pc);
+      ntfd.callNTF<planc::NTFMU, planc::Tensor>(pc);
       break;
     case HALS:
-      ntfd.callNTF<planc::NTFHALS>(pc);
+      ntfd.callNTF<planc::NTFHALS, planc::Tensor>(pc);
       break;
     case ANLSBPP:
-      ntfd.callNTF<planc::NTFANLSBPP>(pc);
+      ntfd.callNTF<planc::NTFANLSBPP, planc::Tensor>(pc);
       break;
     case AOADMM:
-      ntfd.callNTF<planc::NTFAOADMM>(pc);
+      ntfd.callNTF<planc::NTFAOADMM, planc::Tensor>(pc);
       break;
     case NESTEROV:
-      ntfd.callNTF<planc::NTFNES>(pc);
+      ntfd.callNTF<planc::NTFNES, planc::Tensor>(pc);
       break;
     default:
       ERR << "Wrong algorithm choice. Quitting.." << pc.lucalgo() << std::endl;

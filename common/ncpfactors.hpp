@@ -25,11 +25,11 @@ class NCPFactors {
   unsigned int m_k;            /// Low rank
   UVEC m_dimensions;  /// Vector of dimensions for every mode
   /// in the distributed mode all the processes has same lambda
-  VEC m_lambda;
   /// normalize the factors of a matrix
   bool freed_ncp_factors;
 
  public:
+  VEC m_lambda;
   /**
    * constructor that takes the dimensions of every mode, low rank k
    * All the factors will be initialized with random uniform number
@@ -54,6 +54,7 @@ class NCPFactors {
         //                                   arma::distr_param(0, numel));
         ncp_factors[i] = arma::randu<MAT>(rsize, this->m_k);
       }
+      INFO << "Initialized factor matrix for mode: " << i << " ("  << ncp_factors[i].n_rows << "x" << ncp_factors[i].n_cols << ")" << std::endl;
     }
     m_lambda = arma::ones<VEC>(this->m_k);
     freed_ncp_factors = false;
@@ -96,6 +97,7 @@ ncp_factors[i].clear();
   int rank() const { return m_k; }
   /// dimensions of every mode
   UVEC dimensions() const { return m_dimensions; }
+  int dimension(int mode) const { return m_dimensions[mode]; }
   /// factor matrix of a mode i_n
   MAT &factor(const int i_n) const { return ncp_factors[i_n]; }
   /// returns number of modes
@@ -307,6 +309,7 @@ current_nrows *= rightkrp.n_rows;
       std::cout << this->ncp_factors[i];
     }
   }
+  MAT * factors() { return ncp_factors; }
   /**
    * print the ith factor matrix alone
    * @param[in] i_n the mode for which the factor matrix to be printed

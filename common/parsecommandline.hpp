@@ -56,6 +56,9 @@ class ParseCommandLine {
   UVEC m_proc_grids;
   FVEC m_regularizers;
 
+  // sparse ntf -- ALTO, BLCO formats
+  gpuoffloadtype m_gpu_offload;
+
   // LUC params (optional)
   int m_max_luciters;
 
@@ -148,6 +151,7 @@ class ParseCommandLine {
     this->m_gamma = -1;
     this->m_unpartitioned = 1;
     this->m_sparsity  = 0.01;
+    this->m_gpu_offload = CPU_ONLY;
     // Default types (both dense)
     this->feat_type = 1;
     this->conn_type = 1;
@@ -253,6 +257,9 @@ class ParseCommandLine {
           INFO << "feat_type: " << this->feat_type << " conn_type: " << this->conn_type << std::endl;
           break;
         }
+
+        case GPU_OFFLOAD:
+          this->m_gpu_offload = static_cast<gpuoffloadtype>(atoi(optarg));
 
         case ADJRAND:
           this->m_adj_rand = true;
@@ -484,6 +491,9 @@ class ParseCommandLine {
         // Shared memory ntf case
         INFO << "Usage 6: ./ntf -i rand_lowrank -d \"256 256 256 256\" "
             << "-k 64 -t 30 -e 1 -a 5 --dimtree 1" << std::endl;
+        // Shared memory sparse_ntf case
+        INFO << "Usage 7: ./sparse_ntf -i <filename> "
+            << "-k 64 -t 30 -e 1 --gpu_offload 2 -a 0" << std::endl;
         // Mention all the options
         INFO << std::endl;
         INFO << "\tThe following command line options are available:" << std::endl;
@@ -693,6 +703,8 @@ class ParseCommandLine {
   double unpartitioned() { return m_unpartitioned; }
   bool feat_typesity() { return feat_type; }
   bool conn_typesity() { return conn_type; }
+  gpuoffloadtype gpu_type() { return m_gpu_offload; }
+
 
 };  // ParseCommandLine
 }  // namespace planc

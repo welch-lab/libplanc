@@ -29,6 +29,7 @@
 #define MAT_TYPE 2013
 #define MOMENTUM 2014
 #define UNPARTITIONED 2015
+#define GPU_OFFLOAD 2016
 
 // enum factorizationtype{FT_NMF, FT_DISTNMF, FT_NTF, FT_DISTNTF};
 
@@ -105,6 +106,7 @@ struct option plancopts[] = {
     {"conn_grid", required_argument, 0, 'q'},
     {"momentum", required_argument, 0, MOMENTUM},
     {"unpartitioned", required_argument, 0, UNPARTITIONED},
+    {"gpu_offload", required_argument, 0, GPU_OFFLOAD},
     {0, 0, 0, 0}};
 
 #endif  // COMMON_PARSECOMMANDLINE_H_
