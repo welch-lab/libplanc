@@ -72,6 +72,7 @@ private:
             if (numChunks * this->INMF_CHUNK_SIZE < this->m) numChunks++;
 #pragma omp parallel for schedule(dynamic) default(none) shared(numChunks, WTptr, Hptr, Vptr, ETptr, VTptr, giventInput) num_threads(ncores)
             for (int j = 0; j < numChunks; ++j) {
+
                 int spanStart = j * this->INMF_CHUNK_SIZE;
                 int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                 if (spanEnd > this->m - 1) spanEnd = this->m - 1;
@@ -139,9 +140,9 @@ private:
     }
 
 public:
-    BPPINMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda) {
+    BPPINMF(std::vector<std::shared_ptr<T>>& Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda) {
     }
-    BPPINMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, HinitList, VinitList, Winit) {
+    BPPINMF(std::vector<std::shared_ptr<T>>& Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, HinitList, VinitList, Winit) {
     }
 
     void optimizeALS(unsigned int niter, bool verbose = true, const int& ncores = 0) {

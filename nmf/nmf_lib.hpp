@@ -37,19 +37,19 @@ namespace planc {
         std::vector<arma::Mat<eT>> outVList;
         double objErr;
     };
-    template<typename eT>
-    struct NMFLIB_EXPORT uinmfOutput : inmfOutput<eT> {
-        uinmfOutput() = default;
-        ~uinmfOutput() = default;
-        std::vector<arma::Mat<eT>> outUList;
-    };
-    template<typename eT>
-    struct NMFLIB_EXPORT oinmfOutput : inmfOutput<eT> {
-        oinmfOutput() = default;
-        ~oinmfOutput() = default;
-        std::vector<arma::Mat<eT>> outAList;
-        std::vector<arma::Mat<eT>> outBList;
-    };
+    // template<typename eT>
+    // struct NMFLIB_EXPORT uinmfOutput : inmfOutput<eT> {
+    //     uinmfOutput() = default;
+    //     ~uinmfOutput() = default;
+    //     std::vector<arma::Mat<eT>> outUList;
+    // };
+    // template<typename eT>
+    // struct NMFLIB_EXPORT oinmfOutput : inmfOutput<eT> {
+    //     oinmfOutput() = default;
+    //     ~oinmfOutput() = default;
+    //     std::vector<arma::Mat<eT>> outAList;
+    //     std::vector<arma::Mat<eT>> outBList;
+    // };
     template<class T, typename eT = typename T::elem_type>
     std::vector<std::unique_ptr<T>> NMFLIB_NO_EXPORT initMemMatPtr(std::vector<T> objectList)
     {
@@ -74,37 +74,38 @@ namespace planc {
             const arma::Mat<eT> &Winit = arma::Mat<eT>(), const arma::Mat<eT> &Hinit = arma::Mat<eT>());
         static struct nmfOutput<eT> symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
                          const arma::Mat<eT>& Hinit);
-        static struct inmfOutput<eT> bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
-                                          const arma::uword &niter, const bool &verbose, const int& ncores);
-        static struct inmfOutput<eT> bppinmf(const std::vector<T> &objectList, const arma::uword &k, const double &lambda,
-                   const arma::uword &niter, const bool &verbose,
-                   const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit,
-                   const int& ncores);
-        static struct uinmfOutput<eT> uinmf(const std::vector<T> &objectList,
-                     const std::vector<T> &unsharedList,
-                     std::vector<int> whichUnshared,
-                     const arma::uword &k, const int &nCores, const arma::vec &lambda,
-                     const arma::uword &niter, const bool &verbose);
-        static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
-                     const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
-        static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList,
-                                            const std::vector<arma::mat> &Vinit, const arma::mat &Winit,
-                                            const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit,
-                                            const std::vector<T> &objectListNew,
-                                            const arma::uword &k, const int& nCores, const double &lambda, const arma::uword &maxEpoch,
-                                            const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
-        static std::vector<arma::Mat<eT>> oinmf_project(const std::vector<T> &objectList, const arma::mat &Winit,
-    const std::vector<T> &objectListNew, const arma::uword &k, const int& nCores, const double &lambda);
-        static int runNMF(params opts) {
-            NMFDriver<T> myNMF(opts);
-            myNMF.callNMF();
-            return 0;
-        }
-        static int runINMF(params opts) {
-            NMFDriver<T> myNMF(opts);
-            myNMF.callNMF();
-            return 0;
-        }
+        static struct inmfOutput<eT> bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword&k, const double&lambda,
+                                             const arma::uword&niter, const bool&verbose, const int&ncores);
+        static struct inmfOutput<eT> bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword&k, const double&lambda,
+                                             const arma::uword&niter, const bool&verbose,
+                                             const std::vector<arma::mat>&HinitList, const std::vector<arma::mat>&VinitList, const arma::mat&Winit,
+                                             const int&ncores);
+    //     static struct uinmfOutput<eT> uinmf(const std::vector<T> &objectList,
+    //                  const std::vector<T> &unsharedList,
+    //                  std::vector<int> whichUnshared,
+    //                  const arma::uword &k, const int &nCores, const arma::vec &lambda,
+    //                  const arma::uword &niter, const bool &verbose);
+    //     static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList, const arma::uword &k, const int &nCores,
+    //                  const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
+    //     static struct oinmfOutput<eT> oinmf(const std::vector<T> &objectList,
+    //                                         const std::vector<arma::mat> &Vinit, const arma::mat &Winit,
+    //                                         const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit,
+    //                                         const std::vector<T> &objectListNew,
+    //                                         const arma::uword &k, const int& nCores, const double &lambda, const arma::uword &maxEpoch,
+    //                                         const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose);
+    //     static std::vector<arma::Mat<eT>> oinmf_project(const std::vector<T> &objectList, const arma::mat &Winit,
+    // const std::vector<T> &objectListNew, const arma::uword &k, const int& nCores, const double &lambda);
+        // static int runNMF(params opts) {
+        //     NMFDriver<T> myNMF(opts);
+        //     myNMF.callNMF();
+        //     return 0;
+        // }
+        // static int runINMF(params opts) {
+        //     NMFDriver<T> myNMF(opts);
+        //     myNMF.callNMF();
+        //     return 0;
+        // }
+        static std::vector<std::shared_ptr<T>> NMFLIB_EXPORT initMemSharedPtr(std::vector<T> objectList);
     };
 
     template<typename eT>

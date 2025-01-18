@@ -17,7 +17,7 @@ namespace planc {
         arma::uword k, nDatasets, nMax, nSum;
         int INMF_CHUNK_SIZE, m;                 // chunking
         std::vector<arma::uword> ncol_E;             // vector of n_i
-        std::vector<std::unique_ptr<T>> Ei;          // each of size mxn_i
+        std::vector<std::shared_ptr<T>> Ei;          // each of size mxn_i
         std::vector<std::unique_ptr<T>> EiT;          // each of size n_ixm
         std::vector<std::unique_ptr<arma::mat>> Hi;  // each of size n_ixk
         std::vector<std::unique_ptr<arma::mat>> Vi;  // each of size mxk
@@ -47,7 +47,8 @@ namespace planc {
                 arma::mat LtL = L.t() * L; // k x k
                 arma::mat HtH = Hptr->t() * *Hptr;  // k x k
                 double TrLtLHtH = arma::trace(LtL * HtH);
-                arma::mat EtL = Eptr->t() * L; // n_i x k
+                T Et = Eptr->t();
+                arma::mat EtL = Et * L; // n_i x k
                 double TrHtEtL = arma::trace(Hptr->t() * EtL);
                 arma::mat VtV = Vptr->t() * *Vptr; // k x k
                 double TrVtVHtH = arma::trace(VtV * HtH);
@@ -56,8 +57,8 @@ namespace planc {
             return obj;
         }
 
-        void constructObject(std::vector<std::unique_ptr<T>>& inputEi, arma::uword inputk, double inputlambda, bool makeTranspose) {
-            this->Ei = std::move(inputEi);
+        void constructObject(std::vector<std::shared_ptr<T>>& inputEi, arma::uword inputk, double inputlambda, bool makeTranspose) {
+            this->Ei = inputEi;
             this->k = inputk;
             this->m = this->Ei[0].get()->n_rows;
             try {
@@ -147,18 +148,18 @@ namespace planc {
                 }
             }
     public:
-        INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, bool makeTranspose = true) {
+        INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
         this->initW();
         this->initV();
         this->INMF::initH();
         }
-        INMF(std::vector<std::unique_ptr<T>>& Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
+        INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
             std::vector<arma::mat> VinitList, arma::mat Winit,  bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
             this->initW(Winit);
             this->initV(VinitList);
-            this->initH(HinitList);
+            this->INMF::initH(HinitList);
         }
         virtual void initH(std::vector<arma::mat>& Hinit) {
 #ifdef _VERBOSE
@@ -173,6 +174,10 @@ namespace planc {
             std::unique_ptr<arma::mat> H;
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
                 try {
+                    if (Hinit[i].n_cols == 0 && Hinit[i].n_rows == 0) {
+                        this->initH();
+                        return;
+                    }
                     if (Hinit[i].n_cols != this->k || Hinit[i].n_rows != this->ncol_E[i]) {
                         std::string msg = "Each given H must be of size Ei[i].n_cols x " +
                                           std::to_string(this->k);
@@ -227,6 +232,10 @@ namespace planc {
             std::unique_ptr<arma::mat> V;
             std::unique_ptr<arma::mat> VT;
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
+                if (Vinit[i].n_cols == 0 && Vinit[i].n_rows == 0) {
+                    this->initV();
+                    return;
+                }
                 if (Vinit[i].n_cols != this->k || Vinit[i].n_rows != this->m) {
                     std::string msg = "All given Vs must be of size " +
                                       std::to_string(this->m) + " x " +
@@ -265,6 +274,10 @@ namespace planc {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized W matrix" << std::endl;
 #endif
+            if (Winit.n_cols == 0 && Winit.n_rows == 0) {
+                this->initW();
+                return;
+            }
             if (Winit.n_cols != this->k || Winit.n_rows != this->m) {
                 std::string msg = "Given W must be of size " +
                                   std::to_string(this->m) + " x " +
