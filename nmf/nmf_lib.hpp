@@ -5,8 +5,7 @@
 #ifndef PLANC_NMF_LIB_HPP
 #define PLANC_NMF_LIB_HPP
 #include "nmflib_export.h"
-#include "NMFDriver.hpp"
-#include <data.hpp>
+#include "config.h"
 
 
 extern "C" {

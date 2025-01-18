@@ -6,7 +6,6 @@
 #include <utility>
 #include <vector>
 #include <random>
-#include "data.hpp"
 
 void tic() {tictoc_stack.push(std::chrono::steady_clock::now()); }
 double toc()  {

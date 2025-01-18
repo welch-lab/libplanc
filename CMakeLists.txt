@@ -117,8 +117,8 @@ if((WIN32 OR APPLE) AND NOT DEFINED ENV{CONDA_BUILD})
 endif()
 FetchContent_Declare(
     HighFive
-    URL https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.9.0.tar.gz
-    URL_HASH SHA256=6301def8ceb9f4d7a595988612db288b448a3c0546f6c83417dab38c64994d7e
+    URL https://github.com/BlueBrain/HighFive/archive/refs/tags/v3.0.0-beta2.tar.gz
+    URL_HASH SHA256=E09BDF89DCEB3314928237A1B102FB760082C3C880C20854394E3AD2478F602D
 )
 FetchContent_Populate(HighFive)
 FetchContent_GetProperties(HighFive SOURCE_DIR HighFive_SOURCE_DIR)
@@ -399,7 +399,7 @@ if(BUILD_RCPP)
     get_target_property(LIBHWLOC_LINK hw_detect LINK_LIBRARIES)
     list(JOIN LIBHWLOC_LINK " " LIBHWLOC_LINK)
     target_link_libraries(nmflib PRIVATE ${BLAS_LIBRARIES} ${LIBHWLOC_LINK} ${R_LDFLAGS} -lgfortran -lquadmath -lm)
-    install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../src" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../src" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../../src")
+    install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../")
     configure_file(../Makevars.in ../Makevars.gen @ONLY)
     file(GENERATE OUTPUT ../Makevars INPUT ../Makevars.gen)
 elseif(SKBUILD)
