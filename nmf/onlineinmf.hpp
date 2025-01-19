@@ -506,7 +506,7 @@ private:
 #endif
     }
 public:
-    void projectNewData(std::vector<std::unique_ptr<T1>>& E_new, const int& ncores) {
+    void projectNewData(std::vector<std::shared_ptr<T1>>& E_new, const int& ncores) {
         // Main loop of online updating algorithm (S3)
         // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
         this->dataIdxPrev = this->dataIdx;
@@ -567,7 +567,7 @@ public:
 #endif
 #endif
     }
-    ONLINEINMF(std::vector<std::unique_ptr<T1>>& Ei, arma::uword k, double lambda) : INMF<T1>(Ei, k, lambda, false) {
+    ONLINEINMF(std::vector<std::shared_ptr<T1>>& Ei, arma::uword k, double lambda) : INMF<T1>(Ei, k, lambda, false) {
         this->dataIdx = arma::linspace<arma::uvec>(0, this->nDatasets - 1, this->nDatasets);
         this->minibatchSizes = arma::zeros<arma::uvec>(this->nDatasets);
         this->epoch = arma::zeros<arma::uvec>(this->nDatasets);
@@ -703,7 +703,7 @@ public:
 
     // Scenario 2, project == false (default): Online iNMF on new data, factorized upon existing factorization
     // Scenario 3, project == true:  Project new datasets without updating existing factorization
-    void runOnlineINMF(std::vector<std::unique_ptr<T1>>& E_new,
+    void runOnlineINMF(std::vector<std::shared_ptr<T1>>& E_new,
                        arma::uword minibatchSize = 5000, arma::uword inputmaxEpochs = 5,
                        arma::uword maxHALSIter = 1, bool verbose = true, const int& ncores = 0) {
         // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
@@ -760,7 +760,7 @@ public:
 }; // class ONLINEINMF
 
 template<>
-void ONLINEINMF<H5Mat>::permuteChunkIdx(int i) {
+inline void ONLINEINMF<H5Mat>::permuteChunkIdx(int i) {
     // If T is H5Mat, need to get chunkSize to its `colChunkSize` attribute
     unsigned int colChunkSize = this->Ei[i]->colChunkSize;
     arma::uword dataSize = this->ncol_E[i];
