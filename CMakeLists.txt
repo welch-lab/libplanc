@@ -312,8 +312,8 @@ if(HWLOC_FOUND)
     target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
 elseif(MSVC)
     FetchContent_Declare(hwloc
-    URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
-    URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
+    URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
+    URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
     SOURCE_SUBDIR contrib/windows-cmake
     )
     set(HWLOC_ENABLE_TESTING INTERNAL BOOL OFF)
@@ -326,20 +326,24 @@ else()
     list(APPEND cmd ../hwloc/configure --with-pic --prefix=${hwloc_SOURCE_DIR}/out/ --disable-picky --enable-shared=no --enable-static=yes)
     list(APPEND cmd --disable-cairo --disable-libxml2 --disable-io --disable-plugin-dlopen --disable-plugin-ltdl --enable-embedded-mode)
     if(WIN32)
-        list(APPEND cmd --build=x86_64-w64-mingw32)
+        if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES ARM64)
+            list(APPEND cmd --build=aarch64-w64-mingw32)
+        else()
+            list(APPEND cmd --build=x86_64-w64-mingw32)
+        endif()
     elseif(PASSTHROUGH_CONFIGURE_ARGS)
         list(APPEND cmd ${PASSTHROUGH_CONFIGURE_ARGS})
     endif()
     if(BUILD_RCPP)
-        if(WIN32)
-            # prioritize Git Patch on Windows as other Patches may be very old and incompatible.
-            find_package(Git)
-
-            if(Git_FOUND)
-                get_filename_component(GIT_DIR ${GIT_EXECUTABLE} DIRECTORY)
-                get_filename_component(GIT_DIR ${GIT_DIR} DIRECTORY)
-            endif()
-        endif()
+        #if(WIN32)
+        #    # prioritize Git Patch on Windows as other Patches may be very old and incompatible.
+        #    #find_package(Git)
+#
+        #    #if(Git_FOUND)
+        #    #    get_filename_component(GIT_DIR ${GIT_EXECUTABLE} DIRECTORY)
+        #    #    get_filename_component(GIT_DIR ${GIT_DIR} DIRECTORY)
+        #    #endif()
+        #endif()
 
         find_program(PATCH
             NAMES patch
@@ -348,15 +352,15 @@ else()
         )
         file(GLOB hwloc_patch_list LIST_DIRECTORIES FALSE "${CMAKE_CURRENT_SOURCE_DIR}../../../tools/patches/*.patch")
         ExternalProject_Add(hwloc
-            URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
-            URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
+                URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
+                URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
             PATCH_COMMAND ${CMAKE_COMMAND} -E cat ${hwloc_patch_list} | ${PATCH} -p1 -l
             CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd}
         )
         else()
         ExternalProject_Add(hwloc
-            URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
-            URL_HASH SHA256=5985db3a30bbe51234c2cd26ebe4ae9b4c3352ab788b1a464c40c0483bf4de59
+                URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
+                URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
             BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
             CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd}
         )
