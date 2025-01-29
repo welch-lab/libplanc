@@ -8,7 +8,7 @@
 
 namespace planc {
     template<typename T, typename eT>
-    nmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::nmf(const T& x, const arma::uword& k, const arma::uword& niter,
+    nmfOutput<eT> nmflib<T, eT>::nmf(const T& x, const arma::uword& k, const arma::uword& niter,
                                                const std::string& algo, const int& nCores, const arma::Mat<eT>& Winit, const arma::Mat<eT>& Hinit) {
         internalParams options(x, Winit, Hinit);
         options.setMK(k);
@@ -25,7 +25,7 @@ namespace planc {
     // T1 e.g. BPPNMF<arma::sp_mat>
     // T2 e.g. arma::sp_mat
     template<typename T, typename eT>
-    nmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
+    nmfOutput<eT> nmflib<T, eT>::symNMF(const T& x, const arma::uword& k, const arma::uword& niter, const double& lambda, const std::string& algo, const int& nCores,
                          const arma::Mat<eT>& Hinit) {
         internalSymmParams options(x, Hinit);
         options.setMK(k);
@@ -45,7 +45,7 @@ namespace planc {
         return outlist;
     }
     template <typename T, typename eT>
-    inmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword &k, const double &lambda,
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword &k, const double &lambda,
                    const arma::uword &niter, const bool &verbose, const int& ncores)
     {
         BPPINMF<T> solver(objectList, k, lambda);
@@ -65,7 +65,7 @@ namespace planc {
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};
     }
     template <typename T, typename eT>
-    inmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword &k, const double &lambda,
+    inmfOutput<eT> nmflib<T, eT>::bppinmf(std::vector<std::shared_ptr<T>> objectList, const arma::uword &k, const double &lambda,
                        const arma::uword &niter, const bool &verbose,
                        const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit,
                        const int& ncores)
@@ -87,7 +87,7 @@ namespace planc {
         return {solver.getW(), resolvedH, resolvedV, solver.objErr()};;
     }
     template <typename T, typename eT>
-    std::vector<std::shared_ptr<T>> NMFLIB_EXPORT nmflib<T, eT>::initMemSharedPtr(std::vector<T> objectList)
+    std::vector<std::shared_ptr<T>> nmflib<T, eT>::initMemSharedPtr(std::vector<T> objectList)
     {
     std::vector<std::shared_ptr<T>> matPtrVec;
     for (arma::uword i = 0; i < objectList.size(); ++i)
@@ -133,7 +133,7 @@ namespace planc {
 //         return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedU};
 //     }
 template <typename T, typename eT>
-oinmfOutput<eT> NMFLIB_EXPORT nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const arma::uword &k, const int &nCores,
+oinmfOutput<eT> nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const arma::uword &k, const int &nCores,
 const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize,
 const arma::uword &maxHALSIter, const bool &verbose) {
     ONLINEINMF<T> solver(matPtrVec, k, lambda);
@@ -170,7 +170,7 @@ const arma::uword &maxHALSIter, const bool &verbose) {
 }
 //
 template <typename T, typename eT>
-oinmfOutput<eT> NMFLIB_EXPORT nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec,
+oinmfOutput<eT> nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec,
     const std::vector<arma::mat> &Vinit, const arma::mat &Winit,
     const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit,
     std::vector<std::shared_ptr<T>> matPtrVecNew,
@@ -211,7 +211,7 @@ oinmfOutput<eT> NMFLIB_EXPORT nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>
         return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedA, resolvedB};
     }
 template <typename T, typename eT>
-std::vector<arma::Mat<eT>> NMFLIB_EXPORT nmflib<T,eT>::oinmf_project(std::vector<std::shared_ptr<T>> matPtrVec, const arma::mat &Winit,
+std::vector<arma::Mat<eT>> nmflib<T,eT>::oinmf_project(std::vector<std::shared_ptr<T>> matPtrVec, const arma::mat &Winit,
     std::vector<std::shared_ptr<T>> matPtrVecNew,
     const arma::uword &k, const int& nCores, const double &lambda) {
     ONLINEINMF<T> solver(matPtrVec, k, lambda);
