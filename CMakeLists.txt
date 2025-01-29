@@ -328,8 +328,10 @@ else()
     if(WIN32)
         if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES ARM64)
             list(APPEND cmd --build=aarch64-w64-mingw32)
+	    set(HWLOC_LD ld.lld)
         else()
             list(APPEND cmd --build=x86_64-w64-mingw32)
+	    set(HWLOC_LD ld)
         endif()
     elseif(PASSTHROUGH_CONFIGURE_ARGS)
         list(APPEND cmd ${PASSTHROUGH_CONFIGURE_ARGS})
@@ -355,14 +357,15 @@ else()
                 URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
                 URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
             PATCH_COMMAND ${CMAKE_COMMAND} -E cat ${hwloc_patch_list} | ${PATCH} -p1 -l
-            CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd}
+	    BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
+	    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "LD=${HWLOC_LD}" "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
         )
         else()
         ExternalProject_Add(hwloc
                 URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
                 URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
             BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
-            CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd}
+            CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
         )
     endif()
     ExternalProject_Get_Property(hwloc SOURCE_DIR BINARY_DIR)
