@@ -176,9 +176,7 @@ oinmfOutput<eT> nmflib<T,eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec,
     std::vector<std::shared_ptr<T>> matPtrVecNew,
     const arma::uword &k, const int& nCores, const double &lambda, const arma::uword &maxEpoch,
     const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose) {
-        ONLINEINMF<T> solver(matPtrVec, k, lambda);
-        solver.initV(Vinit, false);
-        solver.initW(Winit, false);
+        ONLINEINMF<T> solver(matPtrVec, k, lambda, Vinit, Winit);
         solver.initA(Ainit);
         solver.initB(Binit);
         solver.runOnlineINMF(matPtrVecNew, minibatchSize, maxEpoch, maxHALSIter, verbose, nCores);

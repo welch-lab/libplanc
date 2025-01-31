@@ -578,6 +578,18 @@ public:
         }
     }
 
+    ONLINEINMF(std::vector<std::shared_ptr<T1>>& Ei, arma::uword k, double lambda, std::vector<arma::mat> VinitList,
+            arma::mat Winit) : INMF<T1>(Ei, k, lambda, VinitList, Winit, false) {
+        this->dataIdx = arma::linspace<arma::uvec>(0, this->nDatasets - 1, this->nDatasets);
+        this->minibatchSizes = arma::zeros<arma::uvec>(this->nDatasets);
+        this->epoch = arma::zeros<arma::uvec>(this->nDatasets);
+        this->epochPrev = arma::zeros<arma::uvec>(this->nDatasets);
+        this->epochNext = false;
+        for (arma::uword i = 0; i < this->nDatasets; ++i) {
+            this->samplingIdx.push_back(arma::zeros<arma::uvec>(this->ncol_E[i]));
+        }
+    }
+
     // %%%%%%%%%%%%%%% Public initializers %%%%%%%%%%%%%%%%%%%%%%%
     void initA(const std::vector<arma::mat>& Ainit) {
         // Set A matrices for existing datasets (S2)

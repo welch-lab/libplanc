@@ -154,12 +154,11 @@ namespace planc {
         this->initV();
         this->INMF::initH();
         }
-        INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
+        INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
             std::vector<arma::mat> VinitList, arma::mat Winit,  bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
             this->initW(Winit);
             this->initV(VinitList);
-            this->INMF::initH(HinitList);
         }
         virtual void initH(std::vector<arma::mat>& Hinit) {
 #ifdef _VERBOSE
