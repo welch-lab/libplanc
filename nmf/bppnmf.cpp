@@ -16,7 +16,7 @@ inline void BPPNMF<arma::sp_mat>::computeNMF() {
     // this->At = this->A.t();  // do it once
     // INFO << "At time::" << toc() << std::endl;
     // run hals once to get proper initializations
-    HALSNMF<arma::sp_mat> tempHals(this->A, this->W, this->H);
+    HALSNMF tempHals(this->A, this->W, this->H);
     tempHals.num_iterations(2);
     this->W = tempHals.getLeftLowRankFactor();
     this->H = tempHals.getRightLowRankFactor();

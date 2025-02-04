@@ -17,7 +17,7 @@ template std::vector<arma::Mat<double>> planc::nmflib<T, double>::oinmf_project(
 #include "inmf_types.inc"
 #undef X
 //template planc::uinmfOutput<double> planc::nmflib<T, double>::uinmf(const std::vector<T> &objectList, const std::vector<T> &unsharedList, std::vector<int> whichUnshared, const arma::uword &k, const int& nCores, const arma::vec &lambda, const arma::uword &niter, const bool &verbose);
-void planc::openblas_pthread_off(openblas_handle_t libloc) {
+void planc::openblas_pthread_off(const openblas_handle_t libloc) {
     if (is_openmp()) {
         if (const std::function openblas_parallel = get_openblas_parallel(libloc)) {
             if (openblas_parallel() == 1) {
@@ -29,7 +29,7 @@ void planc::openblas_pthread_off(openblas_handle_t libloc) {
 }
 
 
-void planc::openblas_pthread_on(openblas_handle_t libloc) {
+void planc::openblas_pthread_on(const openblas_handle_t libloc) {
     if (is_openmp()) {
         if (const std::function openblas_parallel = get_openblas_parallel(libloc)) {
             if (openblas_parallel() == 1) {

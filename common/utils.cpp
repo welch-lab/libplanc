@@ -10,25 +10,23 @@
 void tic() { tictoc_stack.push(std::chrono::steady_clock::now()); }
 
 double toc() {
-    auto time_span =
+    const auto time_span =
             std::chrono::duration_cast<std::chrono::duration<double>>(
                 std::chrono::steady_clock::now() - tictoc_stack.top());
-    double rc = time_span.count();
+    const double rc = time_span.count();
     tictoc_stack.pop();
     return rc;
 }
 
 int random_sieve(const int nthprime) {
     int i, m, k;
-    int klimit, nlimit;
-    int* mark;
 
-    nlimit = 104000;
+    constexpr int nlimit = 104000;
 
-    mark = reinterpret_cast<int *>(calloc(nlimit, sizeof(int)));
+    const auto mark = static_cast<int *>(calloc(nlimit, sizeof(int)));
 
     /* Calculate limit for k */
-    klimit = static_cast<int>(sqrt(static_cast<double>(nlimit) + 1));
+    const int klimit = static_cast<int>(sqrt(static_cast<double>(nlimit) + 1));
 
     /* Mark the composites */
     /* Special case */
@@ -106,26 +104,28 @@ std::vector<std::vector<size_t>> cartesian_product(
 }
 
 void cblas_sgemm(const arma::mat&A, const arma::mat&B, double* C) {
-    arma::uword m = A.n_rows;
-    arma::uword n = B.n_cols;
-    arma::uword k = A.n_cols;
-    double alpha = 1.0;
-    double beta = 0.0;
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, (int32_t)m, (int32_t)n, (int32_t)k, alpha,
-                A.memptr(), (int32_t)m, B.memptr(), (int32_t)k, beta, C, (int32_t)m);
+    const arma::uword m = A.n_rows;
+    const arma::uword n = B.n_cols;
+    const arma::uword k = A.n_cols;
+    constexpr double alpha = 1.0;
+    constexpr double beta = 0.0;
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, static_cast<int32_t>(m), static_cast<int32_t>(n),
+                static_cast<int32_t>(k), alpha,
+                A.memptr(), static_cast<int32_t>(m), B.memptr(), static_cast<int32_t>(k), beta, C,
+                static_cast<int32_t>(m));
 }
 
-void gen_discard(arma::uword row_start, arma::uword nrows, arma::uword k,
-                 arma::mat&X, bool trans, int mseed) {
+void gen_discard(const arma::uword row_start, const arma::uword nrows, const arma::uword k,
+                 arma::mat&X, const bool trans, const int mseed) {
     for (unsigned int j = 0; j < k; ++j) {
         std::mt19937 gen(mseed + j);
         gen.discard(row_start);
         for (unsigned int i = 0; i < nrows; ++i) {
             if (trans) {
-                X(j, i) = ((double)gen()) / std::mt19937::max();
+                X(j, i) = static_cast<double>(gen()) / std::mt19937::max();
             }
             else {
-                X(i, j) = ((double)gen()) / std::mt19937::max();
+                X(i, j) = static_cast<double>(gen()) / std::mt19937::max();
             }
         }
     }
@@ -140,8 +140,9 @@ void read_input_matrix(arma::sp_mat&A, std::string fname) {
 }
 
 void generate_rand_matrix(arma::mat&A, const std::string&rtype,
-                          arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag,
-                          bool adjrand, int kalpha, int kbeta) {
+                          const arma::uword m, const arma::uword n, const arma::uword k, double density,
+                          const bool symm_flag,
+                          const bool adjrand, const int kalpha, const int kbeta) {
     if (rtype == "uniform") {
         if (symm_flag) {
             A = arma::randu<arma::mat>(m, n);
@@ -183,7 +184,7 @@ void generate_rand_matrix(arma::mat&A, const std::string&rtype,
         }
     }
     if (adjrand) {
-        A = kalpha * (A) + kbeta;
+        A = kalpha * A + kbeta;
         A = ceil(A);
     }
 }
@@ -217,7 +218,7 @@ void generate_rand_matrix(arma::sp_mat&A, const std::string&rtype,
             double dens = 0.5 * density;
             auto mask = arma::sprandu<arma::sp_mat>(m, n, dens);
             mask = 0.5 * (mask + mask.t());
-            mask = arma::spones(mask);
+            mask = spones(mask);
             arma::mat Htrue = arma::zeros(n, k);
             gen_discard(0, n, k, Htrue, false, HTRUE_SEED);
             A = arma::sp_mat(mask % (Htrue * Htrue.t()));
@@ -228,7 +229,7 @@ void generate_rand_matrix(arma::sp_mat&A, const std::string&rtype,
         }
         else {
             auto mask = arma::sprandu<arma::sp_mat>(m, n, density);
-            mask = arma::spones(mask);
+            mask = spones(mask);
             arma::mat Wtrue = arma::zeros(m, k);
             gen_discard(0, m, k, Wtrue, false, WTRUE_SEED);
             arma::mat Htrue = arma::zeros(k, n);
@@ -245,11 +246,11 @@ void generate_rand_matrix(arma::sp_mat&A, const std::string&rtype,
     arma::sp_mat::iterator start_it = A.begin();
     arma::sp_mat::iterator end_it = A.end();
     for (arma::sp_mat::iterator it = start_it; it != end_it; ++it) {
-        double curVal = (*it);
+        double curVal = *it;
         if (adjrand) {
-            (*it) = ceil(kalpha * curVal + kbeta);
+            *it = ceil(kalpha * curVal + kbeta);
         }
-        if ((*it) < 0) (*it) = kbeta;
+        if (*it < 0) *it = kbeta;
     }
 }
 
