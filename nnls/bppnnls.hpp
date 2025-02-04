@@ -4,20 +4,21 @@
 #include "nnls.hpp"
 #include "SortBooleanMatrix.hpp"
 
-template <class MATTYPE, class VECTYPE>
+template<class MATTYPE, class VECTYPE>
 class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
- public:
-    BPPNNLS(MATTYPE input, VECTYPE rhs, bool prodSent = false):
-        NNLS<MATTYPE, VECTYPE>(input, rhs, prodSent) {
+public:
+    BPPNNLS(MATTYPE input, VECTYPE rhs, bool prodSent = false): NNLS<MATTYPE, VECTYPE>(input, rhs, prodSent) {
     }
-    BPPNNLS(MATTYPE input, MATTYPE RHS, bool prodSent = false) :
-        NNLS<MATTYPE, VECTYPE>(input, RHS, prodSent) {
+
+    BPPNNLS(MATTYPE input, MATTYPE RHS, bool prodSent = false) : NNLS<MATTYPE, VECTYPE>(input, RHS, prodSent) {
     }
+
     int solveNNLS() {
         int rcIterations = 0;
         if (this->k == 1) {
             rcIterations = solveNNLSOneRHS();
-        } else {
+        }
+        else {
             // k must be greater than 1 in this case.
             // we initialized k appropriately in the
             // constructor.
@@ -26,7 +27,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         return rcIterations;
     }
 
- private:
+private:
     /**
      * This implementation is based on Algorithm 1 on Page 6 of paper
      * http://www.cc.gatech.edu/~hpark/papers/SISC_082117RR_Kim_Park.pdf.
@@ -70,10 +71,10 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         P.fill(pbar);
 
         arma::urowvec Ninf(this->k);
-        Ninf.fill(this->n+1);
+        Ninf.fill(this->n + 1);
 
-        arma::umat NonOptSet  = (Y < 0) % (PassiveSet == 0);
-        arma::umat InfeaSet   = (this->X < 0) % PassiveSet;
+        arma::umat NonOptSet = (Y < 0) % (PassiveSet == 0);
+        arma::umat InfeaSet = (this->X < 0) % PassiveSet;
         arma::urowvec NotGood = arma::sum(NonOptSet) + arma::sum(InfeaSet);
         arma::urowvec NotOptCols = (NotGood > 0);
 
@@ -93,10 +94,11 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         while (numNonOptCols > 0) {
             iter++;
             try {
-            if ((MAX_ITERATIONS <= 0) || (iter > MAX_ITERATIONS)) {
-                throw std::logic_error("invalid iteration call");
+                if ((MAX_ITERATIONS <= 0) || (iter > MAX_ITERATIONS)) {
+                    throw std::logic_error("invalid iteration call");
+                }
             }
-            }  catch(std::exception &ex) {
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -107,7 +109,7 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             Cols1 = NotOptCols % (NotGood < Ninf);
             Cols2 = NotOptCols % (NotGood >= Ninf) % (P >= 1);
             arma::urowvec Cols3Ix = arma::conv_to<arma::urowvec>::from(
-                        arma::find(NotOptCols % (Cols1 == 0) % (Cols2 == 0)));
+                arma::find(NotOptCols % (Cols1 == 0) % (Cols2 == 0)));
 
             // Columns that didn't increase number of infeasible variables
             if (!Cols1.empty()) {
@@ -146,13 +148,14 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             // Columns using backup rule
             if (!Cols3Ix.empty()) {
                 arma::urowvec::iterator citr;
-                for (citr = Cols3Ix.begin(); citr !=  Cols3Ix.end(); ++citr) {
+                for (citr = Cols3Ix.begin(); citr != Cols3Ix.end(); ++citr) {
                     arma::uword colidx = *citr;
                     arma::uword rowidx = arma::max(arma::find(
                         NonOptSet.col(colidx) + InfeaSet.col(colidx)));
                     if (PassiveSet(rowidx, colidx) > 0) {
                         PassiveSet(rowidx, colidx) = 0u;
-                    } else {
+                    }
+                    else {
                         PassiveSet(rowidx, colidx) = 1u;
                     }
                 }
@@ -160,10 +163,10 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
 
             arma::uvec NotOptColsIx = arma::find(NotOptCols);
             this->X.cols(NotOptColsIx) = solveNormalEqComb(this->AtA,
-                                   this->AtB.cols(NotOptColsIx),
-                                   PassiveSet.cols(NotOptColsIx));
+                                                           this->AtB.cols(NotOptColsIx),
+                                                           PassiveSet.cols(NotOptColsIx));
             Y.cols(NotOptColsIx) = (this->AtA * this->X.cols(NotOptColsIx))
-                             - this->AtB.cols(NotOptColsIx);
+                                   - this->AtB.cols(NotOptColsIx);
             // X(abs(X)<1e-12) = 0;
             fixAbsNumericalError<MATTYPE>(&this->X, EPSILON_1EMINUS12, 0.0);
             // Y(abs(Y)<1e-12) = 0;
@@ -173,8 +176,8 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             NotOptMask.ones();
             NotOptMask.each_row() %= NotOptCols;
 
-            NonOptSet  = (Y < 0) % (PassiveSet == 0);
-            InfeaSet   = (this->X < 0) % PassiveSet;
+            NonOptSet = (Y < 0) % (PassiveSet == 0);
+            InfeaSet = (this->X < 0) % PassiveSet;
             NotGood = arma::sum(NonOptSet) + arma::sum(InfeaSet);
             NotOptCols = (NotGood > 0);
             numNonOptCols = arma::accu(NotOptCols);
@@ -200,7 +203,8 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         if (anyZeros.empty()) {
             // Everything is the in the passive set.
             Z = arma::solve(AtA, AtB, arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
-        } else {
+        }
+        else {
             arma::uvec Pv = arma::find(PassSet != 0);
             Z.resize(AtB.n_rows, AtB.n_cols);
             Z.zeros();
@@ -208,8 +212,9 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
             if (k1 == 1) {
                 // Single column to solve for.
                 Z(Pv) = arma::solve(AtA(Pv, Pv), AtB(Pv),
-                                arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
-            } else {
+                                    arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
+            }
+            else {
                 // we have to group passive set columns that are same.
                 // find the correlation matrix of passive set matrix.
                 std::vector<arma::uword> sortedIdx, beginIdx;
@@ -222,10 +227,10 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
 
                     // Create submatrices of indices for solve.
                     arma::uvec samePassiveSetCols(std::vector<arma::uword>
-                                            (sortedIdx.begin() + sortedBeginIdx,
-                                             sortedIdx.begin() + sortedEndIdx));
+                    (sortedIdx.begin() + sortedBeginIdx,
+                     sortedIdx.begin() + sortedEndIdx));
                     arma::uvec currentPassiveSet = arma::find(
-                            PassSet.col(sortedIdx[sortedBeginIdx]) == 1);
+                        PassSet.col(sortedIdx[sortedBeginIdx]) == 1);
 #ifdef _VERBOSE
                     INFO << "samePassiveSetCols::" << std::endl
                          <<  samePassiveSetCols << std::endl;
@@ -239,9 +244,9 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
                          << std::endl;
 #endif
                     Z(currentPassiveSet, samePassiveSetCols) = arma::solve(
-                            AtA(currentPassiveSet, currentPassiveSet),
-                            AtB(currentPassiveSet, samePassiveSetCols),
-                            arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
+                        AtA(currentPassiveSet, currentPassiveSet),
+                        AtB(currentPassiveSet, samePassiveSetCols),
+                        arma::solve_opts::likely_sympd + arma::solve_opts::no_approx);
                 }
             }
         }
@@ -251,19 +256,19 @@ class BPPNNLS : public NNLS<MATTYPE, VECTYPE> {
         return Z;
     }
 
-   /**
-    * Passset is a binary matrix where every column represents
-    * one datapoint. The objective is to returns a low triangular
-    * correlation matrix with 1 if the strings are equal. Zero otherwise
-    *
-    * @param[in] The binary matrix being grouped
-    * @param[in] Reference to the array containing lexicographically sorted
-    *            columns of the binary matrix
-    * @param[in] Running indices of the grouped columns in the sorted index
-    *            array
-    */
-    void computeCorrelationScore(arma::umat &PassSet, std::vector<arma::uword> &sortedIdx,
-                                 std::vector<arma::uword> &beginIndex) {
+    /**
+     * Passset is a binary matrix where every column represents
+     * one datapoint. The objective is to returns a low triangular
+     * correlation matrix with 1 if the strings are equal. Zero otherwise
+     *
+     * @param[in] The binary matrix being grouped
+     * @param[in] Reference to the array containing lexicographically sorted
+     *            columns of the binary matrix
+     * @param[in] Running indices of the grouped columns in the sorted index
+     *            array
+     */
+    void computeCorrelationScore(arma::umat&PassSet, std::vector<arma::uword>&sortedIdx,
+                                 std::vector<arma::uword>&beginIndex) {
         SortBooleanMatrix<arma::umat> sbm(PassSet);
         sortedIdx = sbm.sortIndex();
         BooleanArrayComparator<arma::umat> bac(PassSet);

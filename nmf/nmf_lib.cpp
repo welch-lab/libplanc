@@ -19,27 +19,27 @@ template std::vector<arma::Mat<double>> planc::nmflib<T, double>::oinmf_project(
 //template planc::uinmfOutput<double> planc::nmflib<T, double>::uinmf(const std::vector<T> &objectList, const std::vector<T> &unsharedList, std::vector<int> whichUnshared, const arma::uword &k, const int& nCores, const arma::vec &lambda, const arma::uword &niter, const bool &verbose);
 void planc::openblas_pthread_off(openblas_handle_t libloc) {
     if (is_openmp()) {
-        if (const std::function openblas_parallel = get_openblas_parallel(libloc))
-            {
-                if (openblas_parallel() == 1) {
-                    const std::function openblas_set = get_openblas_set(libloc);
-                    openblas_set(1);
-                }
+        if (const std::function openblas_parallel = get_openblas_parallel(libloc)) {
+            if (openblas_parallel() == 1) {
+                const std::function openblas_set = get_openblas_set(libloc);
+                openblas_set(1);
             }
-    }
-}
-
-
-void planc::openblas_pthread_on(openblas_handle_t libloc) {if (is_openmp()) {
-    if (const std::function openblas_parallel = get_openblas_parallel(libloc))
-    {
-        if (openblas_parallel() == 1) {
-            const std::function openblas_set = get_openblas_set(libloc);
-            openblas_set(0);
         }
     }
 }
+
+
+void planc::openblas_pthread_on(openblas_handle_t libloc) {
+    if (is_openmp()) {
+        if (const std::function openblas_parallel = get_openblas_parallel(libloc)) {
+            if (openblas_parallel() == 1) {
+                const std::function openblas_set = get_openblas_set(libloc);
+                openblas_set(0);
+            }
+        }
+    }
 }
+
 //
 // planc::nmfOutput<double> (*ptrnmf)(const arma::Mat<double>&x, const arma::uword&k, const arma::uword&niter,
 //                                    const std::string&algo, const int&nCores, const arma::Mat<double>&Winit,

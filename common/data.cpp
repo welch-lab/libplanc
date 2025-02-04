@@ -32,7 +32,8 @@ namespace planc {
         std::string filename, datapath;
         arma::uword n_cols, n_rows, colChunkSize, rowChunkSize;
         std::vector<hsize_t> chunk_dims;
-        static std::string increUniqName(const std::string& base) {
+
+        static std::string increUniqName(const std::string&base) {
             int suffix = 0;
             std::string tempPath = base + std::to_string(suffix) + ".h5";
             while (std::filesystem::exists(tempPath)) {
@@ -41,8 +42,9 @@ namespace planc {
             }
             return tempPath;
         }
+
     public:
-        H5MatImpl(const std::string& filename, const std::string& datapath) {
+        H5MatImpl(const std::string&filename, const std::string&datapath) {
             this->filename = filename;
             this->datapath = datapath;
             this->LinkedFile = std::make_shared<HighFive::File>(this->filename, HighFive::File::ReadOnly);
@@ -51,57 +53,59 @@ namespace planc {
             // Get the rank (number of dimensions) of the H5D
             const size_t i = dataspace.getNumberDimensions();
             const unsigned int rank = i;
-             // Check if the rank is 2
-             if (rank != 2u) {
+            // Check if the rank is 2
+            if (rank != 2u) {
 #ifdef USING_R
-                 Rcpp::Rcout
+                Rcpp::Rcout
 #else
                  std::cout
 #endif
-                 << "The H5D does not have a rank of 2." << std::endl;
-                }
-                const std::vector<size_t> dims = dataspace.getDimensions();
-                // dataspace.close();
-                this->n_cols = dims[0];
-                this->n_rows = dims[1];
+                        << "The H5D does not have a rank of 2." << std::endl;
+            }
+            const std::vector<size_t> dims = dataspace.getDimensions();
+            // dataspace.close();
+            this->n_cols = dims[0];
+            this->n_rows = dims[1];
 
-                HighFive::DataSetCreateProps cparms = H5D.getCreatePropertyList();
-                this->chunk_dims = HighFive::Chunking(cparms).getDimensions();
+            HighFive::DataSetCreateProps cparms = H5D.getCreatePropertyList();
+            this->chunk_dims = HighFive::Chunking(cparms).getDimensions();
 
-                this->colChunkSize = chunk_dims[0];
-                this->rowChunkSize = chunk_dims[1];
-                // cparms.close();
+            this->colChunkSize = chunk_dims[0];
+            this->rowChunkSize = chunk_dims[1];
+            // cparms.close();
 
-                //#ifdef _VERBOSE
+            //#ifdef _VERBOSE
 #ifdef USING_R
-                Rcpp::Rcout
-    #else
+            Rcpp::Rcout
+#else
                 std::cout
-    #endif
-                        << "==H5Mat constructed==" << std::endl
-                        << "H5File:    " << this->filename << std::endl
-                        << "Mat path:  " << this->datapath << std::endl
-                        << "Dimension: " << this->n_rows << " x " << this->n_cols << std::endl;
-                //#endif
+#endif
+                    << "==H5Mat constructed==" << std::endl
+                    << "H5File:    " << this->filename << std::endl
+                    << "Mat path:  " << this->datapath << std::endl
+                    << "Dimension: " << this->n_rows << " x " << this->n_cols << std::endl;
+            //#endif
         }
+
         arma::mat cols(const arma::uword start, const arma::uword end) const {
             try {
                 if (start < 0) {
                     throw std::invalid_argument(
-                            "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (start > end) {
                     throw std::invalid_argument(
-                            "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (end >= this->n_cols) {
                     throw std::invalid_argument(
-                            "`end` must be less than the number of columns, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`end` must be less than the number of columns, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
-            }  catch(std::exception &ex) {
+            }
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -126,6 +130,7 @@ namespace planc {
             // memspace.close();
             return chunk;
         }
+
         arma::mat cols(arma::uvec index) const {
             arma::mat out(this->n_rows, index.size());
             // Identify contiguous ranges from `index` and use .cols(start, end) for each range
@@ -137,7 +142,8 @@ namespace planc {
                     if (curr > this->n_cols - 1) {
                         throw std::invalid_argument("Index " + std::to_string(curr) + " is out of range.");
                     }
-                }  catch(std::exception &ex) {
+                }
+                catch (std::exception&ex) {
 #ifdef USING_R
                     std::string ex_str = ex.what();
                     Rcpp::stop(ex_str);
@@ -148,7 +154,8 @@ namespace planc {
                 if (curr == end + 1) {
                     // Still contiguous
                     end = curr;
-                } else {
+                }
+                else {
                     out.cols(outStart, outEnd) = this->cols(start, end);
                     outStart = outEnd + 1;
                     start = curr;
@@ -159,24 +166,26 @@ namespace planc {
             out.cols(outStart, outEnd) = this->cols(start, end);
             return out;
         }
+
         arma::mat rows(const arma::uword start, const arma::uword end) const {
             try {
                 if (start < 0) {
                     throw std::invalid_argument(
-                            "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (start > end) {
                     throw std::invalid_argument(
-                            "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (end >= this->n_rows) {
                     throw std::invalid_argument(
-                            "`end` must be less than the number of rows, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`end` must be less than the number of rows, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
-            }  catch(std::exception &ex) {
+            }
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -201,23 +210,27 @@ namespace planc {
             // memspace.close();
             return chunk;
         }
+
         // not thread-safe
         H5Mat t() const {
             // Create new H5 FILE with only the transposed dataset
             const std::string tmpfilename = increUniqName(this->filename + ".dense_transposed.");
-            HighFive::File tmpfile(tmpfilename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+            HighFive::File tmpfile(tmpfilename,
+                                   HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
             // Set specified chunk dimension for the new dataset
             std::vector<hsize_t> chunk_dims_new;
             if (this->colChunkSize > this->n_rows) {
                 // Mainly happening in small unit test case, but worth checking
                 chunk_dims_new.push_back(this->n_rows);
-            } else {
+            }
+            else {
                 chunk_dims_new.push_back(this->colChunkSize);
             }
             if (this->rowChunkSize > this->n_cols) {
                 // Mainly happening in small unit test case, but worth checking
                 chunk_dims_new.push_back(this->n_cols);
-            } else {
+            }
+            else {
                 chunk_dims_new.push_back(this->rowChunkSize);
             }
             const HighFive::Chunking newChunks(chunk_dims_new);
@@ -232,15 +245,15 @@ namespace planc {
 #else
             std::cout
 #endif
-                << "Creating transposed data at "
-                << tmpfilename << ":data" << std::endl;
+                    << "Creating transposed data at "
+                    << tmpfilename << ":data" << std::endl;
             const HighFive::DataSet H5DT = tmpfile.createDataSet<double>("data", fspace, cparms_new);
             // HighFive::DataSet H5DT = this->createDataSet<double>(tempPath, fspace, cparms_new);
             //cparms_new.close();
             // H5::DataSpace dataspace = H5DT.getSpace();
             unsigned int nChunks = this->n_rows / this->colChunkSize;
             if (nChunks * this->colChunkSize < this->n_rows) nChunks++;
-            for (unsigned int i=0; i < nChunks; ++i) {
+            for (unsigned int i = 0; i < nChunks; ++i) {
                 arma::uword start = i * this->colChunkSize;
                 arma::uword end = (i + 1) * this->colChunkSize - 1;
                 if (end > this->n_rows - 1) end = this->n_rows - 1;
@@ -262,9 +275,9 @@ namespace planc {
             tmpfile.flush();
             return {tmpfilename, "data"};
         } // End of H5Mat.t()
-    };// End of class H5MatImpl
-    H5Mat::H5Mat(const std::string& filename, const std::string& datapath) {
-        if (!(filename == "" || datapath == "")) {this->is_initialized = true;}
+    }; // End of class H5MatImpl
+    H5Mat::H5Mat(const std::string&filename, const std::string&datapath) {
+        if (!(filename == "" || datapath == "")) { this->is_initialized = true; }
         if (this->is_initialized) {
             m_pimpl = std::make_shared<H5MatImpl>(filename, datapath);
             this->n_cols = m_pimpl->n_cols1();
@@ -272,15 +285,15 @@ namespace planc {
             this->colChunkSize = m_pimpl->col_chunk_size();
             this->rowChunkSize = m_pimpl->row_chunk_size();
         }
-
     }
+
     arma::mat H5Mat::cols(const arma::uword start, const arma::uword end) const { return m_pimpl->cols(start, end); }
 
-    arma::mat H5Mat::cols(const arma::uvec&index) const {return m_pimpl->cols(index); }
+    arma::mat H5Mat::cols(const arma::uvec&index) const { return m_pimpl->cols(index); }
 
-    arma::mat H5Mat::rows(const arma::uword start, const arma::uword end) const {return m_pimpl->rows(start, end);}
+    arma::mat H5Mat::rows(const arma::uword start, const arma::uword end) const { return m_pimpl->rows(start, end); }
 
-    H5Mat H5Mat::t() const {return m_pimpl->t();}
+    H5Mat H5Mat::t() const { return m_pimpl->t(); }
 
     class H5SpMat::H5SpMatImpl : public HighFive::File {
         std::string filename, xPath, iPath, pPath;
@@ -321,6 +334,7 @@ namespace planc {
             // pMemspace.close();
             return p;
         }
+
         arma::uvec getIByRange(arma::uword const start, arma::uword const end) const {
             arma::uvec i(end - start + 1);
             std::vector<size_t> i_start;
@@ -337,6 +351,7 @@ namespace planc {
             // iMemspace.close();
             return i;
         }
+
     public:
         arma::vec getXByRange(arma::uword const start, arma::uword const end) const {
             arma::vec x(end - start + 1);
@@ -354,8 +369,9 @@ namespace planc {
             // xMemspace.close();
             return x;
         }
-        private:
-        static std::string increUniqName(const std::string& base) {
+
+    private:
+        static std::string increUniqName(const std::string&base) {
             int suffix = 0;
             std::string tempPath = base + std::to_string(suffix) + ".h5";
             while (std::filesystem::exists(tempPath)) {
@@ -364,12 +380,13 @@ namespace planc {
             }
             return tempPath;
         }
+
     public:
         arma::uword n_rows, n_cols, nnz;
         arma::uword x_chunksize, i_chunksize, p_chunksize;
         // not thread safe
-        H5SpMatImpl(const std::string& filename, const std::string& iPath, const std::string& pPath,
-                const std::string& xPath, arma::uword n_rows, arma::uword n_cols) : File(filename, ReadWrite) {
+        H5SpMatImpl(const std::string&filename, const std::string&iPath, const std::string&pPath,
+                    const std::string&xPath, arma::uword n_rows, arma::uword n_cols) : File(filename, ReadWrite) {
             this->filename = filename;
             this->iPath = iPath;
             this->pPath = pPath;
@@ -412,33 +429,34 @@ namespace planc {
                     << "Dimension: " << n_rows << " x " << n_cols << std::endl;
             // #endif
         }
-         ~H5SpMatImpl()
-         {
-             this->flush();
-        //     // this->H5D.close();
-        //     // this->H5F.unlink(this->tempPath);
-        //     // TODO: Have to find a way to unlink the temp transposed matrix
-        //     // this->H5F.close();
-         }
+
+        ~H5SpMatImpl() {
+            this->flush();
+            //     // this->H5D.close();
+            //     // this->H5F.unlink(this->tempPath);
+            //     // TODO: Have to find a way to unlink the temp transposed matrix
+            //     // this->H5F.close();
+        }
 
         arma::sp_mat cols(arma::uword const start, arma::uword const end) const {
             try {
                 if (start < 0) {
                     throw std::invalid_argument(
-                            "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be an unsigned int, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (start > end) {
                     throw std::invalid_argument(
-                            "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`start` must be less than or equal to `end`, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
                 if (end >= this->n_cols) {
                     throw std::invalid_argument(
-                            "`end` must be less than the number of columns, got (" + std::to_string(start) + ", " +
-                            std::to_string(end) + ").");
+                        "`end` must be less than the number of columns, got (" + std::to_string(start) + ", " +
+                        std::to_string(end) + ").");
                 }
-            }  catch(std::exception &ex) {
+            }
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -460,6 +478,7 @@ namespace planc {
 
             return chunk;
         }
+
         arma::sp_mat cols(arma::uvec index) const {
             arma::sp_mat out(this->n_rows, index.size());
             // Identify contiguous ranges from `index` and use .cols(start, end) for each range
@@ -471,7 +490,8 @@ namespace planc {
                     if (curr > this->n_cols - 1) {
                         throw std::invalid_argument("Index " + std::to_string(curr) + " is out of range.");
                     }
-                }  catch(std::exception &ex) {
+                }
+                catch (std::exception&ex) {
 #ifdef USING_R
                     std::string ex_str = ex.what();
                     Rcpp::stop(ex_str);
@@ -482,7 +502,8 @@ namespace planc {
                 if (curr == end + 1) {
                     // Still contiguous
                     end = curr;
-                } else {
+                }
+                else {
                     out.cols(outStart, outEnd) = this->cols(start, end);
                     outStart = outEnd + 1;
                     start = curr;
@@ -493,6 +514,7 @@ namespace planc {
             out.cols(outStart, outEnd) = this->cols(start, end);
             return out;
         }
+
         // not thread safe
         H5SpMat t() const {
 #ifdef USING_R
@@ -500,7 +522,8 @@ namespace planc {
 #else
             std::cout
 #endif
-            << "Creating on-disk transposition of the sparse matrix, which is currently poorly supported and slow" << std::endl;
+                    << "Creating on-disk transposition of the sparse matrix, which is currently poorly supported and slow"
+                    << std::endl;
             // Create new H5 FILE with only the transposed dataset
             std::string tmpfilename = this->increUniqName(this->filename + ".sparse_transposed.");
             HighFive::File tmpfile(tmpfilename, ReadWrite | Create | Truncate);
@@ -517,7 +540,7 @@ namespace planc {
                 arma::uword end = (i + 1) * this->i_chunksize - 1;
                 if (end > this->nnz - 1) end = this->nnz - 1;
                 arma::uvec rowind_chunk = this->getIByRange(start, end);
-                for (unsigned int j : rowind_chunk) {
+                for (unsigned int j: rowind_chunk) {
                     // rowind_chunk[j] gives the number referring to which row of the original
                     // or which column of the transposed matrix have a non-zero value
                     colptrT[j + 1]++;
@@ -529,10 +552,11 @@ namespace planc {
             // Write colptrT to HDF5 file
             // std::string ptempPath = this->increUniqName(this->pPath + "_transposed_");
             std::vector<hsize_t> inputp_chunksize;
-            if (this->p_chunksize > this->n_rows+1) {
+            if (this->p_chunksize > this->n_rows + 1) {
                 // Mainly happening in small unit test case, but worth checking
                 inputp_chunksize.push_back(this->n_rows + 1);
-            } else {
+            }
+            else {
                 inputp_chunksize.push_back(this->p_chunksize);
             }
             HighFive::Chunking p_newChunks(inputp_chunksize);
@@ -633,14 +657,15 @@ namespace planc {
             return {tmpfilename, "rowind", "colptr", "value", this->n_cols, this->n_rows};
             // H5SpMat transposedMat(this->filename, itempPath, ptempPath, xtempPath, this->n_cols, this->n_rows);
         } // End of H5SpMat.t()
-          // End of class H5SpMat
-arma::sp_mat t_mem() const {
+        // End of class H5SpMat
+        arma::sp_mat t_mem() const {
 #ifdef USING_R
             Rcpp::Rcout
 #else
             std::cout
 #endif
-            << "Creating in memory of the sparse matrix, which is currently poorly supported and inefficent" << std::endl;
+                    << "Creating in memory of the sparse matrix, which is currently poorly supported and inefficent" <<
+                    std::endl;
             // Create new arma spmat
             // ================= Create the colptr of the transposed matrix =================
             // Read all colptr into memory, it's not big :)
@@ -654,7 +679,7 @@ arma::sp_mat t_mem() const {
                 arma::uword end = (i + 1) * this->i_chunksize - 1;
                 if (end > this->nnz - 1) end = this->nnz - 1;
                 arma::uvec rowind_chunk = this->getIByRange(start, end);
-                for (unsigned int j : rowind_chunk) {
+                for (unsigned int j: rowind_chunk) {
                     // rowind_chunk[j] gives the number referring to which row of the original
                     // or which column of the transposed matrix have a non-zero value
                     colptrT[j + 1]++;
@@ -671,7 +696,7 @@ arma::sp_mat t_mem() const {
             arma::uvec rowind(i_new_size);
             // Create value.T
             size_t x_new_size;
-            x_new_size =this->nnz;
+            x_new_size = this->nnz;
             arma::vec value(x_new_size);
 
             arma::uvec colptrT_start = colptrT;
@@ -715,43 +740,45 @@ arma::sp_mat t_mem() const {
             return {rowind, colptrT, value, this->n_cols, this->n_rows};
             // H5SpMat transposedMat(this->filename, itempPath, ptempPath, xtempPath, this->n_cols, this->n_rows);
         } // End of H5SpMat.t()
-          // End of class H5SpMat
+        // End of class H5SpMat
     };
     ;
 
-    H5SpMat::H5SpMat(const std::string& filename, const std::string& iPath, const std::string& pPath,
-                const std::string& xPath, arma::uword n_rows, arma::uword n_cols) : n_rows(n_rows), n_cols(n_cols){
+    H5SpMat::H5SpMat(const std::string&filename, const std::string&iPath, const std::string&pPath,
+                     const std::string&xPath, arma::uword n_rows, arma::uword n_cols) : n_rows(n_rows), n_cols(n_cols) {
         sm_pimpl = std::make_shared<H5SpMatImpl>(filename, iPath, pPath, xPath, n_rows, n_cols);
         this->nnz = sm_pimpl->nnz1();
         this->x_chunksize = sm_pimpl->x_chunksize1();
         this->i_chunksize = sm_pimpl->i_chunksize1();
         this->p_chunksize = sm_pimpl->p_chunksize1();
     }
-    arma::sp_mat H5SpMat::cols(arma::uword start, arma::uword end) const  { return sm_pimpl->cols(start, end); }
-    arma::sp_mat H5SpMat::cols(const arma::uvec&index) const {return sm_pimpl->cols(index); }
+
+    arma::sp_mat H5SpMat::cols(arma::uword start, arma::uword end) const { return sm_pimpl->cols(start, end); }
+    arma::sp_mat H5SpMat::cols(const arma::uvec&index) const { return sm_pimpl->cols(index); }
     // not thread safe
-    H5SpMat H5SpMat::t() const {return sm_pimpl->t();}
-    arma::sp_mat H5SpMat::t_mem() const {return sm_pimpl->t_mem();}
-    arma::vec H5SpMat::getXByRange(const arma::uword start, const arma::uword end) const { return sm_pimpl->getXByRange(start, end); }
+    H5SpMat H5SpMat::t() const { return sm_pimpl->t(); }
+    arma::sp_mat H5SpMat::t_mem() const { return sm_pimpl->t_mem(); }
+
+    arma::vec H5SpMat::getXByRange(const arma::uword start, const arma::uword end) const {
+        return sm_pimpl->getXByRange(start, end);
+    }
 
 
-
-        // arma::sp_mat cols(arma::uvec index) {
-        //     arma::sp_mat out(this->n_rows, index.size());
-        //     arma::uvec colptr = this->getPByRange(0, this->n_cols);
-        //     arma::uword idx;
-        //     for (arma::uword i = 0; i < index.size(); ++i) {
-        //         idx = index[i];
-        //         if (idx >= this->n_cols) {
-        //             throw std::invalid_argument("Index " + std::to_string(idx) + " is out of range.");
-        //         }
-        //         arma::uvec rowind = this->getIByRange(colptr[idx], colptr[idx + 1] - 1);
-        //         arma::vec value = this->getXByRange(colptr[idx], colptr[idx + 1] - 1);
-        //         arma::uvec colptr_i = arma::zeros<arma::uvec>(2);
-        //         colptr_i[1] = rowind.size();
-        //         out.col(i) = arma::sp_mat(rowind, colptr_i, value, this->n_rows, 1);
-        //     }
-        //     return out;
-        // }
-
+    // arma::sp_mat cols(arma::uvec index) {
+    //     arma::sp_mat out(this->n_rows, index.size());
+    //     arma::uvec colptr = this->getPByRange(0, this->n_cols);
+    //     arma::uword idx;
+    //     for (arma::uword i = 0; i < index.size(); ++i) {
+    //         idx = index[i];
+    //         if (idx >= this->n_cols) {
+    //             throw std::invalid_argument("Index " + std::to_string(idx) + " is out of range.");
+    //         }
+    //         arma::uvec rowind = this->getIByRange(colptr[idx], colptr[idx + 1] - 1);
+    //         arma::vec value = this->getXByRange(colptr[idx], colptr[idx + 1] - 1);
+    //         arma::uvec colptr_i = arma::zeros<arma::uvec>(2);
+    //         colptr_i[1] = rowind.size();
+    //         out.col(i) = arma::sp_mat(rowind, colptr_i, value, this->n_rows, 1);
+    //     }
+    //     return out;
+    // }
 } // End of namespace planc

@@ -11,21 +11,22 @@
 #endif
 
 namespace planc {
-    template <typename T>
+    template<typename T>
     class INMF {
     protected:
         arma::uword k, nDatasets, nMax, nSum;
-        int INMF_CHUNK_SIZE, m;                 // chunking
-        std::vector<arma::uword> ncol_E;             // vector of n_i
-        std::vector<std::shared_ptr<T>> Ei;          // each of size mxn_i
-        std::vector<std::unique_ptr<T>> EiT;          // each of size n_ixm
-        std::vector<std::unique_ptr<arma::mat>> Hi;  // each of size n_ixk
-        std::vector<std::unique_ptr<arma::mat>> Vi;  // each of size mxk
+        int INMF_CHUNK_SIZE, m; // chunking
+        std::vector<arma::uword> ncol_E; // vector of n_i
+        std::vector<std::shared_ptr<T>> Ei; // each of size mxn_i
+        std::vector<std::unique_ptr<T>> EiT; // each of size n_ixm
+        std::vector<std::unique_ptr<arma::mat>> Hi; // each of size n_ixk
+        std::vector<std::unique_ptr<arma::mat>> Vi; // each of size mxk
         std::vector<std::unique_ptr<arma::mat>> ViT; // each of size kxm
-        std::unique_ptr<arma::mat> W;                // mxk
-        std::unique_ptr<arma::mat> WT;                // kxm
+        std::unique_ptr<arma::mat> W; // mxk
+        std::unique_ptr<arma::mat> WT; // kxm
         double lambda, sqrtLambda, objective_err;
         bool cleared;
+
         virtual double computeObjectiveError() {
             // obj_i = ||E_i - (W + V_i)*H_i||_F^2 + lambda * ||V_i*H_i||_F^2
             // Let W + V = L
@@ -45,7 +46,7 @@ namespace planc {
                 double sqnormE = arma::norm<T>(*Eptr, "fro");
                 sqnormE *= sqnormE;
                 arma::mat LtL = L.t() * L; // k x k
-                arma::mat HtH = Hptr->t() * *Hptr;  // k x k
+                arma::mat HtH = Hptr->t() * *Hptr; // k x k
                 double TrLtLHtH = arma::trace(LtL * HtH);
                 T Et = Eptr->t();
                 arma::mat EtL = Et * L; // n_i x k
@@ -57,7 +58,8 @@ namespace planc {
             return obj;
         }
 
-        void constructObject(std::vector<std::shared_ptr<T>>& inputEi, arma::uword inputk, double inputlambda, bool makeTranspose) {
+        void constructObject(std::vector<std::shared_ptr<T>>&inputEi, arma::uword inputk, double inputlambda,
+                             bool makeTranspose) {
             this->Ei = inputEi;
             this->k = inputk;
             this->m = this->Ei[0].get()->n_rows;
@@ -65,7 +67,8 @@ namespace planc {
                 if (this->k > this->m) {
                     throw std::invalid_argument("k must be <= m");
                 }
-            } catch(std::exception &ex) {
+            }
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -73,7 +76,7 @@ namespace planc {
 #else
                 throw ex;
 #endif
-        }
+            }
             this->cleared = false;
             this->INMF_CHUNK_SIZE = chunk_size_dense<typename T::elem_type>(k);
             this->nMax = 0;
@@ -82,8 +85,7 @@ namespace planc {
 #ifdef _VERBOSE
             Rcpp::Rcout << "k=" << k << "; m=" << m << std::endl;
 #endif
-            for (unsigned int i = 0; i < this->Ei.size(); ++i)
-            {
+            for (unsigned int i = 0; i < this->Ei.size(); ++i) {
                 T* E = this->Ei[i].get();
                 if (makeTranspose) {
                     T ET = E->t();
@@ -120,24 +122,8 @@ namespace planc {
                                           ") does not match with V[" + std::to_string(i) + "]";
                         throw std::invalid_argument(msg);
                     }
-                } catch (std::exception &ex) {
-#ifdef USING_R
-                    std::string ex_str = ex.what();
-                    Rcpp::stop(ex_str);
-
-#else
-                    throw ex;
-#endif
-
                 }
-            }
-                try {
-                    if (this->k != this->W.get()->n_cols) {
-                        std::string msg = "Preset `k` (" + std::to_string(this->k) +
-                                          ") does not match with W";
-                        throw std::invalid_argument(msg);
-                    }
-                } catch (std::exception &ex) {
+                catch (std::exception&ex) {
 #ifdef USING_R
                     std::string ex_str = ex.what();
                     Rcpp::stop(ex_str);
@@ -147,20 +133,40 @@ namespace planc {
 #endif
                 }
             }
+            try {
+                if (this->k != this->W.get()->n_cols) {
+                    std::string msg = "Preset `k` (" + std::to_string(this->k) +
+                                      ") does not match with W";
+                    throw std::invalid_argument(msg);
+                }
+            }
+            catch (std::exception&ex) {
+#ifdef USING_R
+                std::string ex_str = ex.what();
+                Rcpp::stop(ex_str);
+
+#else
+                    throw ex;
+#endif
+            }
+        }
+
     public:
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
-        this->initW();
-        this->initV();
-        this->INMF::initH();
+            this->initW();
+            this->initV();
+            this->INMF::initH();
         }
+
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
-            std::vector<arma::mat> VinitList, arma::mat Winit,  bool makeTranspose = true) {
+             std::vector<arma::mat> VinitList, arma::mat Winit, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
             this->initW(Winit);
             this->initV(VinitList);
         }
-        virtual void initH(std::vector<arma::mat>& Hinit) {
+
+        virtual void initH(std::vector<arma::mat>&Hinit) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized H matrices" << std::endl;
 #endif
@@ -182,7 +188,8 @@ namespace planc {
                                           std::to_string(this->k);
                         throw std::invalid_argument(msg);
                     }
-                } catch (std::exception &ex) {
+                }
+                catch (std::exception&ex) {
 #ifdef USING_R
                     std::string ex_str = ex.what();
                     Rcpp::stop(ex_str);
@@ -194,9 +201,9 @@ namespace planc {
                 H = std::make_unique<arma::mat>();
                 *H = Hinit[i];
                 this->Hi.push_back(std::move(H));
-
             }
         }
+
         virtual void initH() {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Randomly initializing H matrices" << std::endl;
@@ -209,7 +216,8 @@ namespace planc {
                 this->Hi.push_back(std::move(H));
             }
         }
-        void initV(const std::vector<arma::mat>& Vinit, bool transpose = true) {
+
+        void initV(const std::vector<arma::mat>&Vinit, bool transpose = true) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized V matrices" << std::endl;
 #endif
@@ -220,7 +228,8 @@ namespace planc {
                                       " V matrices";
                     throw std::invalid_argument(msg);
                 }
-            }  catch(std::exception &ex) {
+            }
+            catch (std::exception&ex) {
 #ifdef USING_R
                 std::string ex_str = ex.what();
                 Rcpp::stop(ex_str);
@@ -269,7 +278,7 @@ namespace planc {
             }
         }
 
-        void initW(const arma::mat& Winit, bool transpose = true) {
+        void initW(const arma::mat&Winit, bool transpose = true) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized W matrix" << std::endl;
 #endif
@@ -329,6 +338,7 @@ namespace planc {
         }
 
         virtual ~INMF() { clear(); }
+
         void clear() {
             if (!this->cleared) {
                 for (unsigned int i = 0; i < Ei.size(); ++i) {
@@ -338,13 +348,13 @@ namespace planc {
                 for (unsigned int i = 0; i < EiT.size(); ++i) {
                     EiT[i].reset();
                 }
-                for (auto & i : Hi) {
+                for (auto&i: Hi) {
                     i.reset();
                 }
-                for (auto & i : Vi) {
+                for (auto&i: Vi) {
                     i.reset();
                 }
-                for (auto & i : ViT) {
+                for (auto&i: ViT) {
                     i.reset();
                 }
                 this->W.reset();
@@ -353,6 +363,4 @@ namespace planc {
             this->cleared = true;
         }
     }; // class INMF
-
-
 }

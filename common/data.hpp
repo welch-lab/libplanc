@@ -9,17 +9,20 @@ namespace planc {
         // A container only for a 2D dense matrix stored in an HDF5 file
         // with accessor function to columns of the matrix that reads and
         // returns a specified chunk of the matrix into memory
-        public:
+    public:
         virtual ~H5Mat() = default;
+
         typedef double elem_type;
         arma::uword n_cols, n_rows, colChunkSize, rowChunkSize;
-        private:
+
+    private:
         bool is_initialized = false;
         class H5MatImpl;
         std::shared_ptr<H5MatImpl> m_pimpl;
-        public:
+
+    public:
         //not thread safe
-        H5Mat(const std::string& filename, const std::string& datapath);
+        H5Mat(const std::string&filename, const std::string&datapath);
 
         arma::mat cols(arma::uword start, arma::uword end) const;
 
@@ -29,7 +32,8 @@ namespace planc {
 
         // not thread-safe
         H5Mat t() const;
-        arma::mat operator*(const arma::mat &other) const {
+
+        arma::mat operator*(const arma::mat&other) const {
             auto out = arma::mat(this->n_rows, other.n_cols);
             arma::uword numChunks = this->n_rows / this->rowChunkSize;
             if (numChunks * this->rowChunkSize < this->n_rows) numChunks++;
@@ -44,26 +48,35 @@ namespace planc {
             return out;
         }
     }; // End of class H5Mat
-    class NMFLIB_EXPORT H5SpMat  {
+    class NMFLIB_EXPORT H5SpMat {
     public:
         virtual ~H5SpMat() = default;
+
         arma::uword x_chunksize, i_chunksize, p_chunksize;
         arma::uword n_rows, n_cols, nnz;
         typedef double elem_type;
-        private:
+
+    private:
         class H5SpMatImpl;
         std::shared_ptr<H5SpMatImpl> sm_pimpl;
-        public:
-// not thread safe
-        H5SpMat(const std::string& filename, const std::string& iPath, const std::string& pPath,
-                const std::string& xPath, arma::uword n_rows, arma::uword n_cols);
+
+    public:
+        // not thread safe
+        H5SpMat(const std::string&filename, const std::string&iPath, const std::string&pPath,
+                const std::string&xPath, arma::uword n_rows, arma::uword n_cols);
+
         arma::sp_mat cols(arma::uword start, arma::uword end) const;
+
         arma::sp_mat cols(const arma::uvec&index) const;
+
         arma::vec getXByRange(arma::uword start, arma::uword end) const;
-// not thread safe
+
+        // not thread safe
         H5SpMat t() const;
+
         arma::sp_mat t_mem() const;
-        arma::mat operator*(const arma::mat& other) const {
+
+        arma::mat operator*(const arma::mat&other) const {
             arma::sp_mat thisT = this->t_mem();
             arma::mat out(this->n_rows, other.n_cols);
             arma::uword numChunks = this->n_rows / this->x_chunksize;
@@ -75,7 +88,8 @@ namespace planc {
                 arma::uword spanEnd = (j + 1) * this->x_chunksize - 1;
                 if (spanEnd > this->n_rows - 1) spanEnd = this->n_rows - 1;
                 std::cout << "spanend: " << spanEnd << std::endl;
-                out.rows(spanStart, spanEnd) = thisT.cols(spanStart, spanEnd).t() * other; // this is hacky and inefficient and should probably just be replaced with implementing rows() for SpMat
+                out.rows(spanStart, spanEnd) = thisT.cols(spanStart, spanEnd).t() * other;
+                // this is hacky and inefficient and should probably just be replaced with implementing rows() for SpMat
             }
             return out;
         }
@@ -84,7 +98,7 @@ namespace planc {
 namespace arma {
     // always frobenius
     template<typename>
-    double norm(const planc::H5Mat &X, const char* method) {
+    double norm(const planc::H5Mat&X, const char* method) {
         uword nChunks = X.n_cols / X.colChunkSize;
         if (nChunks * X.colChunkSize < X.n_cols) nChunks++;
         double lnorm = 0;
@@ -97,8 +111,9 @@ namespace arma {
         }
         return std::sqrt(lnorm);
     }
+
     template<typename>
-    double norm(const planc::H5SpMat &X, const char* method) {
+    double norm(const planc::H5SpMat&X, const char* method) {
         uword nChunks = X.nnz / X.x_chunksize;
         if (nChunks * X.x_chunksize < X.nnz) nChunks++;
         double norm = 0;

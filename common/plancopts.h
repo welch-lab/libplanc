@@ -75,9 +75,9 @@ namespace planc {
         bool m_adj_rand{};
 
         // file names
-        std::string m_Afile_name;         // X (features) matrix for jointnmf
+        std::string m_Afile_name; // X (features) matrix for jointnmf
         std::string m_outputfile_name;
-        std::string m_Sfile_name;         // S (connection) matrix for jointnmf
+        std::string m_Sfile_name; // S (connection) matrix for jointnmf
         std::string m_h_init_file_name;
         std::string M_W_init_file_name;
 
@@ -92,6 +92,7 @@ namespace planc {
         arma::fvec m_regH;
         float m_sparsity{};
         int m_symm_flag{};
+
         [[nodiscard]] algotype getMLucalgo() const {
             return m_lucalgo;
         }
@@ -99,8 +100,10 @@ namespace planc {
         virtual void setMLucalgo(std::string mLucalgo) {
             try {
                 m_lucalgo = algomap.at(mLucalgo);
-            } catch(const std::out_of_range& e) {
-                std::throw_with_nested(std::runtime_error("Please choose `algo` from \"anlsbpp\", \"admm\", \"hals\" or \"mu\"."));
+            }
+            catch (const std::out_of_range&e) {
+                std::throw_with_nested(
+                    std::runtime_error("Please choose `algo` from \"anlsbpp\", \"admm\", \"hals\" or \"mu\"."));
             }
         }
 
@@ -160,43 +163,43 @@ namespace planc {
             m_adj_rand = mAdjRand;
         }
 
-        [[nodiscard]] virtual const std::string &getMAfileName() const {
+        [[nodiscard]] virtual const std::string& getMAfileName() const {
             return m_Afile_name;
         }
 
-        void setMAfileName(const std::string &mAfileName) {
+        void setMAfileName(const std::string&mAfileName) {
             m_Afile_name = mAfileName;
         }
 
-        virtual const std::string &getMOutputfileName() const {
+        virtual const std::string& getMOutputfileName() const {
             return m_outputfile_name;
         }
 
-        void setMOutputfileName(const std::string &mOutputfileName) {
+        void setMOutputfileName(const std::string&mOutputfileName) {
             m_outputfile_name = mOutputfileName;
         }
 
-        const std::string &getMSfileName() const {
+        const std::string& getMSfileName() const {
             return m_Sfile_name;
         }
 
-        void setMSfileName(const std::string &mSfileName) {
+        void setMSfileName(const std::string&mSfileName) {
             m_Sfile_name = mSfileName;
         }
 
-        virtual const std::string &getMHInitFileName() const {
+        virtual const std::string& getMHInitFileName() const {
             return m_h_init_file_name;
         }
 
-        void setMHInitFileName(const std::string &mHInitFileName) {
+        void setMHInitFileName(const std::string&mHInitFileName) {
             m_h_init_file_name = mHInitFileName;
         }
 
-        virtual const std::string &getMWInitFileName() const {
+        virtual const std::string& getMWInitFileName() const {
             return M_W_init_file_name;
         }
 
-        void setMWInitFileName(const std::string &MWInitFileName) {
+        void setMWInitFileName(const std::string&MWInitFileName) {
             M_W_init_file_name = MWInitFileName;
         }
 
@@ -232,19 +235,19 @@ namespace planc {
             m_initseed = mInitseed;
         }
 
-        const arma::fvec &getMRegW() const {
+        const arma::fvec& getMRegW() const {
             return m_regW;
         }
 
-        void setMRegW(const arma::fvec &mRegW) {
+        void setMRegW(const arma::fvec&mRegW) {
             m_regW = mRegW;
         }
 
-        const arma::fvec &getMRegH() const {
+        const arma::fvec& getMRegH() const {
             return m_regH;
         }
 
-        void setMRegH(const arma::fvec &mRegH) {
+        void setMRegH(const arma::fvec&mRegH) {
             m_regH = mRegH;
         }
 
@@ -296,27 +299,27 @@ namespace planc {
             m_num_modes = mNumModes;
         }
 
-        const arma::uvec &getMDimensions() const {
+        const arma::uvec& getMDimensions() const {
             return m_dimensions;
         }
 
-        void setMDimensions(const arma::uvec &mDimensions) {
+        void setMDimensions(const arma::uvec&mDimensions) {
             m_dimensions = mDimensions;
         }
 
-        const arma::uvec &getMProcGrids() const {
+        const arma::uvec& getMProcGrids() const {
             return m_proc_grids;
         }
 
-        void setMProcGrids(const arma::uvec &mProcGrids) {
+        void setMProcGrids(const arma::uvec&mProcGrids) {
             m_proc_grids = mProcGrids;
         }
 
-        const arma::fvec &getMRegularizers() const {
+        const arma::fvec& getMRegularizers() const {
             return m_regularizers;
         }
 
-        void setMRegularizers(const arma::fvec &mRegularizers) {
+        void setMRegularizers(const arma::fvec&mRegularizers) {
             m_regularizers = mRegularizers;
         }
 
@@ -384,11 +387,11 @@ namespace planc {
             m_unpartitioned = mUnpartitioned;
         }
 
-        const arma::uvec &getMConnGrids() const {
+        const arma::uvec& getMConnGrids() const {
             return m_conn_grids;
         }
 
-        void setMConnGrids(const arma::uvec &mConnGrids) {
+        void setMConnGrids(const arma::uvec&mConnGrids) {
             m_conn_grids = mConnGrids;
         }
 
@@ -438,38 +441,43 @@ namespace planc {
         int m_cpr{};
         int m_cpc{};
     };
+
     template<typename T>
     struct internalParams : virtual params {
         // matrix pointers for direct passage
-        const T& m_a_mat;
+        const T&m_a_mat;
         arma::mat m_h_init_mat;
         arma::mat m_w_init_mat;
-        internalParams(const T &mAMat, const arma::mat &mWInitMat, const arma::mat &mHInitMat) : m_a_mat(mAMat), m_w_init_mat(mWInitMat),
-                                                                               m_h_init_mat(mHInitMat) {}
 
-        explicit internalParams(T &mAMat) : m_a_mat(mAMat) {}
+        internalParams(const T&mAMat, const arma::mat&mWInitMat, const arma::mat&mHInitMat) : m_a_mat(mAMat),
+            m_w_init_mat(mWInitMat),
+            m_h_init_mat(mHInitMat) {
+        }
 
-        [[nodiscard]] const T &getMAMat() const {
+        explicit internalParams(T&mAMat) : m_a_mat(mAMat) {
+        }
+
+        [[nodiscard]] const T& getMAMat() const {
             return m_a_mat;
         }
 
-        void setMAMat(T &mAMat) {
+        void setMAMat(T&mAMat) {
             m_a_mat = mAMat;
         }
 
-        [[nodiscard]] const arma::mat &getMHInitMat() const {
+        [[nodiscard]] const arma::mat& getMHInitMat() const {
             return m_h_init_mat;
         }
 
-        void setMHInitMat(arma::mat &mHInitMat) {
+        void setMHInitMat(arma::mat&mHInitMat) {
             m_h_init_mat = mHInitMat;
         }
 
-        [[nodiscard]] const arma::mat &getMWInitMat() const {
+        [[nodiscard]] const arma::mat& getMWInitMat() const {
             return m_w_init_mat;
         }
 
-        void setMWInitMat(arma::mat &mWInitMat) {
+        void setMWInitMat(arma::mat&mWInitMat) {
             m_w_init_mat = mWInitMat;
         }
 
@@ -484,23 +492,24 @@ namespace planc {
         void setMLucalgo(std::string mLucalgo) override {
             try {
                 m_lucalgo = symmap.at(mLucalgo);
-            } catch(const std::out_of_range& e) {
+            }
+            catch (const std::out_of_range&e) {
                 std::throw_with_nested(std::runtime_error("Please choose `algo` from \"anlsbpp\", or \"gnsym\"."));
             }
         }
     };
+
     template<typename T>
     struct internalSymmParams final : symmParams, internalParams<T> {
-        internalSymmParams(const T& mAMat, const arma::mat& mHInitMat)
+        internalSymmParams(const T&mAMat, const arma::mat&mHInitMat)
             : internalParams<T>(mAMat, arma::mat{}, mHInitMat), symmParams() {
         }
+
         using internalParams<T>::setMK;
         using internalParams<T>::setMNumIt;
         using symmParams::setMLucalgo;
         using internalParams<T>::setMSymmReg;
         using internalParams<T>::setMSymmFlag;
-
-
     };
 }
 

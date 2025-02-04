@@ -9,22 +9,24 @@ extern "C" {
 #include "hw_detect.h"
 }
 
-static uint64_t powersof10[16] = {1,
-                                  10,
-                                  100,
-                                  1000,
-                                  10000,
-                                  100000,
-                                  1000000,
-                                  10000000,
-                                  100000000,
-                                  1000000000,
-                                  10000000000,
-                                  100000000000,
-                                  1000000000000,
-                                  10000000000000,
-                                  100000000000000,
-                                  1000000000000000};
+static uint64_t powersof10[16] = {
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000,
+    100000000,
+    1000000000,
+    10000000000,
+    100000000000,
+    1000000000000,
+    10000000000000,
+    100000000000000,
+    1000000000000000
+};
 
 static std::stack<std::chrono::steady_clock::time_point> tictoc_stack;
 static std::stack<double> tictoc_stack_omp_clock;
@@ -39,24 +41,24 @@ void tic();
 */
 double toc();
 
-template <class T>
-void fixNumericalError(T *X, const double prec,
+template<class T>
+void fixNumericalError(T* X, const double prec,
                        const double repl) {
     (*X).for_each(
-            [&](typename T::elem_type &val) { val = (val < prec) ? repl : val; });
+        [&](typename T::elem_type&val) { val = (val < prec) ? repl : val; });
 }
 
-template <class T>
-void fixAbsNumericalError(T *X, const double prec,
+template<class T>
+void fixAbsNumericalError(T* X, const double prec,
                           const double repl) {
-    (*X).for_each([&](typename T::elem_type &val) {
+    (*X).for_each([&](typename T::elem_type&val) {
         val = (std::abs(val) < prec) ? repl : val;
     });
 }
 
-template <class T>
-void fixDecimalPlaces(T *X, const int places) {
-    (*X).for_each([&](typename T::elem_type &val) {
+template<class T>
+void fixDecimalPlaces(T* X, const int places) {
+    (*X).for_each([&](typename T::elem_type&val) {
         val = floorf(val * powersof10[places]) / powersof10[places];
     });
 }
@@ -67,14 +69,14 @@ void fixDecimalPlaces(T *X, const int places) {
  */
 int random_sieve(int nthprime);
 
-template <class T>
-void absmat(T *X) {
+template<class T>
+void absmat(T* X) {
     arma::uvec negativeIdx = find((*X) < 0);
     (*X)(negativeIdx) = (*X)(negativeIdx) * -1;
 }
 
-template <class T>
-void makeSparse(const double sparsity, T(*X)) {
+template<class T>
+void makeSparse(const double sparsity, T (*X)) {
     // make a matrix sparse
 #ifndef USING_R
     srand(RAND_SEED_SPARSE);
@@ -88,29 +90,30 @@ void makeSparse(const double sparsity, T(*X)) {
 }
 
 void randNMF(arma::uword m, arma::uword n, arma::uword k, double sparsity,
-             arma::mat *A);
-void randNMF(arma::uword m, arma::uword n, arma::uword k, double sparsity,
-             arma::sp_mat *A);
+             arma::mat* A);
 
-template <class T>
-void printVector(std::vector<T> &x);
+void randNMF(arma::uword m, arma::uword n, arma::uword k, double sparsity,
+             arma::sp_mat* A);
+
+template<class T>
+void printVector(std::vector<T>&x);
 
 std::vector<std::vector<size_t>> cartesian_product(
-    std::vector<std::vector<size_t>> &v);
+    std::vector<std::vector<size_t>>&v);
 
 /*
  * can be called by external people for sparse input matrix.
  */
-template <class INPUTTYPE, class LRTYPE>
-double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
-                             const LRTYPE &H);
+template<class INPUTTYPE, class LRTYPE>
+double computeObjectiveError(const INPUTTYPE&A, const LRTYPE&W,
+                             const LRTYPE&H);
 
 /*
  * This is an sgemm wrapper for armadillo matrices
  * Something is going crazy with armadillo
  */
 
-void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C);
+void cblas_sgemm(const arma::mat&A, const arma::mat&B, double* C);
 
 /**
  * Generates the same low rank matrix. Matrix columns are seeded to
@@ -125,37 +128,38 @@ void cblas_sgemm(const arma::mat &A, const arma::mat &B, double *C);
  * @param[in] mseed is the seed for the first column of the matrix
  */
 void gen_discard(arma::uword row_start, arma::uword nrows, arma::uword k,
-        arma::mat &X, bool trans, int mseed=7907);
+                 arma::mat&X, bool trans, int mseed = 7907);
+
 /*
  * Read in a dense matrix
  */
-void read_input_matrix(arma::mat &A, std::string fname);
+void read_input_matrix(arma::mat&A, std::string fname);
 
 /*
  * Read in a sparse matrix
  */
-void read_input_matrix(arma::sp_mat &A, std::string fname);
+void read_input_matrix(arma::sp_mat&A, std::string fname);
 
 /*
  * Generate random dense matrix
  */
-void generate_rand_matrix(arma::mat &A, const std::string& rtype,
-        arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
-        bool adjrand = false, int kalpha = 1, int kbeta = 0);
+void generate_rand_matrix(arma::mat&A, const std::string&rtype,
+                          arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
+                          bool adjrand = false, int kalpha = 1, int kbeta = 0);
 
 /*
  * Generate random sparse matrix
  */
-void generate_rand_matrix(arma::sp_mat &A, const std::string& rtype,
-        arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
-        bool adjrand = false, int kalpha = 5, int kbeta = 10);
+void generate_rand_matrix(arma::sp_mat&A, const std::string&rtype,
+                          arma::uword m, arma::uword n, arma::uword k, double density, bool symm_flag = false,
+                          bool adjrand = false, int kalpha = 5, int kbeta = 10);
 
 int debug_hook();
 
 
-template <class INPUTTYPE, class LRTYPE>
-double computeObjectiveError(const INPUTTYPE &A, const LRTYPE &W,
-                             const LRTYPE &H) {
+template<class INPUTTYPE, class LRTYPE>
+double computeObjectiveError(const INPUTTYPE&A, const LRTYPE&W,
+                             const LRTYPE&H) {
     // 1. over all nnz (a_ij - w_i h_j)^2
     // 2. over all nnz (w_i h_j)^2
     // 3. Compute R of W ahd L of H through QR
