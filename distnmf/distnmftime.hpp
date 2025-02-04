@@ -1,10 +1,8 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_DISTNMFTIME_HPP_
-#define DISTNMF_DISTNMFTIME_HPP_
-
 /**
- * Class and function for collecting time statistics 
+ * Class and function for collecting time statistics
  */
 
 namespace planc {
@@ -123,5 +121,3 @@ class DistNMFTime {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTNMFTIME_HPP_

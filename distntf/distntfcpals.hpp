@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFCPALS_HPP_
-#define DISTNTF_DISTNTFCPALS_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -28,13 +26,11 @@ class DistNTFCPALS : public DistAUNTF {
 
  public:
   DistNTFCPALS(const Tensor &i_tensor, const int i_k, algotype i_algo,
-               const UVEC &i_global_dims, const UVEC &i_local_dims,
-               const UVEC &i_nls_sizes, const UVEC &i_nls_idxs,
+               const arma::uvec &i_global_dims, const arma::uvec &i_local_dims,
+               const arma::uvec &i_nls_sizes, const arma::uvec &i_nls_idxs,
                const NTFMPICommunicator &i_mpicomm)
       : DistAUNTF(i_tensor, i_k, i_algo, i_global_dims, i_local_dims,
                   i_nls_sizes, i_nls_idxs, i_mpicomm) {}
 };  // class DistNTFMU
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFCPALS_HPP_

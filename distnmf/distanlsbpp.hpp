@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTANLSBPP_HPP_
-#define DISTNMF_DISTANLSBPP_HPP_
 
 #include "distnmf/aunmf.hpp"
 #include "nnls/bppnnls.hpp"
@@ -23,8 +21,8 @@ namespace planc {
 template <class INPUTMATTYPE>
 class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
  private:
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
   void allocateMatrices() {}
 
@@ -34,17 +32,17 @@ class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
    */
   void updateOtherGivenOneMultipleRHS(const MAT& giventGiven,
                                       const MAT& giventInput, MAT* othermat) {
-    UINT numChunks = giventInput.n_cols / ONE_THREAD_MATRIX_SIZE;
+    unsigned int numChunks = giventInput.n_cols / ONE_THREAD_MATRIX_SIZE;
     if (numChunks * ONE_THREAD_MATRIX_SIZE < giventInput.n_cols) numChunks++;
 
 // #pragma omp parallel for schedule(dynamic)
-    for (UINT i = 0; i < numChunks; i++) {
-      UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
-      UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
+    for (unsigned int i = 0; i < numChunks; i++) {
+      unsigned int spanStart = i * ONE_THREAD_MATRIX_SIZE;
+      unsigned int spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
       if (spanEnd > giventInput.n_cols - 1) {
         spanEnd = giventInput.n_cols - 1;
       }
-      BPPNNLS<MAT, VEC> subProblem(giventGiven,
+      BPPNNLS<MAT, arma::vec> subProblem(giventGiven,
                             (MAT)giventInput.cols(spanStart, spanEnd), true);
 #ifdef _VERBOSE
       // #pragma omp critical
@@ -88,7 +86,7 @@ class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
    * WtAij is of size \f$k \times \frac{globaln}{p} \f$
    * this->H is of size \f$ \frac{globaln}{p} \times k \f$
    * this->WtW is of size kxk
-   */  
+   */
   void updateH() {
     updateOtherGivenOneMultipleRHS(this->WtW, this->WtAij, &this->H);
     this->Ht = this->H.t();
@@ -116,5 +114,3 @@ class DistANLSBPP : public DistAUNMF<INPUTMATTYPE> {
 };  // class DistANLSBPP2D
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTANLSBPP_HPP_

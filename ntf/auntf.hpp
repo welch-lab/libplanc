@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2017 */
-
-#ifndef NTF_AUNTF_HPP_
-#define NTF_AUNTF_HPP_
 
 #define MPITIC tic();
 #define MPITOC toc();
@@ -90,7 +88,7 @@ class AUNTF {
     ncp_mttkrp_t = new MAT[i_tensor.modes()];
     ncp_krp = new MAT[i_tensor.modes()];
     for (int i = 0; i < i_tensor.modes(); i++) {
-      UWORD current_size = TENSOR_NUMEL / TENSOR_DIM[i];
+      arma::uword current_size = TENSOR_NUMEL / TENSOR_DIM[i];
       ncp_krp[i].zeros(current_size, i_k);
       ncp_mttkrp_t[i].zeros(i_k, TENSOR_DIM[i]);
       this->m_stale_mttkrp.push_back(true);
@@ -199,7 +197,7 @@ class AUNTF {
   int current_it() const { return m_current_it; }
   double computeObjectiveError() {
     // current low rank tensor
-    // UWORD krpsize = arma::prod(this->m_dimensions);
+    // arma::uword krpsize = arma::prod(this->m_dimensions);
     // krpsize /= this->m_dimensions[0];
     // MAT krpleavingzero.zeros(krpsize, this->m_k);
     // krp_leave_out_one(0, &krpleavingzero);
@@ -250,5 +248,3 @@ class AUNTF {
   }
 };  // class AUNTF
 }  // namespace planc
-
-#endif  // NTF_AUNTF_HPP_

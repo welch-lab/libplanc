@@ -1,94 +1,78 @@
+#pragma once
+#include "config.h"
+#include <unordered_map>
+#include <string>
+
+extern "C" {
+#include "hw_detect.h"
+}
+
 /* Copyright 2016 Ramakrishnan Kannan */
 // utility functions
-#ifndef COMMON_UTILS_H_
-#define COMMON_UTILS_H_
 
 // #ifndef _VERBOSE
 // #define _VERBOSE 1
 // #endif
 
-enum algotype { MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM, 
-        NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG };
+enum algotype {
+    MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM,
+    NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG
+};
+
+extern std::unordered_map<std::string, algotype> algomap;
+extern std::unordered_map<std::string, algotype> symmap;
+
 
 enum normtype { NONE, L2NORM, MAXNORM };
 
+extern std::unordered_map<std::string, normtype> normmap;
+
+
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
-// #if !defined(ARMA_64BIT_WORD)
-// #define ARMA_64BIT_WORD
-#define ARMA_DONT_USE_WRAPPER
-#define ARMA_USE_BLAS
-#define ARMA_USE_LAPACK
-// #endif
-#include <armadillo>
+
 #include <cmath>
 #include <iostream>
 #include <vector>
 
+template<typename T>
+arma::uword chunk_size_dense(arma::uword rank) {
+#ifdef _OPENMP
+    return (get_l1_data_cache() / (rank * sizeof(T)));
+#else
+    return (get_l2_data_cache() / (rank * sizeof(T)));
+#endif
+}
+
 // using namespace std;
 
-#ifndef ERR
-#define ERR std::cerr
-#endif
 
-#ifndef WARN
-#define WARN std::cerr
-#endif
+constexpr auto EPSILON_1EMINUS16 = 0.00000000000000001;
+constexpr auto EPSILON_1EMINUS8 = 0.00000001;
+constexpr auto EPSILON = 0.000001;
+constexpr auto EPSILON_1EMINUS12 = 1e-12;
+constexpr auto NUMBEROF_DECIMAL_PLACES = 12;
+constexpr auto RAND_SEED = 100;
+constexpr auto RAND_SEED_SPARSE = 100;
+constexpr auto WTRUE_SEED = 1196089;
+constexpr auto HTRUE_SEED = 1230587;
 
-#ifndef INFO
-#define INFO std::cout
-#endif
-
-#ifndef OUTPUT
-#define OUTPUT std::cout
-#endif
-
-#define EPSILON_1EMINUS16 0.00000000000000001
-#define EPSILON_1EMINUS8 0.00000001
-#define EPSILON 0.000001
-#define EPSILON_1EMINUS12 1e-12
-#define NUMBEROF_DECIMAL_PLACES 12
-#define RAND_SEED 100
-#define RAND_SEED_SPARSE 100
-#define WTRUE_SEED 1196089
-#define HTRUE_SEED 1230587
-
-// defines for namespace confusion
-#define FMAT arma::fmat
-#define MAT arma::mat
-#define UMAT arma::umat
-#define FROWVEC arma::frowvec
-#define ROWVEC arma::rowvec
-#define UROWVEC arma::urowvec
-#define FVEC arma::fvec
-#define SP_FMAT arma::sp_fmat
-#define SP_MAT arma::sp_mat
-#define UVEC arma::uvec
-#define IVEC arma::ivec
-#define UWORD arma::uword
-#define VEC arma::vec
 
 #define PRINTMATINFO(A) "::" #A "::" << (A).n_rows << "x" << (A).n_cols
 
 #define PRINTMAT(A) PRINTMATINFO((A)) << std::endl << (A)
 
 typedef std::vector<int> STDVEC;
-typedef unsigned int UINT;
-typedef unsigned int uint;
-typedef unsigned long ULONG;
+#ifndef ULONG
+typedef uint64_t ULONG;
+#endif
 
-void absmat(const FMAT *X);
+void absmat(const arma::fmat* X);
 
-inline void tic();
-inline double toc();
 
-int random_sieve(const int);
-
-template <typename FVT>
-inline void fillVector(const FVT value, std::vector<FVT> *a) {
-  for (unsigned int ii = 0; ii < a->size(); ii++) {
-    (*a)[ii] = value;
-  }
+template<typename FVT>
+inline void fillVector(const FVT value, std::vector<FVT>* a) {
+    for (unsigned int ii = 0; ii < a->size(); ii++) {
+        (*a)[ii] = value;
+    }
 }
-
-#endif  // COMMON_UTILS_H_

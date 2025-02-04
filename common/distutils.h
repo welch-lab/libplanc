@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-#ifndef COMMON_DISTUTILS_H_
-#define COMMON_DISTUTILS_H_
 
 #define APPEND_TIME 1
 // #define MPI_VERBOSE       1
@@ -52,5 +51,3 @@ enum iodistributions { ONED_ROW, ONED_COL, ONED_DOUBLE, TWOD };
 #define PRINTTICTOCTOP                                                         \
   if (ISROOT)                                                                  \
     INFO << "tictoc::" << tictoc_stack.top() << std::endl;
-
-#endif // COMMON_DISTUTILS_H_

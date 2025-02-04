@@ -1,13 +1,12 @@
+#pragma once
 /* Copyright 2018 Ramakrishnan Kannan */
-#ifndef COMMON_NPYIO_HPP_
-#define COMMON_NPYIO_HPP_
 #include <armadillo>
 #include <cassert>
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "common/tensor.hpp"
-#include "common/utils.h"
+#include "tensor.hpp"
+#include "utils.h"
 
 namespace planc {
 class NumPyArray {
@@ -15,7 +14,7 @@ class NumPyArray {
   int64_t m_word_size;
   bool m_fortran_order;
   int64_t m_modes;
-  UVEC m_dims;
+  arma::uvec m_dims;
   void parse_npy_header(FILE* fp) {
     char buffer[256];
     int64_t res = fread(buffer, sizeof(char), 11, fp);
@@ -49,7 +48,7 @@ class NumPyArray {
     } else {
       this->m_modes = std::count(str_shape.begin(), str_shape.end(), ',') + 1;
     }
-    this->m_dims = arma::zeros<UVEC>(m_modes);
+    this->m_dims = arma::zeros<arma::uvec>(m_modes);
 
     std::stringstream ss(str_shape);
     std::string s;
@@ -103,5 +102,3 @@ class NumPyArray {
   }
 };
 }  // namespace planc
-
-#endif  // COMMON_NPYIO_HPP_

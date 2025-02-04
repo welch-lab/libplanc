@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-
-#ifndef DISTNMF_DISTNMF1D_HPP_
-#define DISTNMF_DISTNMF1D_HPP_
 
 #include <string>
 #include "common/distutils.hpp"
@@ -16,7 +14,7 @@ class DistNMF1D {
   const MPICommunicator &m_mpicomm;
   INPUTMATTYPE m_Arows;
   INPUTMATTYPE m_Acols;
-  UWORD m_globalm, m_globaln;
+  arma::uword m_globalm, m_globaln;
   MAT m_W, m_H;
   MAT m_Wt, m_Ht;
   MAT m_globalW, m_globalH;
@@ -165,8 +163,8 @@ class DistNMF1D {
   virtual void computeNMF() = 0;
   const unsigned int num_iterations() const { return this->m_num_iterations; }
   void num_iterations(int it) { m_num_iterations = it; }
-  const UWORD globalm() const { return m_globalm; }
-  const UWORD globaln() const { return m_globaln; }
+  const arma::uword globalm() const { return m_globalm; }
+  const arma::uword globaln() const { return m_globaln; }
   MAT getLeftLowRankFactor() { return this->m_W; }
   MAT getRightLowRankFactor() { return this->m_H; }
   void compute_error(const uint &ce) { this->m_compute_error = ce; }
@@ -188,5 +186,3 @@ class DistNMF1D {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTNMF1D_HPP_

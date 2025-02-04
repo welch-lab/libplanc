@@ -19,14 +19,14 @@ class HierNMFDriver {
   int m_argc;
   char **m_argv;
   int m_k;
-  UWORD m_globalm, m_globaln;
+  arma::uword m_globalm, m_globaln;
   std::string m_Afile_name;
   std::string m_outputfile_name;
   int m_num_it;
   int m_pr;
   int m_pc = 1;
-  FVEC m_regW;
-  FVEC m_regH;
+  arma::fvec m_regW;
+  arma::fvec m_regH;
   double m_sparsity;
   iodistributions m_distio;
   uint m_compute_error;
@@ -37,7 +37,7 @@ class HierNMFDriver {
   ParseCommandLine *pc;
 
 #ifdef BUILD_SPARSE
-  RootNode<SP_MAT> *root;
+  RootNode<arma::sp_mat> *root;
 #else
   RootNode<MAT> *root;
 #endif
@@ -68,8 +68,8 @@ class HierNMFDriver {
         new MPICommunicator(this->m_argc, this->m_argv, this->m_pr, this->m_pc);
 
 #ifdef BUILD_SPARSE
-    SP_MAT A;
-    DistIO<SP_MAT> dio(*mpicomm, m_distio, A);
+    arma::sp_mat A;
+    DistIO<arma::sp_mat> dio(*mpicomm, m_distio, A);
 #else
     MAT A;
     DistIO<MAT> dio(*mpicomm, m_distio, A);
@@ -96,13 +96,13 @@ class HierNMFDriver {
     }
 
 #ifdef BUILD_SPARSE
-    std::priority_queue<Node<SP_MAT> *, std::vector<Node<SP_MAT> *>,
+    std::priority_queue<Node<arma::sp_mat> *, std::vector<Node<arma::sp_mat> *>,
                         ScoreCompare>
         frontiers;
-    Node<SP_MAT> *frontier;
-    Node<SP_MAT> *node;
+    Node<arma::sp_mat> *frontier;
+    Node<arma::sp_mat> *node;
 
-    std::queue<Node<SP_MAT> *> nodes;
+    std::queue<Node<arma::sp_mat> *> nodes;
 #else
     std::priority_queue<Node<MAT> *, std::vector<Node<MAT> *>, ScoreCompare>
         frontiers;
@@ -118,7 +118,7 @@ class HierNMFDriver {
     memusage(mpicomm->rank(), "before root initialization");
 
 #ifdef BUILD_SPARSE
-    this->root = new RootNode<SP_MAT>(&A, this->m_globalm, this->m_globaln,
+    this->root = new RootNode<arma::sp_mat>(&A, this->m_globalm, this->m_globaln,
                                       cols, this->mpicomm, this->pc);
 #else
     this->root = new RootNode<MAT>(&A, this->m_globalm, this->m_globaln, cols,

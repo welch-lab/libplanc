@@ -1,13 +1,7 @@
+#pragma once
 /* Copyright 2017 Ramakrishnan Kannan */
 
-#ifndef COMMON_TENSOR_HPP_
-#define COMMON_TENSOR_HPP_
-
-#ifdef MKL_FOUND
-#include <mkl.h>
-#else
 #include <cblas.h>
-#endif
 #include <armadillo>
 #include <fstream>
 #include <ios>
@@ -16,7 +10,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/utils.h"
+#include "utils.h"
 
 namespace planc {
 /**
@@ -36,21 +30,21 @@ namespace planc {
 class Tensor {
  private:
   int m_modes;
-  UVEC m_dimensions;
-  UWORD m_numel;
-  UVEC m_global_idx;
+  arma::uvec m_dimensions;
+  arma::uword m_numel;
+  arma::uvec m_global_idx;
   unsigned int rand_seed;
 
   // for the time being it is used for debugging purposes
-  size_t sub2ind(UVEC sub, UVEC dimensions) {
+  size_t sub2ind(arma::uvec sub, arma::uvec dimensions) {
     assert(sub.n_rows == dimensions.n_rows);
-    UVEC cumprod_dims = arma::cumprod(dimensions);
-    UVEC cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
+    arma::uvec cumprod_dims = arma::cumprod(dimensions);
+    arma::uvec cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
     cumprod_dims_shifted(0) = 1;
     size_t idx = arma::dot(cumprod_dims_shifted, sub);
     return idx;
   }
-  UVEC ind2sub(UVEC dimensions, size_t idx) {
+  arma::uvec ind2sub(arma::uvec dimensions, size_t idx) {
     //   k = [1 cumprod(siz(1 : end - 1))];
     //   n = length(siz);
     //   idx = idx - 1;
@@ -59,11 +53,11 @@ class Tensor {
     //   subs( :, i) = div + 1;
     //   idx = idx - k(i) * div;
     // end
-    UVEC cumprod_dims = arma::cumprod(dimensions);
-    UVEC cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
+    arma::uvec cumprod_dims = arma::cumprod(dimensions);
+    arma::uvec cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
     cumprod_dims_shifted(0) = 1;
     int modes = dimensions.n_elem;
-    UVEC sub = arma::zeros<UVEC>(modes);
+    arma::uvec sub = arma::zeros<arma::uvec>(modes);
     float temp;
     for (int i = modes - 1; i >= 0; i--) {
       temp = std::floor((idx * 1.0) / (cumprod_dims_shifted(i) * 1.0));
@@ -83,7 +77,7 @@ class Tensor {
   /**
    * Constructor that takes only dimensions of every mode as a vector
    */
-  explicit Tensor(const UVEC &i_dimensions)
+  explicit Tensor(const arma::uvec &i_dimensions)
       : m_modes(i_dimensions.n_rows),
         m_dimensions(i_dimensions),
         m_numel(arma::prod(i_dimensions)),
@@ -91,7 +85,7 @@ class Tensor {
     m_data.resize(m_numel);
     randu();
   }
-  Tensor(const UVEC &i_dimensions, const UVEC &i_start_idx)
+  Tensor(const arma::uvec &i_dimensions, const arma::uvec &i_start_idx)
       : m_modes(i_dimensions.n_rows),
         m_dimensions(i_dimensions),
         m_numel(arma::prod(i_dimensions)),
@@ -105,7 +99,7 @@ class Tensor {
    * will be called. The data will be passed in row major order
    *
    */
-  Tensor(const UVEC &i_dimensions, double *i_data)
+  Tensor(const arma::uvec &i_dimensions, double *i_data)
       : m_modes(i_dimensions.n_rows),
         m_dimensions(i_dimensions),
         m_numel(arma::prod(i_dimensions)),
@@ -162,8 +156,8 @@ class Tensor {
   /// Return the number of modes. It is a scalar value.
   int modes() const { return m_modes; }
   /// Returns a vector of dimensions on every mode
-  UVEC dimensions() const { return m_dimensions; }
-  UVEC global_idx() const { return m_global_idx; }
+  arma::uvec dimensions() const { return m_dimensions; }
+  arma::uvec global_idx() const { return m_global_idx; }
 
   /**
    * Returns the dimension of the input mode.
@@ -173,28 +167,28 @@ class Tensor {
 
   int dimension(int i) const { return m_dimensions[i]; }
   /// Returns total number of elements
-  UWORD numel() const { return m_numel; }
+  arma::uword numel() const { return m_numel; }
 
-  void set_idx(const UVEC &i_start_idx) { m_global_idx = i_start_idx; }
+  void set_idx(const arma::uvec &i_start_idx) { m_global_idx = i_start_idx; }
   /**
    * Return the product of dimensions except mode i
    * @param[in] mode i
    * @return product of dimensions except mode i
    */
-  UWORD dimensions_leave_out_one(int i) const {
-    UWORD rc = arma::prod(this->m_dimensions);
+  arma::uword dimensions_leave_out_one(int i) const {
+    arma::uword rc = arma::prod(this->m_dimensions);
     return rc - this->m_dimensions(i);
   }
   /// Zeros out the entire tensor
   void zeros() {
-    for (UWORD i = 0; i < this->m_numel; i++) {
+    for (arma::uword i = 0; i < this->m_numel; i++) {
       this->m_data[i] = 0;
     }
   }
   /// set the tensor with uniform random.
   void rand() {
 #pragma omp parallel for
-    for (UWORD i = 0; i < this->m_numel; i++) {
+    for (arma::uword i = 0; i < this->m_numel; i++) {
       unsigned int *temp = const_cast<unsigned int *>(&rand_seed);
       this->m_data[i] =
           static_cast<double>(rand_r(temp)) / static_cast<double>(RAND_MAX);
@@ -207,7 +201,7 @@ class Tensor {
     int max_randi = this->m_numel;
     std::uniform_int_distribution<> dis(0, max_randi);
 #pragma omp parallel for
-    for (UWORD i = 0; i < this->m_numel; i++) {
+    for (arma::uword i = 0; i < this->m_numel; i++) {
       this->m_data[i] = dis(gen);
     }
   }
@@ -243,7 +237,7 @@ class Tensor {
    * @param[out] o_mttkrp pointer to the mttkrp matrix.
    */
 
-  void mttkrp(const int i_n, const MAT &i_krp, MAT *o_mttkrp) const {
+  void mttkrp(const int i_n, const arma::mat &i_krp, arma::mat *o_mttkrp) const {
     (*o_mttkrp).zeros();
     if (i_n == 0) {
       // if n == 1
@@ -333,10 +327,10 @@ class Tensor {
     }
   }
 
-  void print(const UVEC &global_dims, const UVEC &global_start_sub) {
-    UVEC local_sub = arma::zeros<UVEC>(global_dims.n_elem);
-    // UVEC global_start_sub = ind2sub(global_dims, global_start_idx);
-    UVEC global_sub = arma::zeros<UVEC>(global_dims.n_elem);
+  void print(const arma::uvec &global_dims, const arma::uvec &global_start_sub) {
+    arma::uvec local_sub = arma::zeros<arma::uvec>(global_dims.n_elem);
+    // arma::uvec global_start_sub = ind2sub(global_dims, global_start_idx);
+    arma::uvec global_sub = arma::zeros<arma::uvec>(global_dims.n_elem);
     int global_idx;
     for (unsigned int i = 0; i < this->m_numel; i++) {
       local_sub = ind2sub(this->m_dimensions, i);
@@ -478,7 +472,7 @@ class Tensor {
     // write modes
     ifs >> this->m_modes;
     // dimension of modes
-    this->m_dimensions = arma::zeros<UVEC>(this->m_modes);
+    this->m_dimensions = arma::zeros<arma::uvec>(this->m_modes);
     for (int i = 0; i < this->m_modes; i++) {
       ifs >> this->m_dimensions[i];
     }
@@ -509,18 +503,16 @@ class Tensor {
    * @return linear index within the tensor
    */
 
-  UWORD sub2ind(UVEC sub) {
+  arma::uword sub2ind(arma::uvec sub) {
     assert(sub.n_cols == this->m_dimensions.n_cols);
-    UVEC cumprod_dims = arma::cumprod(this->m_dimensions);
-    UVEC cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
+    arma::uvec cumprod_dims = arma::cumprod(this->m_dimensions);
+    arma::uvec cumprod_dims_shifted = arma::shift(cumprod_dims, 1);
     cumprod_dims_shifted(0) = 1;
     size_t idx = arma::dot(cumprod_dims_shifted, sub);
     return idx;
   }
-  double at(UVEC sub) { return m_data[sub2ind(sub)]; }
+  double at(arma::uvec sub) { return m_data[sub2ind(sub)]; }
 };  // class Tensor
 }  // namespace planc
 
 void swap(planc::Tensor &x, planc::Tensor &y) { x.swap(y); }
-
-#endif  // COMMON_TENSOR_HPP_

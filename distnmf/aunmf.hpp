@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_AUNMF_HPP_
-#define DISTNMF_AUNMF_HPP_
 
 #include <mpi.h>
 #include <armadillo>
@@ -838,5 +837,3 @@ DISTPRINTINFO("::it=" << it << "localdiff::" << localdiff
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_AUNMF_HPP_

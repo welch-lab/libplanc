@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
-
-#ifndef DIMTREE_DDT_HPP_
-#define DIMTREE_DDT_HPP_
 
 #include "common/ncpfactors.hpp"
 #include "common/tensor.hpp"
@@ -40,7 +38,7 @@ class DenseDimensionTree {
     m_local_T->dims = (long int *)malloc(sizeof(long int) * m_local_T->nmodes);
     m_local_Y->nmodes = i_ncp_factors.modes();
     m_local_Y->rank = i_ncp_factors.rank();
-    VEC temp_vec = i_ncp_factors.lambda();
+    arma::vec temp_vec = i_ncp_factors.lambda();
     m_local_Y->lambdas = temp_vec.memptr();
     m_local_Y->dims_product = arma::prod(i_ncp_factors.dimensions());
 
@@ -242,5 +240,3 @@ class DenseDimensionTree {
     }
   }
 };
-
-#endif  // DIMTREE_DDT_HPP_

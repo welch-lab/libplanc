@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
-
-#ifndef DIMTREE_DIMTREES_HPP_
-#define DIMTREE_DIMTREES_HPP_
 
 #include "dimtree/ddttensor.hpp"
 #include "dimtree/dimtrees.h"
@@ -505,5 +503,3 @@ void multi_TTV_with_KRP_output_T(long int s, direction D, tensor *input_tensor,
     output_tensor->dims_product *= input_ktensor->rank;
   }
 }
-
-#endif  // DIMTREE_DIMTREES_HPP_

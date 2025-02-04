@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_DISTAOADMM_HPP_
-#define DISTNMF_DISTAOADMM_HPP_
 
 #include "distnmf/aunmf.hpp"
 /**
@@ -18,8 +17,8 @@ class DistAOADMM : public DistAUNMF<INPUTMATTYPE> {
   MAT tempWtW;
   MAT tempAHtij;
   MAT tempWtAij;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
   // Dual Variables
   MAT U;
@@ -279,5 +278,3 @@ class DistAOADMM : public DistAUNMF<INPUTMATTYPE> {
 };  // class DistAOADMM2D
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTAOADMM_HPP_

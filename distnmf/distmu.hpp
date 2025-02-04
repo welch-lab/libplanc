@@ -1,7 +1,6 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_DISTMU_HPP_
-#define DISTNMF_DISTMU_HPP_
 #include "distnmf/aunmf.hpp"
 
 /**
@@ -16,8 +15,8 @@ template <class INPUTMATTYPE>
 class DistMU : public DistAUNMF<INPUTMATTYPE> {
   MAT HWtW;
   MAT WHtH;
-  ROWVEC localWnorm;
-  ROWVEC Wnorm;
+  arma::rowvec localWnorm;
+  arma::rowvec Wnorm;
 
  protected:
   /**
@@ -65,7 +64,7 @@ class DistMU : public DistAUNMF<INPUTMATTYPE> {
    * this->WtW is of size kxk
    * \f$h_{ij} = \frac{h_{ij} .* WtAij.t()}{(HW^TW)_{ij}}\f$
    * Here ij is the element of H matrix.
-   */  
+   */
   void updateH() {
     HWtW = this->H * this->WtW + EPSILON;
     this->H = (this->H % this->WtAij.t()) / HWtW;
@@ -100,5 +99,3 @@ class DistMU : public DistAUNMF<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTMU_HPP_

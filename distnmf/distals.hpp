@@ -1,12 +1,11 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
 
-#ifndef DISTNMF_DISTALS_HPP_
-#define DISTNMF_DISTALS_HPP_
 #include "distnmf/aunmf.hpp"
 
 /**
  * Unconstrained least squares. Should match the SVD
- * objective error.  
+ * objective error.
  */
 
 namespace planc {
@@ -60,5 +59,3 @@ class DistALS : public DistAUNMF<INPUTMATTYPE> {
 };
 
 }  // namespace planc
-
-#endif  // DISTNMF_DISTALS_HPP_

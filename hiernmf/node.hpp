@@ -1,6 +1,5 @@
+#pragma once
 /* Copyright 2020 Lawton Manning */
-#ifndef HIERNMF_NODE_HPP_
-#define HIERNMF_NODE_HPP_
 #include <queue>
 #include <vector>
 #include "common/parsecommandline.hpp"
@@ -25,18 +24,18 @@ class Node {
   Node *parent = NULL;
   const INPUTMATTYPE * A0;
   INPUTMATTYPE A;
-  VEC W;
-  VEC H;
+  arma::vec W;
+  arma::vec H;
   double sigma;
   double score;
-  UVEC cols;
+  arma::uvec cols;
   bool accepted = false;
   uint64_t index;
   uint64_t level;
 
   uint64_t global_m, global_n;
 
-  UVEC top_words;
+  arma::uvec top_words;
 
   MPICommunicator *mpicomm;
   ParseCommandLine *pc;
@@ -52,10 +51,10 @@ class Node {
       locs(1, i) = i;
       locs(0, i) = this->cols(i);
     }
-    VEC vals(n_cols);
+    arma::vec vals(n_cols);
     vals.fill(1);
 
-    SP_MAT S(locs, vals, this->A0->n_cols, n_cols);
+    arma::sp_mat S(locs, vals, this->A0->n_cols, n_cols);
 
     this->A = *this->A0 * S;
 #else
@@ -82,7 +81,7 @@ class Node {
 
   Node() {}
 
-  Node(const INPUTMATTYPE * A, VEC W, VEC H, const UVEC & cols, Node * parent,
+  Node(const INPUTMATTYPE * A, arma::vec W, arma::vec H, const arma::uvec & cols, Node * parent,
        uint64_t index) {
     this->cols = cols;
     this->A0 = A;
@@ -144,8 +143,8 @@ class Node {
     W = nmf.getLeftLowRankFactor();
     H = nmf.getRightLowRankFactor();
 
-    UVEC lleft = H.col(0) >= H.col(1);
-    UVEC left(A.n_cols, arma::fill::zeros);
+    arma::uvec lleft = H.col(0) >= H.col(1);
+    arma::uvec left(A.n_cols, arma::fill::zeros);
     int * recvcnts = new int[this->mpicomm->size()];
     int * displs = new int[this->mpicomm->size()];
     recvcnts[0] = itersplit(A.n_cols, pc->pr(), 0);
@@ -161,8 +160,8 @@ class Node {
     delete displs;
 
     int lidx = 0;
-    UVEC lcols = this->cols(find(left == 1));
-    UVEC rcols = this->cols(find(left == 0));
+    arma::uvec lcols = this->cols(find(left == 1));
+    arma::uvec rcols = this->cols(find(left == 0));
 
     if (rcols.n_elem > lcols.n_elem) {
       lcols = this->cols(find(left == 0));
@@ -227,7 +226,7 @@ template <class INPUTMATTYPE>
 class RootNode : public Node<INPUTMATTYPE> {
  public:
   RootNode(const INPUTMATTYPE * A, uint64_t global_m,
-           uint64_t global_n, const UVEC & cols, MPICommunicator * mpicomm,
+           uint64_t global_n, const arma::uvec & cols, MPICommunicator * mpicomm,
            ParseCommandLine * pc)
       : Node<INPUTMATTYPE>() {
     this->cols = cols;
@@ -246,4 +245,3 @@ class RootNode : public Node<INPUTMATTYPE> {
   }
 };
 }  // namespace planc
-#endif  // HIERNMF_NODE_HPP_

@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
+            "program": "${workspaceFolder}/out/build/x64-debug/bench/planc_bench.exe",
+            "args": ["-i", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.mtx", "-j", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.dense.mtx"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "source arma-prettyprint",
+                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_armadillo_printers.py"
+                },
+                {
+                    "description": "source stdcomplex-prettyprint",
+                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_std_complex_printer.py"
+                }
+            ]
+        }
+
+    ]
+}

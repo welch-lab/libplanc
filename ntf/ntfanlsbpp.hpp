@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef NTF_NTFANLSBPP_HPP_
-#define NTF_NTFANLSBPP_HPP_
 
 #include "nnls/bppnnls.hpp"
 #include "ntf/auntf.hpp"
@@ -14,19 +12,19 @@ class NTFANLSBPP : public AUNTF {
  protected:
   MAT update(const int mode) {
     MAT othermat(this->m_ncp_factors.factor(mode).t());
-    UINT nrhs = this->ncp_mttkrp_t[mode].n_cols;
-    UINT numChunks = nrhs / ONE_THREAD_MATRIX_SIZE;
+    unsigned int nrhs = this->ncp_mttkrp_t[mode].n_cols;
+    unsigned int numChunks = nrhs / ONE_THREAD_MATRIX_SIZE;
     if (numChunks * ONE_THREAD_MATRIX_SIZE < nrhs) numChunks++;
 
 // #pragma omp parallel for schedule(dynamic)
-    for (UINT i = 0; i < numChunks; i++) {
-      UINT spanStart = i * ONE_THREAD_MATRIX_SIZE;
-      UINT spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
+    for (unsigned int i = 0; i < numChunks; i++) {
+      unsigned int spanStart = i * ONE_THREAD_MATRIX_SIZE;
+      unsigned int spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
       if (spanEnd > nrhs - 1) {
         spanEnd = nrhs - 1;
       }
 
-      BPPNNLS<MAT, VEC> subProblem(this->gram_without_one,
+      BPPNNLS<MAT, arma::vec> subProblem(this->gram_without_one,
                         (MAT)this->ncp_mttkrp_t[mode].cols(spanStart, spanEnd),
                         true);
 #ifdef _VERBOSE
@@ -62,5 +60,3 @@ class NTFANLSBPP : public AUNTF {
 };  // class NTFANLSBPP
 
 }  // namespace planc
-
-#endif  // NTF_NTFANLSBPP_HPP_

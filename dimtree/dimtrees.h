@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Koby Hayashi 2018 */
-
-#ifndef DIMTREE_DIMTREES_H_
-#define DIMTREE_DIMTREES_H_
 
 #include "dimtree/ddttensor.h"
 
@@ -41,4 +39,3 @@ void multi_TTV_with_KRP_output_FM(direction D, tensor *input_tensor,
 void multi_TTV_with_KRP_output_T(long int s, direction D, tensor *input_tensor,
                                  ktensor *input_ktensor, tensor *output_tensor,
                                  long int num_threads);
-#endif  // DIMTREE_DIMTREES_H_

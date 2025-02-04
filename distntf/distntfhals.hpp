@@ -1,7 +1,5 @@
+#pragma once
 /* Copyright Ramakrishnan Kannan 2018 */
-
-#ifndef DISTNTF_DISTNTFHALS_HPP_
-#define DISTNTF_DISTNTFHALS_HPP_
 
 #include "distntf/distauntf.hpp"
 
@@ -11,8 +9,8 @@ class DistNTFHALS : public DistAUNTF {
  protected:
    /**
    * This is HALS update function.
-   * Given the MTTKRP and the hadamard of all the grams, we 
-   * determine the factor matrix to be updated. 
+   * Given the MTTKRP and the hadamard of all the grams, we
+   * determine the factor matrix to be updated.
    * @param[in] Mode of the factor to be updated
    * @returns The new updated factor
    */
@@ -20,7 +18,7 @@ class DistNTFHALS : public DistAUNTF {
     MAT H(this->m_local_ncp_factors.factor(mode));
     // iterate over all columns of H
     for (int i = 0; i < this->m_local_ncp_factors.rank(); i++) {
-      VEC updHi;
+      arma::vec updHi;
       if (m_nls_sizes[mode] > 0) {
         updHi = H.col(i) + ((this->ncp_local_mttkrp_t[mode].row(i)).t() -
                             H * this->global_gram.col(i));
@@ -29,7 +27,7 @@ class DistNTFHALS : public DistAUNTF {
         updHi.zeros();
       }
 
-      fixNumericalError<VEC>(&updHi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
+      fixNumericalError<arma::vec>(&updHi, EPSILON_1EMINUS16, EPSILON_1EMINUS16);
       double normHi = arma::norm(updHi, 2);
       normHi *= normHi;
       double globalnormHi = normHi;
@@ -44,13 +42,11 @@ class DistNTFHALS : public DistAUNTF {
 
  public:
   DistNTFHALS(const Tensor &i_tensor, const int i_k, algotype i_algo,
-              const UVEC &i_global_dims, const UVEC &i_local_dims,
-              const UVEC &i_nls_sizes, const UVEC &i_nls_idxs,
+              const arma::uvec &i_global_dims, const arma::uvec &i_local_dims,
+              const arma::uvec &i_nls_sizes, const arma::uvec &i_nls_idxs,
               const NTFMPICommunicator &i_mpicomm)
       : DistAUNTF(i_tensor, i_k, i_algo, i_global_dims, i_local_dims,
                   i_nls_sizes, i_nls_idxs, i_mpicomm) {}
 };  // class DistNTFHALS
 
 }  // namespace planc
-
-#endif  // DISTNTF_DISTNTFHALS_HPP_

@@ -1,12 +1,11 @@
+#pragma once
 /* Copyright 2016 Ramakrishnan Kannan */
-#ifndef COMMON_DISTUTILS_HPP_
-#define COMMON_DISTUTILS_HPP_
 
 #include <mpi.h>
 #include <string>
-#include "common/distutils.h"
-#include "common/utils.h"
-#include "common/utils.hpp"
+#include "distutils.h"
+#include "utils.h"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -128,10 +127,10 @@ inline void memusage(const int myrank, std::string event) {
 }
 
 /**
- * The dimension a particular rank holds out of 
+ * The dimension a particular rank holds out of
  * the global dimension n across p processes.
  * @param[in] n is the global size of the tensor on that dimension
- * @param[in] p is the number of splits of n. 
+ * @param[in] p is the number of splits of n.
  *            Typically number of processes on a particular mode
  * @param[in] r is the rank of the mpi process in that mode. fiber rank
  */
@@ -142,7 +141,7 @@ inline int itersplit(int n, int p, int r) {
 
 /**
  * Returns the start idx of the current rank r
- * for a global dimension n across p processes. 
+ * for a global dimension n across p processes.
  * @param[in] n is the size of the tensor on that dimension
  * @param[in] p is the number of splits of n.
  * @param[in] r is the rank of the mpi process in that mode. fiber rank
@@ -297,7 +296,7 @@ procInfo getfirstproc(int n, int sidx, int pr, int pc, char ord='C') {
     for (int jj = 0; jj < pc; jj++) {
       for (int ii = 0; ii < pr; ii++) {
         pinfo = getrownum(n, ii, jj, pr, pc, ord);
-        if (sidx >= pinfo.start_idx 
+        if (sidx >= pinfo.start_idx
               && sidx < (pinfo.start_idx + pinfo.nrows)) {
           found = true;
           break;
@@ -309,7 +308,7 @@ procInfo getfirstproc(int n, int sidx, int pr, int pc, char ord='C') {
     for (int ii = 0; ii < pr; ii++) {
       for (int jj = 0; jj < pc; jj++) {
         pinfo = getrownum(n, ii, jj, pr, pc, ord);
-        if (sidx >= pinfo.start_idx 
+        if (sidx >= pinfo.start_idx
               && sidx < (pinfo.start_idx + pinfo.nrows)) {
           found = true;
           break;
@@ -334,7 +333,7 @@ procInfo getfirstproc(int n, int sidx, int pr, int pc, char ord='C') {
  * @param[in] A is the grid (with the sending processor (i, j))
  * @param[in] B is the grid (with the receiving processors)
  * @param[out] tosend vector containing the processor ids (in B grid) to send
- *                    to and offset lengths (in rows)       
+ *                    to and offset lengths (in rows)
  */
 std::vector<procInfo> getsendinfo(int n, int i, int j,
                           gridInfo A, gridInfo B) {
@@ -349,7 +348,7 @@ std::vector<procInfo> getsendinfo(int n, int i, int j,
   // Prepare the first message
   int endidx  = firstp.start_idx + firstp.nrows;
   int maxsend = std::min(endidx - localp.start_idx, localp.nrows);
-  
+
   procInfo msg1;
   msg1.i         = firstp.i;
   msg1.j         = firstp.j;
@@ -360,7 +359,7 @@ std::vector<procInfo> getsendinfo(int n, int i, int j,
 
   // Check if another message is needed. We only need 1 extra send.
   if (maxsend < localp.nrows) {
-    std::vector<int> nextpcoords = nextproc(firstp.i, firstp.j, 
+    std::vector<int> nextpcoords = nextproc(firstp.i, firstp.j,
                                                 B.pr, B.pc, B.order);
     procInfo msg2;
     msg2.i         = nextpcoords[0];
@@ -386,7 +385,7 @@ std::vector<procInfo> getsendinfo(int n, int i, int j,
  * @param[in] A is the grid (with the sending processors)
  * @param[in] B is the grid (with the receiving processor (i, j))
  * @param[out] torecv vector containing the processor ids (in A grid) to
- *                    receive from and offset lengths (in rows)       
+ *                    receive from and offset lengths (in rows)
  */
 std::vector<procInfo> getrecvinfo(int n, int i, int j,
                           gridInfo A, gridInfo B) {
@@ -401,7 +400,7 @@ std::vector<procInfo> getrecvinfo(int n, int i, int j,
   // Prepare the first message
   int endidx  = firstp.start_idx + firstp.nrows;
   int maxrecv = std::min(endidx - localp.start_idx, localp.nrows);
-  
+
   procInfo msg1;
   msg1.i         = firstp.i;
   msg1.j         = firstp.j;
@@ -412,7 +411,7 @@ std::vector<procInfo> getrecvinfo(int n, int i, int j,
 
   // Check if another message is needed. We only need 1 extra recv.
   if (maxrecv < localp.nrows) {
-    std::vector<int> nextpcoords = nextproc(firstp.i, firstp.j, 
+    std::vector<int> nextpcoords = nextproc(firstp.i, firstp.j,
                                                 A.pr, A.pc, A.order);
     procInfo msg2;
     msg2.i         = nextpcoords[0];
@@ -452,7 +451,7 @@ int ss_tok(stringstream& ss, Type& arg, Types&... args){
   return 0;
 }
 
-// Convert string into variable number of mixed-type variables 
+// Convert string into variable number of mixed-type variables
 template<typename... Types>
 int ss_tok(string line, Types&... args){
   stringstream ss;
@@ -470,9 +469,9 @@ int ss_tok(string line, Types&... args){
 // passes in the dimension information via the input arguments, which is why we do not need the meta
 // information. we should probably add in error checking to make sure all indices of read in matrix
 // are with the dimensions passed in by the user.
-void readInputUnpartitionedMatrix(UWORD m, UWORD n, 
-                      const std::string& input_file_name, 
-                      SP_MAT &m_A, const MPI_Comm gridComm, 
+void readInputUnpartitionedMatrix(UWORD m, UWORD n,
+                      const std::string& input_file_name,
+                      SP_MAT &m_A, const MPI_Comm gridComm,
                       int unpartitioned) {
 
   int i = 1;
@@ -482,10 +481,10 @@ void readInputUnpartitionedMatrix(UWORD m, UWORD n,
   std::vector<int> coords;
 
   int pr, pc, rank, row_rank, col_rank;
-  
+
   // Get the p2p rank
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  
+
   // Get the grid details
   int nd = 2;
   dimSizes.resize(nd);
@@ -519,7 +518,7 @@ void readInputUnpartitionedMatrix(UWORD m, UWORD n,
   int shift = 0;
 
   if(suffix == ".mtx"){
-    shift = 1; 
+    shift = 1;
     // discard first three lines
     for(int i = 0; i < 3; i++){
       getline(fin, test);
@@ -538,7 +537,7 @@ void readInputUnpartitionedMatrix(UWORD m, UWORD n,
       while(getline(fin, test)){
         // cout << "test: " << test << endl;
         ss_tok(test, row, col, val); //coords_tuple);
-        
+
         // if we read in mtx file, then convert to 0 indexing...
         row = row - shift;
         col = col - shift;
@@ -566,7 +565,7 @@ void readInputUnpartitionedMatrix(UWORD m, UWORD n,
 
 
         if(suffix == ".mtx"){
-          shift = 1; 
+          shift = 1;
           // discard first three lines
           for(int i = 0; i < 3; i++){
             getline(fin, test);
@@ -629,8 +628,8 @@ void readInputUnpartitionedMatrix(UWORD m, UWORD n,
 }
 
 // SPARSE
-void readInputMatrix(UWORD m, UWORD n, 
-                      const std::string& input_file_name, 
+void readInputMatrix(UWORD m, UWORD n,
+                      const std::string& input_file_name,
                       SP_MAT &m_A, const MPI_Comm gridComm, int unpartitioned = 1) {
   if(unpartitioned==0){
     std::stringstream sr;
@@ -639,10 +638,10 @@ void readInputMatrix(UWORD m, UWORD n,
     std::vector<int> coords;
 
     int pr, pc, rank, row_rank, col_rank;
-    
+
     // Get the p2p rank
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    
+
     // Get the grid details
     int nd = 2;
     dimSizes.resize(nd);
@@ -700,10 +699,10 @@ void readInputMatrix(UWORD global_m, UWORD global_n,
   std::vector<int> coords;
 
   int pr, pc, rank, row_rank, col_rank;
-  
+
   // Get the p2p rank
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  
+
   // Get the grid details
   int nd = 2;
   dimSizes.resize(nd);
@@ -735,8 +734,8 @@ void readInputMatrix(UWORD global_m, UWORD global_n,
   int ret = MPI_File_open(MPI_COMM_WORLD, input_file_name.c_str(),
                           MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
   if ((rank == 0) && ret != MPI_SUCCESS) {
-    INFO << rank << "::" << __PRETTY_FUNCTION__ << "::" << __LINE__          
-      << "::" << std::endl << "Error: Could not open file " 
+    INFO << rank << "::" << __PRETTY_FUNCTION__ << "::" << __LINE__
+      << "::" << std::endl << "Error: Could not open file "
       << input_file_name << std::endl << std::endl;
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
@@ -748,8 +747,8 @@ void readInputMatrix(UWORD global_m, UWORD global_n,
   MPI_Status status;
   ret = MPI_File_read_all(fh, m_A.memptr(), count, MPI_DOUBLE, &status);
   if ((rank == 0) && ret != MPI_SUCCESS) {
-    INFO << rank << "::" << __PRETTY_FUNCTION__ << "::" << __LINE__          
-      << "::" << std::endl << "Error: Could not read file " 
+    INFO << rank << "::" << __PRETTY_FUNCTION__ << "::" << __LINE__
+      << "::" << std::endl << "Error: Could not read file "
       << input_file_name << std::endl << std::endl;
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
@@ -763,4 +762,3 @@ int print_mat(MATTYPE X){
   return 0;
 }
 
-#endif  // COMMON_DISTUTILS_HPP_

@@ -21,7 +21,7 @@ class NTFDriver {
   template <class NTFTYPE>
   void callNTF(planc::ParseCommandLine pc) {
     int test_modes = pc.num_modes();
-    UVEC dimensions(test_modes);
+    arma::uvec dimensions(test_modes);
     Tensor my_tensor(pc.dimensions());
     std::string rand_prefix("rand_");
     std::string filename = pc.input_file_name();
