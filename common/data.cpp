@@ -725,8 +725,8 @@ namespace planc {
                 // HighFive::DataSpace xt_writeDataSpace(1, count);
                 // HighFive::DataSpace it_writeDataSpace(1, count);
 
-                rowind.elem(static_cast<arma::uvec>(coord)) = it_value;
-                value.elem(static_cast<arma::uvec>(coord)) = value_ori_col;
+                rowind.elem(arma::conv_to<arma::uvec>::from(coord)) = it_value;
+                value.elem(arma::conv_to<arma::uvec>::from(coord)) = value_ori_col;
                 // Increment it, so that next time when fetching the number `nnz_idx` of the same new-column/old-row,
                 // it know the previous position has been filled
                 colptrT_start.elem(rowind_ori_col) += 1;
