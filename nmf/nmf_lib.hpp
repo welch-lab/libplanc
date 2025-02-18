@@ -143,7 +143,7 @@ namespace planc {
         //     myNMF.callNMF();
         //     return 0;
         // }
-        static std::vector<std::shared_ptr<T>> NMFLIB_EXPORT initMemSharedPtr(std::vector<T> objectList);
+        static std::vector<std::shared_ptr<T>> initMemSharedPtr(std::vector<T> objectList);
     };
 
     template<typename eT>
