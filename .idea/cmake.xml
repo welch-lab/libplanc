@@ -22,7 +22,6 @@
           </envs>
         </ADDITIONAL_GENERATION_ENVIRONMENT>
       </configuration>
-      <configuration PROFILE_NAME="Debug-Visual Studio-event-trace" ENABLED="false" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Visual Studio" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=C:\Users\andrew\.vcpkg-clion\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_OVERLAY_TRIPLETS=E:\my-vcpkg-triplets -DBLAS_LIBRARIES:FILEPATH=&quot;C:/Program Files/AMD/AOCL-Windows/amd-blis/lib/LP64/AOCL-LibBlis-Win-MT.lib&quot; -DLAPACK_LIBRARIES:FILEPATH=&quot;C:/Program Files/AMD/AOCL-Windows/amd-libflame/LP64/AOCL-LibFlame-Win.lib&quot; -DCBLAS_H_DIR:PATH=E:/planc/cmake-build-debug-visual-studio/vcpkg_installed/x64-windows/include/openblas --profiling-format=google-trace --profiling-output=CMakeFiles\clion-event-trace.json" />
     </configurations>
   </component>
 </project>

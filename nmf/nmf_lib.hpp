@@ -4,9 +4,10 @@
 
 #ifndef PLANC_NMF_LIB_HPP
 #define PLANC_NMF_LIB_HPP
+#include <memory>
 #include "nmflib_export.h"
 #include "config.h"
-
+#include <data.hpp>
 
 extern "C" {
 #include "detect_blas.h"

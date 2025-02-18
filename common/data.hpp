@@ -2,6 +2,7 @@
 // Created by andrew on 12/3/2024.
 //
 #pragma once
+#include <memory>
 #include <nmflib_export.h>
 
 namespace planc {
