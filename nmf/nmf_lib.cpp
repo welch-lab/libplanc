@@ -13,10 +13,10 @@ template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(std::vector
 template std::vector<std::shared_ptr<T>> planc::nmflib<T, double>::initMemSharedPtr(std::vector<T> objectList); \
 template planc::oinmfOutput<double> planc::nmflib<T, double>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const arma::uword &k, const int &nCores, const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose); \
 template planc::oinmfOutput<double> planc::nmflib<T, double>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const std::vector<arma::mat> &Vinit, const arma::mat &Winit, const std::vector<arma::mat> &Ainit, const std::vector<arma::mat> &Binit, std::vector<std::shared_ptr<T>> matPtrVecNew, const arma::uword &k, const int& nCores, const double &lambda, const arma::uword &maxEpoch, const arma::uword &minibatchSize, const arma::uword &maxHALSIter, const bool &verbose); \
-template std::vector<arma::Mat<double>> planc::nmflib<T, double>::oinmf_project(std::vector<std::shared_ptr<T>> matPtrVec, const arma::mat &Winit, std::vector<std::shared_ptr<T>> matPtrVecNew, const arma::uword &k, const int& nCores, const double &lambda);
+template std::vector<arma::Mat<double>> planc::nmflib<T, double>::oinmf_project(std::vector<std::shared_ptr<T>> matPtrVec, const arma::mat &Winit, std::vector<std::shared_ptr<T>> matPtrVecNew, const arma::uword &k, const int& nCores, const double &lambda); \
+template planc::uinmfOutput<double> planc::nmflib<T, double>::uinmf(const std::vector<std::shared_ptr<T>> &matPtrVec, const std::vector<std::shared_ptr<T>> &unsharedPtrVec, std::vector<int> whichUnshared, const arma::uword &k, const int& nCores, const arma::vec &lambda, const arma::uword &niter, const bool &verbose);
 #include "inmf_types.inc"
 #undef X
-//template planc::uinmfOutput<double> planc::nmflib<T, double>::uinmf(const std::vector<T> &objectList, const std::vector<T> &unsharedList, std::vector<int> whichUnshared, const arma::uword &k, const int& nCores, const arma::vec &lambda, const arma::uword &niter, const bool &verbose);
 void planc::openblas_pthread_off(const openblas_handle_t libloc) {
     if (is_openmp()) {
         if (const std::function openblas_parallel = get_openblas_parallel(libloc)) {

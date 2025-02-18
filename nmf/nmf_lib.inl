@@ -104,40 +104,42 @@ namespace planc {
         return matPtrVec;
     }
 
-    //    template <typename T, typename eT>
-    //     uinmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::uinmf(const std::vector<T> &objectList,
-    //                      const std::vector<T> &unsharedList,
-    //                      std::vector<int> whichUnshared,
-    //                      const arma::uword &k, const int& nCores, const arma::vec &lambda,
-    //                      const arma::uword &niter, const bool &verbose)
-    //     {
-    //         std::vector<std::unique_ptr<T>> matPtrVec;
-    //         std::vector<std::unique_ptr<T>> unsharedPtrVec;
-    //         matPtrVec = initMemMatPtr<T>(objectList);
-    //         unsharedPtrVec = initMemMatPtr<T>(unsharedList);
-    //         UINMF<T> solver(matPtrVec, unsharedPtrVec, whichUnshared, k, lambda);
-    //         solver.optimizeUANLS(niter, verbose, nCores);
-    //
-    //         std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
-    //         std::vector<arma::mat> resolvedH{};
-    //         for (unsigned int i = 0; i < allH.size(); ++i) {
-    //             arma::mat* ptr = allH[i].release();
-    //             resolvedH.push_back(*ptr);
-    //         }
-    //         std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
-    //         std::vector<arma::mat> resolvedV{};
-    //         for (unsigned int i = 0; i < allV.size(); ++i) {
-    //             arma::mat* ptr = allV[i].release();
-    //             resolvedV.push_back(*ptr);
-    //          }
-    //         std::vector<std::unique_ptr<arma::mat>> allU = solver.getAllU();
-    //         std::vector<arma::mat> resolvedU{};
-    //         for (unsigned int i = 0; i < allU.size(); ++i) {
-    //             arma::mat* ptr = allU[i].release();
-    //             resolvedU.push_back(*ptr);
-    //         }
-    //         return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedU};
-    //     }
+    template<typename T, typename eT>
+    uinmfOutput<eT> NMFLIB_EXPORT nmflib<T, eT>::uinmf(const std::vector<std::shared_ptr<T>>&matPtrVec,
+                                                       const std::vector<std::shared_ptr<T>>&unsharedPtrVec,
+                                                       std::vector<int> whichUnshared,
+                                                       const arma::uword&k, const int&nCores, const arma::vec&lambda,
+                                                       const arma::uword&niter, const bool&verbose) {
+        UINMF<T> solver(matPtrVec, unsharedPtrVec, whichUnshared, k, lambda);
+        solver.optimizeUANLS(niter, verbose, nCores);
+        std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
+        std::vector<arma::mat> resolvedH{};
+        for (unsigned int i = 0; i < allH.size(); ++i) {
+            arma::mat* ptr = allH[i].release();
+            resolvedH.push_back(*ptr);
+        }
+        std::vector<std::unique_ptr<arma::mat>> allV = solver.getAllV();
+        std::vector<arma::mat> resolvedV{};
+        for (unsigned int i = 0; i < allV.size(); ++i) {
+            arma::mat* ptr = allV[i].release();
+            resolvedV.push_back(*ptr);
+        }
+        std::vector<arma::mat> resolvedU{};
+        std::vector<std::unique_ptr<arma::mat>> allU = solver.getAllU();
+        for (unsigned int i = 0; i < allU.size(); ++i) {
+            arma::mat* ptr = allU[i].release();
+            resolvedU.push_back(*ptr);
+        }
+        std::vector<arma::mat> outU{};
+        for (unsigned int i = 0; i < allU.size(); ++i) {
+            int uidx = whichUnshared[i];
+            if (uidx >= 0) {
+                outU.push_back(resolvedU[uidx]);
+            }
+        }
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr(), outU};
+    }
+
     template<typename T, typename eT>
     oinmfOutput<eT> nmflib<T, eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const arma::uword&k,
                                          const int&nCores,
