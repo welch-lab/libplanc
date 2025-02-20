@@ -212,11 +212,11 @@ namespace planc {
 //         }
 
     public:
-        BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda) {
+        BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda, false) {
         }
 
         BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
-                std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, VinitList, Winit) {
+                std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, VinitList, Winit, false) {
             this->initH(HinitList);
         }
 

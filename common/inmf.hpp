@@ -18,7 +18,7 @@ namespace planc {
         int INMF_CHUNK_SIZE, m; // chunking
         std::vector<arma::uword> ncol_E; // vector of n_i
         std::vector<std::shared_ptr<T>> Ei; // each of size mxn_i
-        // std::vector<std::unique_ptr<T>> EiT; // each of size n_ixm
+        std::vector<std::unique_ptr<T>> EiT; // each of size n_ixm
         std::vector<std::unique_ptr<arma::mat>> Hi; // each of size n_ixk
         std::vector<std::unique_ptr<arma::mat>> Vi; // each of size mxk
         std::vector<std::unique_ptr<arma::mat>> ViT; // each of size kxm
@@ -93,11 +93,11 @@ namespace planc {
 #endif
             for (unsigned int i = 0; i < this->Ei.size(); ++i) {
                 T* E = this->Ei[i].get();
-                // if (makeTranspose) {
-                //     T ET = E->t();
-                //     std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
-                //     this->EiT.push_back(std::move(ETptr));
-                // }
+                if (makeTranspose) {
+                    T ET = E->t();
+                    std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
+                    this->EiT.push_back(std::move(ETptr));
+                }
                 this->ncol_E.push_back(E->n_cols);
                 if (E->n_cols > this->nMax) {
                     this->nMax = E->n_cols;
@@ -159,7 +159,7 @@ namespace planc {
 
     public:
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, bool makeTranspose = true) {
-            this->constructObject(Ei, k, lambda, false);
+            this->constructObject(Ei, k, lambda, makeTranspose);
             this->initW();
             this->initV();
             this->INMF::initH();
@@ -167,7 +167,7 @@ namespace planc {
 
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
              std::vector<arma::mat> VinitList, arma::mat Winit, bool makeTranspose = true) {
-            this->constructObject(Ei, k, lambda, false);
+            this->constructObject(Ei, k, lambda, makeTranspose);
             this->initW(Winit);
             this->initV(VinitList);
         }
@@ -351,9 +351,9 @@ namespace planc {
                     Ei[i].reset();
                     // EiT[i].reset();
                 }
-                // for (unsigned int i = 0; i < EiT.size(); ++i) {
-                //     EiT[i].reset();
-                // }
+                for (unsigned int i = 0; i < EiT.size(); ++i) {
+                    EiT[i].reset();
+                }
                 for (auto&i: Hi) {
                     i.reset();
                 }
