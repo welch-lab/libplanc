@@ -415,18 +415,18 @@ namespace planc {
             this->p_chunksize = p_chunkdim[0];
             // p_cparms.close();
             // #ifdef _VERBOSE
-#ifdef USING_R
-            Rcpp::Rcout
-#else
-            std::cout
-#endif
-                    << "==H5SpMat constructed==" << std::endl
-                    << "H5File:    " << filename << std::endl
-                    << "colptr path:  " << pPath << std::endl
-                    << "rowind path:  " << iPath << std::endl
-                    << "value path:   " << xPath << std::endl
-                    << "Dimension: " << n_rows << " x " << n_cols << std::endl;
-            // #endif
+// #ifdef USING_R
+//             Rcpp::Rcout
+// #else
+//             std::cout
+// #endif
+//                     << "==H5SpMat constructed==" << std::endl
+//                     << "H5File:    " << filename << std::endl
+//                     << "colptr path:  " << pPath << std::endl
+//                     << "rowind path:  " << iPath << std::endl
+//                     << "value path:   " << xPath << std::endl
+//                     << "Dimension: " << n_rows << " x " << n_cols << std::endl;
+//             // #endif
         }
 
         ~H5SpMatImpl() {
@@ -725,8 +725,8 @@ namespace planc {
                 // HighFive::DataSpace xt_writeDataSpace(1, count);
                 // HighFive::DataSpace it_writeDataSpace(1, count);
 
-                rowind.elem(static_cast<arma::uvec>(coord)) = it_value;
-                value.elem(static_cast<arma::uvec>(coord)) = value_ori_col;
+                rowind.elem(arma::conv_to<arma::uvec>::from(coord)) = it_value;
+                value.elem(arma::conv_to<arma::uvec>::from(coord)) = value_ori_col;
                 // Increment it, so that next time when fetching the number `nnz_idx` of the same new-column/old-row,
                 // it know the previous position has been filled
                 colptrT_start.elem(rowind_ori_col) += 1;

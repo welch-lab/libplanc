@@ -4,9 +4,10 @@
 
 #ifndef PLANC_NMF_LIB_HPP
 #define PLANC_NMF_LIB_HPP
+#include <memory>
 #include "nmflib_export.h"
 #include "config.h"
-
+#include <data.hpp>
 
 extern "C" {
 #include "detect_blas.h"
@@ -47,12 +48,15 @@ namespace planc {
         double objErr;
     };
 
-    // template<typename eT>
-    // struct NMFLIB_EXPORT uinmfOutput : inmfOutput<eT> {
-    //     uinmfOutput() = default;
-    //     ~uinmfOutput() = default;
-    //     std::vector<arma::Mat<eT>> outUList;
-    // };
+    template<typename eT>
+    struct NMFLIB_EXPORT uinmfOutput : inmfOutput<eT> {
+        uinmfOutput() = default;
+
+        ~uinmfOutput() = default;
+
+        std::vector<arma::Mat<eT>> outUList;
+    };
+
     template<typename eT>
     struct NMFLIB_EXPORT oinmfOutput : inmfOutput<eT> {
         oinmfOutput() = default;
@@ -103,11 +107,12 @@ namespace planc {
                                              const std::vector<arma::mat>&VinitList, const arma::mat&Winit,
                                              const int&ncores);
 
-        //     static struct uinmfOutput<eT> uinmf(const std::vector<T> &objectList,
-        //                  const std::vector<T> &unsharedList,
-        //                  std::vector<int> whichUnshared,
-        //                  const arma::uword &k, const int &nCores, const arma::vec &lambda,
-        //                  const arma::uword &niter, const bool &verbose);
+        static struct uinmfOutput<eT> uinmf(const std::vector<std::shared_ptr<T>>&matPtrVec,
+                                            const std::vector<std::shared_ptr<T>>&unsharedPtrVec,
+                                            std::vector<int> whichUnshared,
+                                            const arma::uword&k, const int&nCores, const arma::vec&lambda,
+                                            const arma::uword&niter, const bool&verbose);
+
         static struct oinmfOutput<eT> oinmf(std::vector<std::shared_ptr<T>> matPtrVec, const arma::uword&k,
                                             const int&nCores,
                                             const double&lambda, const arma::uword&maxEpoch,
@@ -138,7 +143,7 @@ namespace planc {
         //     myNMF.callNMF();
         //     return 0;
         // }
-        static std::vector<std::shared_ptr<T>> NMFLIB_EXPORT initMemSharedPtr(std::vector<T> objectList);
+        static std::vector<std::shared_ptr<T>> initMemSharedPtr(std::vector<T> objectList);
     };
 
     template<typename eT>
