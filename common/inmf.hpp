@@ -18,7 +18,7 @@ namespace planc {
         int INMF_CHUNK_SIZE, m; // chunking
         std::vector<arma::uword> ncol_E; // vector of n_i
         std::vector<std::shared_ptr<T>> Ei; // each of size mxn_i
-        std::vector<std::unique_ptr<T>> EiT; // each of size n_ixm
+        // std::vector<std::unique_ptr<T>> EiT; // each of size n_ixm
         std::vector<std::unique_ptr<arma::mat>> Hi; // each of size n_ixk
         std::vector<std::unique_ptr<arma::mat>> Vi; // each of size mxk
         std::vector<std::unique_ptr<arma::mat>> ViT; // each of size kxm
@@ -26,6 +26,8 @@ namespace planc {
         std::unique_ptr<arma::mat> WT; // kxm
         double lambda, sqrtLambda, objective_err;
         bool cleared;
+        std::unique_ptr<arma::sp_mat> tempE;
+        void load_whole_E(arma::uword i);
 
         virtual double computeObjectiveError() {
             // obj_i = ||E_i - (W + V_i)*H_i||_F^2 + lambda * ||V_i*H_i||_F^2
@@ -39,16 +41,20 @@ namespace planc {
             arma::mat* Wptr = this->W.get();
             arma::mat L(this->m, this->k); // (loading) L = W + V
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
-                T* Eptr = this->Ei[i].get();
+                // T* Eptr = this->Ei[i].get();
+                // arma::sp_mat* Eptr = this->load_whole_E(i);
+                this->load_whole_E(i);
+                arma::sp_mat* Eptr = this->tempE.get();
                 arma::mat* Hptr = this->Hi[i].get();
                 arma::mat* Vptr = this->Vi[i].get();
                 L = *Wptr + *Vptr;
-                double sqnormE = arma::norm<T>(*Eptr, "fro");
+                double sqnormE = arma::norm<arma::sp_mat>(*Eptr, "fro");
                 sqnormE *= sqnormE;
                 arma::mat LtL = L.t() * L; // k x k
                 arma::mat HtH = Hptr->t() * *Hptr; // k x k
                 double TrLtLHtH = arma::trace(LtL * HtH);
-                T Et = Eptr->t();
+                // T Et = Eptr->t();
+                arma::sp_mat Et = Eptr->t();
                 arma::mat EtL = Et * L; // n_i x k
                 double TrHtEtL = arma::trace(Hptr->t() * EtL);
                 arma::mat VtV = Vptr->t() * *Vptr; // k x k
@@ -87,11 +93,11 @@ namespace planc {
 #endif
             for (unsigned int i = 0; i < this->Ei.size(); ++i) {
                 T* E = this->Ei[i].get();
-                if (makeTranspose) {
-                    T ET = E->t();
-                    std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
-                    this->EiT.push_back(std::move(ETptr));
-                }
+                // if (makeTranspose) {
+                //     T ET = E->t();
+                //     std::unique_ptr<T> ETptr = std::make_unique<T>(ET);
+                //     this->EiT.push_back(std::move(ETptr));
+                // }
                 this->ncol_E.push_back(E->n_cols);
                 if (E->n_cols > this->nMax) {
                     this->nMax = E->n_cols;
@@ -153,7 +159,7 @@ namespace planc {
 
     public:
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda, bool makeTranspose = true) {
-            this->constructObject(Ei, k, lambda, makeTranspose);
+            this->constructObject(Ei, k, lambda, false);
             this->initW();
             this->initV();
             this->INMF::initH();
@@ -161,7 +167,7 @@ namespace planc {
 
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
              std::vector<arma::mat> VinitList, arma::mat Winit, bool makeTranspose = true) {
-            this->constructObject(Ei, k, lambda, makeTranspose);
+            this->constructObject(Ei, k, lambda, false);
             this->initW(Winit);
             this->initV(VinitList);
         }
@@ -345,9 +351,9 @@ namespace planc {
                     Ei[i].reset();
                     // EiT[i].reset();
                 }
-                for (unsigned int i = 0; i < EiT.size(); ++i) {
-                    EiT[i].reset();
-                }
+                // for (unsigned int i = 0; i < EiT.size(); ++i) {
+                //     EiT[i].reset();
+                // }
                 for (auto&i: Hi) {
                     i.reset();
                 }
@@ -359,8 +365,75 @@ namespace planc {
                 }
                 this->W.reset();
                 if (this->WT.get() != nullptr) this->WT.reset();
+                this->tempE.reset();
             }
             this->cleared = true;
         }
     }; // class INMF
+
+    template<>
+    inline void INMF<arma::sp_mat>::load_whole_E(arma::uword i) {
+        // Make a real matrix copied from what's pointed by this->Ei[i]
+        arma::sp_mat tempSparse = *(this->Ei[i].get());
+        // Make new unique_ptr to manage the memory
+        auto tempSparseUniquePtr = std::make_unique<arma::sp_mat>(tempSparse);
+        this->tempE = std::move(tempSparseUniquePtr);
+        // return this->Ei[i].get();
+    }
+
+    template<>
+    inline void INMF<arma::mat>::load_whole_E(arma::uword i) {
+        auto tempSparse = std::make_unique<arma::sp_mat>(*(this->Ei[i]));
+
+        // Get raw pointer before transferring ownership
+        // arma::sp_mat* rawPtr = tempSparse.get();
+
+        // Move unique_ptr to a class member to ensure it stays alive
+        this->tempE = std::move(tempSparse);
+
+        // return rawPtr;
+    }
+
+    template<>
+    inline void INMF<H5SpMat>::load_whole_E(arma::uword i) {
+        H5SpMat* Eptr = this->Ei[i].get();
+        // arma::uword m = Eptr->n_rows;
+        arma::uword n = Eptr->n_cols;
+        this->tempE.reset();
+        arma::sp_mat tempSparse = Eptr->cols(0, n - 1);
+        auto tempSparseUniquePtr = std::make_unique<arma::sp_mat>(tempSparse);
+        // auto tempSparse = std::make_unique<arma::sp_mat>(m, n);
+        // (*tempSparse) = Eptr->cols(0, n - 1);
+        // Get raw pointer before transferring ownership
+        // arma::sp_mat* rawPtr = tempSparseUniquePtr.get();
+
+        // Move unique_ptr to a class member to ensure it stays alive
+        this->tempE = std::move(tempSparseUniquePtr);
+        // return rawPtr;
+    }
+
+    template<>
+    inline void INMF<H5Mat>::load_whole_E(arma::uword i) {
+        H5Mat* Eptr = this->Ei[i].get();
+        // arma::uword m = Eptr->n_rows;
+        arma::uword n = Eptr->n_cols;
+        auto out = std::make_unique<arma::sp_mat>(m, n);
+        // Load on-disk dense matrix by chunks and convert to sparse and fill
+        int numChunks = n / this->INMF_CHUNK_SIZE;
+        if (numChunks * this->INMF_CHUNK_SIZE < n) numChunks++;
+        for (int i = 0; i < numChunks; ++i) {
+            int spanStart = i * this->INMF_CHUNK_SIZE;
+            int spanEnd = (i + 1) * this->INMF_CHUNK_SIZE - 1;
+            if (spanEnd > n - 1) spanEnd = n - 1;
+            arma::mat dense_span = Eptr->cols(spanStart, spanEnd);
+            arma::sp_mat sparse_span(dense_span);
+            (*out).cols(spanStart, spanEnd) = sparse_span;
+        }
+        // Get raw pointer before transferring ownership
+        // arma::sp_mat* rawPtr = out.get();
+        // Move unique_ptr to a class member to ensure it stays alive
+        this->tempE = std::move(out);
+        // return rawPtr;
+    }
+
 }
