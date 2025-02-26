@@ -4,7 +4,7 @@
 #include <omp.h>
 #endif
 #ifdef USING_R
-#include <Progress.hpp>
+#include <progress.hpp>
 #else
 #include "progressWrapper.h"
 #endif
