@@ -35,17 +35,9 @@ set(TEMP_CMAKE_FIND_APPBUNDLE ${CMAKE_FIND_APPBUNDLE})
 set(CMAKE_FIND_APPBUNDLE "NEVER")
 
 # Find R.
-find_program(R_EXECUTABLE R DOC "R executable.")
+find_program(R_EXECUTABLE R DOC "R executable." PATHS ${R_RHOME} PATH_SUFFIXES bin)
 
 if(R_EXECUTABLE)
-    # Get the location of R.
-    execute_process(
-        WORKING_DIRECTORY .
-        COMMAND ${R_EXECUTABLE} RHOME
-        OUTPUT_VARIABLE R_BASE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
     # Get the R version.
     execute_process(
         COMMAND ${R_EXECUTABLE} --version
@@ -59,14 +51,12 @@ if(R_EXECUTABLE)
             R_VERSION_STRING "${R_VERSION_STRING}")
     endif()
 
-    
-    set(R_HOME ${R_BASE_DIR} CACHE PATH "R home directory obtained from R RHOME")
+    set(R_HOME ${R_RHOME} CACHE PATH "R home directory obtained from R RHOME")
     mark_as_advanced(R_HOME)
 endif()
 
 # Find the Rscript program.
 find_program(RSCRIPT_EXECUTABLE Rscript DOC "Rscript executable." HINTS "${R_HOME}/bin")
-
 set(CMAKE_FIND_APPBUNDLE ${TEMP_CMAKE_FIND_APPBUNDLE})
 
 # Search for non-standard R.h include path if header missing
