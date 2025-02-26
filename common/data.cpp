@@ -415,18 +415,18 @@ namespace planc {
             this->p_chunksize = p_chunkdim[0];
             // p_cparms.close();
             // #ifdef _VERBOSE
-#ifdef USING_R
-            Rcpp::Rcout
-#else
-            std::cout
-#endif
-                    << "==H5SpMat constructed==" << std::endl
-                    << "H5File:    " << filename << std::endl
-                    << "colptr path:  " << pPath << std::endl
-                    << "rowind path:  " << iPath << std::endl
-                    << "value path:   " << xPath << std::endl
-                    << "Dimension: " << n_rows << " x " << n_cols << std::endl;
-            // #endif
+// #ifdef USING_R
+//             Rcpp::Rcout
+// #else
+//             std::cout
+// #endif
+//                     << "==H5SpMat constructed==" << std::endl
+//                     << "H5File:    " << filename << std::endl
+//                     << "colptr path:  " << pPath << std::endl
+//                     << "rowind path:  " << iPath << std::endl
+//                     << "value path:   " << xPath << std::endl
+//                     << "Dimension: " << n_rows << " x " << n_cols << std::endl;
+//             // #endif
         }
 
         ~H5SpMatImpl() {
