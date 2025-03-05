@@ -43,7 +43,7 @@ namespace planc {
                 this->Vi.push_back(std::move(V));
                 int uidx = this->whichUnshared[i];
                 if (uidx == -1) continue; // skip if no U
-                U = std::make_unique<arma::mat>(this->u[i], this->k, arma::fill::zeros);
+                U = std::make_unique<arma::mat>(this->u[uidx], this->k, arma::fill::zeros);
                 arma::mat* Uptr = U.get();
                 *Uptr = this->Pi[uidx].get()->cols(indices);
                 this->Ui.push_back(std::move(U));
@@ -53,9 +53,6 @@ namespace planc {
         void initW2() {
             // Initialization is different than regular iNMF, so "2"
             // NOTE that this is also different from the initW2 in onlineINMF
-#ifdef _VERBOSE
-        Rcpp::Rcout << "Randomly initializing W matrix" << std::endl;
-#endif
             this->W = std::make_unique<arma::mat>();
             arma::mat* Wptr = this->W.get();
             *Wptr = arma::randu<arma::mat>(this->m, this->k, arma::distr_param(0, 2));
@@ -238,13 +235,13 @@ namespace planc {
                 giventGiven *= 1 + this->lambda_i[i];
                 // T* Pptr = this->Pi[uidx].get();
                 T* PTptr = this->PiT[uidx].get();
-                int numChunks = this->u[i] / this->INMF_CHUNK_SIZE;
-                if (numChunks * this->INMF_CHUNK_SIZE < this->u[i]) numChunks++;
+                int numChunks = this->u[uidx] / this->INMF_CHUNK_SIZE;
+                if (numChunks * this->INMF_CHUNK_SIZE < this->u[uidx]) numChunks++;
 #pragma omp parallel for schedule(dynamic) default(none) shared(i, Uptr, Hptr, numChunks, PTptr) num_threads(ncores)
                 for (int j = 0; j < numChunks; ++j) {
                     int spanStart = j * this->INMF_CHUNK_SIZE;
                     int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
-                    if (spanEnd > this->u[i] - 1) spanEnd = this->u[i] - 1;
+                    if (spanEnd > this->u[uidx] - 1) spanEnd = this->u[uidx] - 1;
                     arma::mat giventInputTLS = (*Hptr).t() * PTptr->cols(spanStart, spanEnd);
                     BPPNNLS<arma::mat, arma::vec> subProbU(giventGiven, giventInputTLS, true);
                     subProbU.solveNNLS();
@@ -328,10 +325,15 @@ namespace planc {
               const std::vector<std::shared_ptr<T>>&Pi,
               std::vector<int>&whichUnshared,
               arma::uword k, const arma::vec&lambda) : INMF<T>(Ei, k, 0, true) {
+            this->Vi.clear();
+            this->ViT.clear();
+            this->Hi.clear();
+            this->W.reset();
+            this->WT.reset();
             this->Pi = std::move(Pi);
             this->lambda_i = lambda;
             this->whichUnshared = whichUnshared;
-            u = arma::zeros<arma::uvec>(this->nDatasets);
+            u = arma::zeros<arma::uvec>(this->Pi.size());
             for (arma::uword i = 0; i < this->Pi.size(); ++i) {
                 u[i] = this->Pi[i]->n_rows;
                 T* Pptr = this->Pi[i].get();
