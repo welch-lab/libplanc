@@ -130,14 +130,7 @@ namespace planc {
             arma::mat* ptr = allU[i].release();
             resolvedU.push_back(*ptr);
         }
-        std::vector<arma::mat> outU{};
-        for (unsigned int i = 0; i < allU.size(); ++i) {
-            int uidx = whichUnshared[i];
-            if (uidx >= 0) {
-                outU.push_back(resolvedU[uidx]);
-            }
-        }
-        return {solver.getW(), resolvedH, resolvedV, solver.objErr(), outU};
+        return {solver.getW(), resolvedH, resolvedV, solver.objErr(), resolvedU};
     }
 
     template<typename T, typename eT>
