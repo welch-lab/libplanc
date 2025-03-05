@@ -237,7 +237,7 @@ namespace planc {
                 T* PTptr = this->PiT[uidx].get();
                 int numChunks = this->u[uidx] / this->INMF_CHUNK_SIZE;
                 if (numChunks * this->INMF_CHUNK_SIZE < this->u[uidx]) numChunks++;
-#pragma omp parallel for schedule(dynamic) default(none) shared(i, Uptr, Hptr, numChunks, PTptr) num_threads(ncores)
+#pragma omp parallel for schedule(dynamic) default(none) shared(i, Uptr, Hptr, numChunks, PTptr, uidx) num_threads(ncores)
                 for (int j = 0; j < numChunks; ++j) {
                     int spanStart = j * this->INMF_CHUNK_SIZE;
                     int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
