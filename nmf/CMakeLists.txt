@@ -18,7 +18,25 @@ target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CX
 target_include_directories(nmflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nmflib PUBLIC utils hw_detect detect_blas)
 generate_export_header(nmflib)
-
+if(BUILD_RCPP)
+    if(WIN32)
+        add_custom_command(TARGET nmflib POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${HighFive_SOURCE_DIR}/../highfive-subbuild/Makefile
+                VERBATIM)
+        add_custom_command(TARGET nmflib POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/../CMakeFiles/${CMAKE_VERSION}/CompilerIdC/CMakeCCompilerId.c
+                VERBATIM)
+        add_custom_command(TARGET nmflib POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/../CMakeFiles/${CMAKE_VERSION}/CompilerIdCXX/CMakeCXXCompilerId.cpp
+                VERBATIM)
+        add_custom_command(TARGET nmflib POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/Makefile
+                VERBATIM)
+        add_custom_command(TARGET nmflib POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/../Makefile
+                VERBATIM)
+    endif()
+endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
 #install(TARGETS  plancnmf nmflib
 #        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
