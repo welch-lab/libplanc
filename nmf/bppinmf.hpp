@@ -217,7 +217,7 @@ namespace planc {
 
         BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
                 std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, VinitList, Winit, false) {
-            this->initH(HinitList);
+            this->setH(HinitList);
         }
 
         void optimizeALS(unsigned int niter, bool verbose = true, const int&ncores = 0) {

@@ -138,9 +138,11 @@ namespace planc {
                                          const int&nCores,
                                          const double&lambda, const arma::uword&maxEpoch,
                                          const arma::uword&minibatchSize,
-                                         const arma::uword&maxHALSIter, const bool&verbose) {
+                                         const arma::uword&maxHALSIter,
+                                         const arma::uword&permuteChunkSize,
+                                         const bool&verbose) {
         ONLINEINMF<T> solver(matPtrVec, k, lambda);
-        solver.runOnlineINMF(minibatchSize, maxEpoch, maxHALSIter, verbose, nCores);
+        solver.runOnlineINMF(minibatchSize, maxEpoch, maxHALSIter, permuteChunkSize, verbose, nCores);
         std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
         std::vector<arma::mat> resolvedH{};
         for (unsigned int i = 0; i < allH.size(); ++i) {
@@ -175,17 +177,18 @@ namespace planc {
     //
     template<typename T, typename eT>
     oinmfOutput<eT> nmflib<T, eT>::oinmf(std::vector<std::shared_ptr<T>> matPtrVec,
+                                         const std::vector<arma::mat>&Hinit,
                                          const std::vector<arma::mat>&Vinit, const arma::mat&Winit,
                                          const std::vector<arma::mat>&Ainit, const std::vector<arma::mat>&Binit,
                                          std::vector<std::shared_ptr<T>> matPtrVecNew,
                                          const arma::uword&k, const int&nCores, const double&lambda,
                                          const arma::uword&maxEpoch,
                                          const arma::uword&minibatchSize, const arma::uword&maxHALSIter,
-                                         const bool&verbose) {
-        ONLINEINMF<T> solver(matPtrVec, k, lambda, Vinit, Winit);
-        solver.initA(Ainit);
-        solver.initB(Binit);
-        solver.runOnlineINMF(matPtrVecNew, minibatchSize, maxEpoch, maxHALSIter, verbose, nCores);
+                                         const arma::uword&permuteChunkSize, const bool&verbose) {
+        ONLINEINMF<T> solver(matPtrVec, k, lambda, Hinit, Vinit, Winit);
+        solver.setA(Ainit);
+        solver.setB(Binit);
+        solver.runOnlineINMF(matPtrVecNew, minibatchSize, maxEpoch, maxHALSIter, permuteChunkSize, verbose, nCores);
         //if (!project) {
         // Scenario 2
         std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();
@@ -222,7 +225,7 @@ namespace planc {
                                                             const arma::uword&k, const int&nCores,
                                                             const double&lambda) {
         ONLINEINMF<T> solver(matPtrVec, k, lambda);
-        solver.initW(Winit, false);
+        solver.setW(Winit, false);
         solver.projectNewData(matPtrVecNew, nCores);
         // Scenario 3
         std::vector<std::unique_ptr<arma::mat>> allH = solver.getAllH();

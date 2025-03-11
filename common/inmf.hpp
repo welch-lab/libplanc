@@ -168,11 +168,11 @@ namespace planc {
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
              std::vector<arma::mat> VinitList, arma::mat Winit, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
-            this->initW(Winit);
-            this->initV(VinitList);
+            this->setW(Winit);
+            this->setV(VinitList);
         }
 
-        virtual void initH(std::vector<arma::mat>&Hinit) {
+        virtual void setH(std::vector<arma::mat>&Hinit) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized H matrices" << std::endl;
 #endif
@@ -223,7 +223,7 @@ namespace planc {
             }
         }
 
-        void initV(const std::vector<arma::mat>&Vinit, bool transpose = true) {
+        void setV(const std::vector<arma::mat>&Vinit, bool transpose = true) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized V matrices" << std::endl;
 #endif
@@ -284,7 +284,7 @@ namespace planc {
             }
         }
 
-        void initW(const arma::mat&Winit, bool transpose = true) {
+        void setW(const arma::mat&Winit, bool transpose = true) {
 #ifdef _VERBOSE
             Rcpp::Rcout << "Taking initialized W matrix" << std::endl;
 #endif

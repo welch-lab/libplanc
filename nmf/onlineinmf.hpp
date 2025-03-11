@@ -8,8 +8,6 @@
 #include "bppnnls.hpp"
 #include "inmf.hpp"
 
-#define CHUNK_SIZE 1000
-
 namespace planc {
     struct mem_type {
         arma::mat operator()(arma::mat);
@@ -45,7 +43,7 @@ namespace planc {
         arma::uword iter; // iter is the number of iterations performed after the current iteration
         arma::uword maxEpochs; // The maximum number of epochs allowed to run
         std::vector<T2> E_mini; // contains the minibatches for each dataset, each of size m x minibatchSizes[i]
-
+        arma::uword permuteChunkSize; // chunk size for shuffling chunks when subsetting minibatches
         // %%%%%%%%%%%%%%% Iteration helper functions %%%%%%%%%%%%%%%%%%%%%%%
 
         bool next() {
@@ -129,16 +127,16 @@ namespace planc {
             // If T is H5Mat, need to get chunkSize to its `colChunkSize` attribute, the templated
             // function is defined at the end of this file
             arma::uword dataSize = this->ncol_E[i];
-            arma::uword numChunks = dataSize / CHUNK_SIZE;
-            if (numChunks * CHUNK_SIZE < dataSize) numChunks++;
+            arma::uword numChunks = dataSize / this->permuteChunkSize;
+            if (numChunks * this->permuteChunkSize < dataSize) numChunks++;
             // Get a shuffled vector of numbers from 0 to numChunks-1
             arma::uvec shuffleOrder = arma::randperm<arma::uvec>(numChunks);
             this->samplingIdx[i] = arma::zeros<arma::uvec>(dataSize);
             arma::uword lastEnd = -1ull;
             for (arma::uword j = 0; j < numChunks; ++j) {
                 // origStart to origEnd marks a chunk of the original matrix
-                arma::uword origStart = shuffleOrder[j] * CHUNK_SIZE;
-                arma::uword origEnd = (shuffleOrder[j] + 1ull) * CHUNK_SIZE - 1ull;
+                arma::uword origStart = shuffleOrder[j] * this->permuteChunkSize;
+                arma::uword origEnd = (shuffleOrder[j] + 1ull) * this->permuteChunkSize - 1ull;
                 if (origEnd > dataSize - 1ull) origEnd = dataSize - 1ull;
                 arma::uvec origIdx = arma::linspace<arma::uvec>(origStart, origEnd, origEnd - origStart + 1ull);
 
@@ -191,19 +189,6 @@ namespace planc {
         }
 
         // %%%%%%%%%%%%%%% Matrix Initiation %%%%%%%%%%%%%%%%%%%%%%%
-
-        void initH() override {
-            // Generate place holder of H matrices for all datasets (S1)
-#ifdef _VERBOSE
-        Rcpp::Rcout << "Initializing empty H matrices" << std::endl;
-#endif
-            std::unique_ptr<arma::mat> H;
-            for (arma::uword i = 0; i < this->nDatasets; ++i) {
-                H = std::make_unique<arma::mat>();
-                *H = arma::zeros<arma::mat>(this->ncol_E[i], this->k);
-                this->Hi.push_back(std::move(H));
-            }
-        }
 
         void initNewH() {
             // Generate place holder of H matrices only for new datasets (S2&3)
@@ -464,11 +449,6 @@ namespace planc {
             // Universal initialization
             this->maxEpochs = inputmaxEpochs;
             this->iter = 0;
-            this->sampleV();
-            this->initH();
-            this->initA();
-            this->initB();
-            this->checkK();
             this->initMinibatch(minibatchSize);
             // Initialize miniHi
             std::unique_ptr<arma::mat> miniH;
@@ -591,10 +571,17 @@ namespace planc {
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
                 this->samplingIdx.push_back(arma::zeros<arma::uvec>(this->ncol_E[i]));
             }
+            this->Vi.clear();
+            this->ViT.clear();
+            this->W.reset();
+            this->WT.reset();
+            this->Hi.clear();
         }
 
-        ONLINEINMF(std::vector<std::shared_ptr<T1>>&Ei, arma::uword k, double lambda, std::vector<arma::mat> VinitList,
+        ONLINEINMF(std::vector<std::shared_ptr<T1>>&Ei, arma::uword k, double lambda,
+                   std::vector<arma::mat> HinitList, std::vector<arma::mat> VinitList,
                    arma::mat Winit) : INMF<T1>(Ei, k, lambda, VinitList, Winit, false) {
+            this->setH(HinitList);
             this->dataIdx = arma::linspace<arma::uvec>(0, this->nDatasets - 1, this->nDatasets);
             this->minibatchSizes = arma::zeros<arma::uvec>(this->nDatasets);
             this->epoch = arma::zeros<arma::uvec>(this->nDatasets);
@@ -606,7 +593,7 @@ namespace planc {
         }
 
         // %%%%%%%%%%%%%%% Public initializers %%%%%%%%%%%%%%%%%%%%%%%
-        void initA(const std::vector<arma::mat>&Ainit) {
+        void setA(const std::vector<arma::mat>&Ainit) {
             // Set A matrices for existing datasets (S2)
 #ifdef USING_R
 #ifdef _VERBOSE
@@ -660,7 +647,7 @@ namespace planc {
             }
         }
 
-        void initB(const std::vector<arma::mat>&Binit) {
+        void setB(const std::vector<arma::mat>&Binit) {
             // Set B matrices for existing datasets (S2)
 #ifdef USING_R
 #ifdef _VERBOSE
@@ -719,7 +706,8 @@ namespace planc {
 
         // Scenario 1: Online iNMF on all data as new factorization
         void runOnlineINMF(arma::uword minibatchSize = 5000, arma::uword inputmaxEpochs = 5,
-                           arma::uword maxHALSIter = 1, bool verbose = true, const int&ncores = 0) {
+                           arma::uword maxHALSIter = 1, arma::uword permuteChunkSize = 1000,
+                           bool verbose = true, const int&ncores = 0) {
 #ifdef USING_R
             if (verbose) {
                 Rcpp::Rcerr << "Starting online iNMF scenario 1, factorize all datasets" << std::endl;
@@ -727,7 +715,13 @@ namespace planc {
 #endif
             this->dataIdxNew = this->dataIdx;
             this->nCellsNew = this->ncol_E;
+            this->permuteChunkSize = permuteChunkSize;
             this->initW2();
+            this->sampleV();
+            this->initNewH();
+            this->initA();
+            this->initB();
+            this->checkK();
             this->solveHALS(minibatchSize, inputmaxEpochs, maxHALSIter, verbose, ncores);
         }
 
@@ -735,9 +729,11 @@ namespace planc {
         // Scenario 3, project == true:  Project new datasets without updating existing factorization
         void runOnlineINMF(std::vector<std::shared_ptr<T1>>&E_new,
                            arma::uword minibatchSize = 5000, arma::uword inputmaxEpochs = 5,
-                           arma::uword maxHALSIter = 1, bool verbose = true, const int&ncores = 0) {
+                           arma::uword maxHALSIter = 1, arma::uword permuteChunkSize = 1000,
+                           bool verbose = true, const int&ncores = 0) {
             // Move new Es into Ei, and manage dataIdxNew, Prev, and nCellsNew
             this->dataIdxPrev = this->dataIdx;
+            this->permuteChunkSize = permuteChunkSize;
             this->dataIdxNew = arma::linspace<arma::uvec>(this->nDatasets,
                                                           this->nDatasets + E_new.size() - 1,
                                                           E_new.size());
@@ -763,9 +759,13 @@ namespace planc {
                         "update factorization with new datasets" << std::endl;
             }
 #endif
+            this->sampleV();
+            this->initNewH();
+            this->initA();
+            this->initB();
+            this->checkK();
             this->solveHALS(minibatchSize, inputmaxEpochs, maxHALSIter, verbose, ncores);
             this->objective_err = this->computeObjectiveError();
-            // No factorization update, so no objective error
         }
 
         // %%%%%%%%%%%%%%% Results Getters %%%%%%%%%%%%%%%%%%%%%%%

@@ -117,16 +117,17 @@ namespace planc {
                                             const int&nCores,
                                             const double&lambda, const arma::uword&maxEpoch,
                                             const arma::uword&minibatchSize, const arma::uword&maxHALSIter,
-                                            const bool&verbose);
+                                            const arma::uword&permuteChunkSize, const bool&verbose);
 
         static struct oinmfOutput<eT> oinmf(std::vector<std::shared_ptr<T>> matPtrVec,
+                                            const std::vector<arma::mat> &Hinit,
                                             const std::vector<arma::mat>&Vinit, const arma::mat&Winit,
                                             const std::vector<arma::mat>&Ainit, const std::vector<arma::mat>&Binit,
                                             std::vector<std::shared_ptr<T>> matPtrVecNew,
                                             const arma::uword&k, const int&nCores, const double&lambda,
                                             const arma::uword&maxEpoch,
                                             const arma::uword&minibatchSize, const arma::uword&maxHALSIter,
-                                            const bool&verbose);
+                                            const arma::uword&permuteChunkSize, const bool&verbose);
 
         static std::vector<arma::Mat<eT>> oinmf_project(std::vector<std::shared_ptr<T>> matPtrVec,
                                                         const arma::mat&Winit,
