@@ -450,8 +450,8 @@ namespace planc {
         arma::mat m_w_init_mat;
 
         internalParams(const T&mAMat, const arma::mat&mWInitMat, const arma::mat&mHInitMat) : m_a_mat(mAMat),
-            m_w_init_mat(mWInitMat),
-            m_h_init_mat(mHInitMat) {
+            m_h_init_mat(mHInitMat),
+            m_w_init_mat(mWInitMat) {
         }
 
         explicit internalParams(T&mAMat) : m_a_mat(mAMat) {
@@ -469,7 +469,7 @@ namespace planc {
             return m_h_init_mat;
         }
 
-        void setMHInitMat(arma::mat&mHInitMat) {
+        void setMHInitMat(const arma::mat&mHInitMat) {
             m_h_init_mat = mHInitMat;
         }
 
@@ -477,7 +477,7 @@ namespace planc {
             return m_w_init_mat;
         }
 
-        void setMWInitMat(arma::mat&mWInitMat) {
+        void setMWInitMat(const arma::mat&mWInitMat) {
             m_w_init_mat = mWInitMat;
         }
 
@@ -502,7 +502,7 @@ namespace planc {
     template<typename T>
     struct internalSymmParams final : symmParams, internalParams<T> {
         internalSymmParams(const T&mAMat, const arma::mat&mHInitMat)
-            : internalParams<T>(mAMat, arma::mat{}, mHInitMat), symmParams() {
+            : symmParams(), internalParams<T>(mAMat, arma::mat{}, mHInitMat) {
         }
 
         using internalParams<T>::setMK;
