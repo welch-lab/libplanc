@@ -329,7 +329,7 @@ namespace planc {
     template<class NMFTYPE>
     void NMFDriver<arma::mat>::CallNMF() {
         // Generate/Read data matrix
-        double t2;
+        double t2 = 0;
         if (!this->m_Afile_name.empty()) loadMat(t2);
         else genDense(t2);
 
@@ -391,7 +391,7 @@ namespace planc {
     template<class NMFTYPE>
     void NMFDriver<arma::sp_mat>::CallNMF() {
         // Generate/Read data matrix
-        double t2;
+        double t2 = 0;
         if (!this->m_Afile_name.empty()) loadMat(t2);
         else genSparse(t2);
         // Normalize the input matrix
