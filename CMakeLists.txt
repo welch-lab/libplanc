@@ -366,7 +366,6 @@ else ()
         )
         file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/series" hwloc_patch_list)
         list(TRANSFORM hwloc_patch_list PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/")
-        message(hwloc_patch_list)
         ExternalProject_Add(hwloc
                 URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
                 URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
