@@ -47,7 +47,7 @@ namespace planc {
       this->At = this->A.t();
     }
 
-    void computeNMF() {
+    void computeNMF() override {
       unsigned int currentIteration = 0;
 #ifdef _VERBOSE
     INFO << "computed transpose At=" << PRINTMATINFO(this->At) << std::endl;
@@ -128,6 +128,6 @@ namespace planc {
       }
     }
 
-    ~HALSNMF() = default;
+    ~HALSNMF() override = default;
   };
 } // namespace planc

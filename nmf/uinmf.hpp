@@ -129,7 +129,7 @@ namespace planc {
                 T* Eptr = this->Ei[i].get();
                 arma::mat WV = *Wptr + *Vptr;
                 giventGiven = WV.t() * WV;
-                giventGiven += (*Vptr).t() * (*Vptr) * this->lambda_i[i];
+                giventGiven += Vptr->t() * *Vptr * this->lambda_i[i];
                 int uidx = this->whichUnshared[i];
                 if (uidx >= 0) {
                     arma::mat* Uptr = this->Ui[uidx].get();
@@ -194,8 +194,8 @@ namespace planc {
                     int spanStart = j * this->INMF_CHUNK_SIZE;
                     int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                     if (spanEnd > this->m - 1) spanEnd = this->m - 1;
-                    arma::mat giventInputTLS = (*Hptr).t() * ETptr->cols(spanStart, spanEnd);
-                    giventInputTLS -= (*Hptr).t() * *Hptr * Wptr->rows(spanStart, spanEnd).t();
+                    arma::mat giventInputTLS = Hptr->t() * ETptr->cols(spanStart, spanEnd);
+                    giventInputTLS -= Hptr->t() * *Hptr * Wptr->rows(spanStart, spanEnd).t();
                     BPPNNLS<arma::mat, arma::vec> subProbV(giventGiven, giventInputTLS, true);
                     subProbV.solveNNLS();
                     Vptr->rows(spanStart, spanEnd) = subProbV.getSolutionMatrix().t();
@@ -242,7 +242,7 @@ namespace planc {
                     int spanStart = j * this->INMF_CHUNK_SIZE;
                     int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                     if (spanEnd > this->u[uidx] - 1) spanEnd = this->u[uidx] - 1;
-                    arma::mat giventInputTLS = (*Hptr).t() * PTptr->cols(spanStart, spanEnd);
+                    arma::mat giventInputTLS = Hptr->t() * PTptr->cols(spanStart, spanEnd);
                     BPPNNLS<arma::mat, arma::vec> subProbU(giventGiven, giventInputTLS, true);
                     subProbU.solveNNLS();
                     Uptr->rows(spanStart, spanEnd) = subProbU.getSolutionMatrix().t();
@@ -277,7 +277,7 @@ namespace planc {
             arma::mat giventInput;
             for (unsigned int j = 0; j < this->nDatasets; ++j) {
                 arma::mat* Hptr = this->Hi[j].get();
-                giventGiven += (*Hptr).t() * (*Hptr);
+                giventGiven += Hptr->t() * *Hptr;
             }
 
             int numChunks = this->m / this->INMF_CHUNK_SIZE;
@@ -293,8 +293,8 @@ namespace planc {
                     arma::mat* Hptr = this->Hi[j].get();
                     // arma::mat* VTptr = this->ViT[j].get();
                     arma::mat* Vptr = this->Vi[j].get();
-                    arma::mat gtIpos = (*Hptr).t() * ETptr->cols(spanStart, spanEnd);
-                    arma::mat gtIneg = (*Hptr).t() * *Hptr * Vptr->rows(spanStart, spanEnd).t();
+                    arma::mat gtIpos = Hptr->t() * ETptr->cols(spanStart, spanEnd);
+                    arma::mat gtIneg = Hptr->t() * *Hptr * Vptr->rows(spanStart, spanEnd).t();
 #pragma omp ordered
                     {
                         giventInput += gtIpos;
@@ -303,7 +303,7 @@ namespace planc {
                 }
                 BPPNNLS<arma::mat, arma::vec> subProbW(giventGiven, giventInput, true); ///
                 subProbW.solveNNLS();
-                (*Wptr).rows(spanStart, spanEnd) = subProbW.getSolutionMatrix().t();
+                Wptr->rows(spanStart, spanEnd) = subProbW.getSolutionMatrix().t();
                 // (*WTptr).cols(spanStart, spanEnd) = subProbW.getSolutionMatrix();
             }
             giventGiven.clear(); ///

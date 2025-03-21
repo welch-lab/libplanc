@@ -85,8 +85,8 @@ namespace planc {
             }
             else {
                 // This is the very last iteration within maxEpoch
-                for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                    idx = this->dataIdxNew[i];
+                for (unsigned long long i : this->dataIdxNew) {
+                    idx = i;
                     start = ((this->iter - 1) * this->minibatchSizes[idx]) % this->ncol_E[idx];
                     end = this->ncol_E[idx] - 1;
                     this->minibatchIdx[idx] = this->samplingIdx[idx].subvec(start, end);
@@ -104,8 +104,8 @@ namespace planc {
                 this->E_mini.push_back(T2());
             }
 
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
                 T1* Eptr = this->Ei[idx].get();
                 this->createEmini(Eptr, idx);
             }
@@ -157,9 +157,9 @@ namespace planc {
             }
             arma::uword idx;
             this->minibatchSizes.resize(this->nDatasets);
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
-                double ratio = (double)this->ncol_E[idx] / (double)arma::accu(this->nCellsNew);
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
+                double ratio = static_cast<double>(this->ncol_E[idx]) / static_cast<double>(arma::accu(this->nCellsNew));
                 this->minibatchSizes[idx] = round(ratio * minibatchSize);
                 try {
                     if (this->minibatchSizes[idx] < 1) {
@@ -197,8 +197,8 @@ namespace planc {
 #endif
             std::unique_ptr<arma::mat> H;
             unsigned int idx;
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
                 H = std::make_unique<arma::mat>();
                 arma::mat* Hptr = H.get();
                 *Hptr = arma::zeros<arma::mat>(this->ncol_E[idx], this->k);
@@ -213,8 +213,8 @@ namespace planc {
             std::unique_ptr<arma::mat> V;
             std::unique_ptr<arma::mat> VT;
             arma::uword idx;
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
                 V = std::make_unique<arma::mat>();
                 // *V taken from random sampled columns of Ei[i]
                 arma::mat* Vptr = V.get();
@@ -280,14 +280,14 @@ namespace planc {
             arma::mat* Wptr = this->W.get();
             arma::mat given(this->m, this->k);
             arma::uword idx;
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
                 arma::mat* Vptr = this->Vi[idx].get();
                 arma::mat* Hminiptr = this->miniHi[idx].get(); // `i` but not `idx`, nothing init for prev data
                 T2 Emini = this->E_mini[idx];
                 given = *Wptr + *Vptr;
                 giventGiven = given.t() * given;
-                giventGiven += (*Vptr).t() * (*Vptr) * this->lambda;
+                giventGiven += Vptr->t() * *Vptr * this->lambda;
                 arma::mat giventInput = given.t() * Emini;
                 BPPNNLS<arma::mat, arma::vec> subProbH(giventGiven, giventInput, true);
                 subProbH.solveNNLS();
@@ -305,8 +305,8 @@ namespace planc {
             if (arma::any(this->dataIdxPrev == i)) return 0;
             else {
                 if (this->iter == 1) return 0;
-                if (this->iter == 2) return 1 / (double)this->minibatchSizes[i];
-                else return (double)(this->iter - 2) / (double)(this->iter - 1);
+                if (this->iter == 2) return 1 / static_cast<double>(this->minibatchSizes[i]);
+                else return static_cast<double>(this->iter - 2) / static_cast<double>(this->iter - 1);
             }
         }
 
@@ -316,8 +316,8 @@ namespace planc {
         Rcpp::Rcout << "--Updating A and B--  ";
 #endif
             arma::uword idx;
-            for (arma::uword i = 0; i < this->dataIdxNew.size(); ++i) {
-                idx = this->dataIdxNew[i];
+            for (unsigned long long i : this->dataIdxNew) {
+                idx = i;
                 arma::mat* Aptr = this->Ai[idx].get();
                 arma::mat* Aoldptr = this->Ai_old[idx].get();
                 arma::mat* Bptr = this->Bi[idx].get();
@@ -339,7 +339,7 @@ namespace planc {
 
                 // HiHit
                 *Aptr *= this->scaleParam(idx);
-                *Aptr += (*Hminiptr).t() * *Hminiptr / this->minibatchSizes[idx];
+                *Aptr += Hminiptr->t() * *Hminiptr / this->minibatchSizes[idx];
                 for (arma::uword j = 0; j < this->k; ++j) {
                     if ((*Aptr)(j, j) == 0) (*Aptr)(j, j) = 1e-15;
                 }
@@ -387,8 +387,8 @@ namespace planc {
             arma::uword idx;
             arma::mat* Wptr = this->W.get();
             for (arma::uword j = 0; j < this->k; j++) {
-                for (arma::uword i = 0; i < this->dataIdxNew.size(); i++) {
-                    idx = this->dataIdxNew[i];
+                for (unsigned long long i : this->dataIdxNew) {
+                    idx = i;
                     arma::mat* Aptr = this->Ai[idx].get();
                     arma::mat* Bptr = this->Bi[idx].get();
                     arma::mat* Vptr = this->Vi[idx].get();
@@ -419,7 +419,7 @@ namespace planc {
                 T1* Eptr = this->Ei[i].get();
                 given = *Wptr + *Vptr;
                 giventGiven = given.t() * given;
-                giventGiven += (*Vptr).t() * (*Vptr) * this->lambda;
+                giventGiven += Vptr->t() * *Vptr * this->lambda;
                 int dataSize = this->ncol_E[i];
                 int numChunks = dataSize / this->INMF_CHUNK_SIZE;
                 if (numChunks * this->INMF_CHUNK_SIZE < dataSize) numChunks++;
@@ -431,7 +431,7 @@ namespace planc {
                     arma::mat giventInput = given.t() * (*Eptr).cols(spanStart, spanEnd);
                     BPPNNLS<arma::mat, arma::vec> subProbH(giventGiven, giventInput, true);
                     subProbH.solveNNLS();
-                    (*Hptr).rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
+                    Hptr->rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
                     giventInput.clear();
                 }
             }
@@ -453,7 +453,7 @@ namespace planc {
             // Initialize miniHi
             std::unique_ptr<arma::mat> miniH;
             for (arma::uword i = 0; i < this->nDatasets; ++i) {
-                miniH = std::unique_ptr<arma::mat>(new arma::mat(this->minibatchSizes[i], this->k));
+                miniH = std::make_unique<arma::mat>(this->minibatchSizes[i], this->k);
                 this->miniHi.push_back(std::move(miniH));
             }
             // Setup the progress bar
@@ -533,7 +533,7 @@ namespace planc {
                 idx = this->dataIdxNew[i];
                 arma::mat* Hptr = this->Hi[i].get(); // `i` but not `idx`, nothing init for prev data
                 T1* Eptr = this->Ei[idx].get();
-                giventGiven = (*Wptr).t() * (*Wptr);
+                giventGiven = Wptr->t() * *Wptr;
                 int dataSize = this->ncol_E[idx];
                 int numChunks = dataSize / this->INMF_CHUNK_SIZE;
                 if (numChunks * this->INMF_CHUNK_SIZE < dataSize) numChunks++;
@@ -542,10 +542,10 @@ namespace planc {
                     int spanStart = j * this->INMF_CHUNK_SIZE;
                     int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                     if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;
-                    arma::mat giventInput = (*Wptr).t() * (*Eptr).cols(spanStart, spanEnd);
+                    arma::mat giventInput = Wptr->t() * (*Eptr).cols(spanStart, spanEnd);
                     BPPNNLS<arma::mat, arma::vec> subProbH(giventGiven, giventInput, true);
                     subProbH.solveNNLS();
-                    (*Hptr).rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
+                    Hptr->rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
                     giventInput.clear();
                 }
                 // iNMF is basically (W + V) * HT = E, now we solved W * HT = E, so V = 0

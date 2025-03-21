@@ -26,7 +26,7 @@ namespace planc {
             arma::sp_mat* Eptr = this->tempE.get();
             given = *Wptr + *Vptr;
             giventGiven = given.t() * given;
-            giventGiven += (*Vptr).t() * (*Vptr) * this->lambda;
+            giventGiven += Vptr->t() * (*Vptr) * this->lambda;
             int dataSize = this->ncol_E[i];
             int numChunks = dataSize / this->INMF_CHUNK_SIZE;
             if (numChunks * this->INMF_CHUNK_SIZE < dataSize) numChunks++;
@@ -35,10 +35,10 @@ namespace planc {
                 int spanStart = j * this->INMF_CHUNK_SIZE;
                 int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                 if (spanEnd > dataSize - 1) spanEnd = dataSize - 1;
-                arma::mat giventInput = given.t() * (*Eptr).cols(spanStart, spanEnd);
+                arma::mat giventInput = given.t() * Eptr->cols(spanStart, spanEnd);
                 BPPNNLS<arma::mat, arma::vec> subProbH(giventGiven, giventInput, true);
                 subProbH.solveNNLS();
-                (*Hptr).rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
+                Hptr->rows(spanStart, spanEnd) = subProbH.getSolutionMatrix().t();
                 giventInput.clear();
             }
         }
@@ -86,7 +86,7 @@ namespace planc {
             arma::mat* WTptr = this->WT.get();
             arma::mat giventInput(this->k, this->INMF_CHUNK_SIZE);
             arma::mat* Hptr = this->Hi[i].get();\
-            giventGiven = (*Hptr).t() * (*Hptr);
+            giventGiven = Hptr->t() * (*Hptr);
             giventGiven *= 1 + this->lambda;
             arma::mat* Vptr = this->Vi[i].get();
             arma::mat* VTptr = this->ViT[i].get();
@@ -102,12 +102,12 @@ namespace planc {
                 int spanEnd = (j + 1) * this->INMF_CHUNK_SIZE - 1;
                 if (spanEnd > this->m - 1) spanEnd = this->m - 1;
                 arma::mat giventInputTLS;
-                giventInputTLS = (*Hptr).t() * ETptr.cols(spanStart, spanEnd);
-                giventInputTLS -= (*Hptr).t() * *Hptr * (*WTptr).cols(spanStart, spanEnd);
+                giventInputTLS = Hptr->t() * ETptr.cols(spanStart, spanEnd);
+                giventInputTLS -= Hptr->t() * *Hptr * WTptr->cols(spanStart, spanEnd);
                 BPPNNLS<arma::mat, arma::vec> subProbV(giventGiven, giventInputTLS, true);
                 subProbV.solveNNLS();
-                (*Vptr).rows(spanStart, spanEnd) = subProbV.getSolutionMatrix().t();
-                (*VTptr).cols(spanStart, spanEnd) = subProbV.getSolutionMatrix();
+                Vptr->rows(spanStart, spanEnd) = subProbV.getSolutionMatrix().t();
+                VTptr->cols(spanStart, spanEnd) = subProbV.getSolutionMatrix();
             }
             giventGiven.clear();
             giventInput.clear();
@@ -246,14 +246,14 @@ namespace planc {
                     solveV_i(i, ncores);
                     // // Accumulate values to be used for solving W
                     arma::mat* Hptr = this->Hi[i].get();
-                    W_giventGiven += (*Hptr).t() * (*Hptr);
+                    W_giventGiven += Hptr->t() * (*Hptr);
 
                     arma::sp_mat* Eptr = this->tempE.get();
                     // This pointer must be explicitly deleted after done
                     arma::sp_mat ETptr = arma::sp_mat(Eptr->t());
                     arma::mat* VTptr = this->ViT[i].get();
-                    arma::mat gtIpos = (*Hptr).t() * ETptr;
-                    arma::mat gtIneg = (*Hptr).t() * *Hptr * (*VTptr);
+                    arma::mat gtIpos = Hptr->t() * ETptr;
+                    arma::mat gtIneg = Hptr->t() * *Hptr * (*VTptr);
                     W_giventInput += gtIpos;
                     W_giventInput -= gtIneg;
                 }

@@ -59,7 +59,7 @@ int random_sieve(const int nthprime) {
 
 
 void randNMF(const arma::uword m, const arma::uword n, const arma::uword k, const double sparsity,
-             arma::mat* A) {
+             const arma::mat* A) {
 #ifndef USING_R
     srand(RAND_SEED);
 #endif
@@ -74,8 +74,8 @@ void randNMF(const arma::uword m, const arma::uword n, const arma::uword k, cons
 }
 
 void randNMF(const arma::uword m, const arma::uword n, const arma::uword k, const double sparsity,
-             arma::sp_mat* A) {
-    auto temp = arma::sprandu<arma::sp_mat>(m, n, sparsity);
+             const arma::sp_mat* A) {
+    const auto temp = arma::sprandu<arma::sp_mat>(m, n, sparsity);
     A = &temp;
 }
 

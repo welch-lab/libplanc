@@ -140,7 +140,7 @@ namespace planc {
                 }
             }
             try {
-                if (this->k != this->W.get()->n_cols) {
+                if (this->k != this->W->n_cols) {
                     std::string msg = "Preset `k` (" + std::to_string(this->k) +
                                       ") does not match with W";
                     throw std::invalid_argument(msg);
@@ -166,7 +166,7 @@ namespace planc {
         }
 
         INMF(std::vector<std::shared_ptr<T>> Ei, arma::uword k, double lambda,
-             std::vector<arma::mat> VinitList, arma::mat Winit, bool makeTranspose = true) {
+             const std::vector<arma::mat>&VinitList, const arma::mat&Winit, bool makeTranspose = true) {
             this->constructObject(Ei, k, lambda, makeTranspose);
             this->setW(Winit);
             this->setV(VinitList);
@@ -260,7 +260,7 @@ namespace planc {
                 *V = Vinit[i];
                 if (transpose) {
                     VT = std::make_unique<arma::mat>();
-                    *VT = (*V).t();
+                    *VT = V->t();
                     this->ViT.push_back(std::move(VT));
                 }
                 this->Vi.push_back(std::move(V));
@@ -278,7 +278,7 @@ namespace planc {
                 VT = std::make_unique<arma::mat>();
                 *V = arma::randu<arma::mat>(this->m, this->k,
                                             arma::distr_param(0, 2));
-                *VT = (*V).t();
+                *VT = V->t();
                 this->Vi.push_back(std::move(V));
                 this->ViT.push_back(std::move(VT));
             }
@@ -319,7 +319,7 @@ namespace planc {
             *this->WT = (*this->W).t();
         }
 
-        double objErr() {
+        [[nodiscard]] double objErr() const {
             return this->objective_err;
         }
 
@@ -339,8 +339,8 @@ namespace planc {
             return std::move(this->Vi);
         }
 
-        arma::mat getW() const {
-            return *(this->W.get());
+        [[nodiscard]] arma::mat getW() const {
+            return *(this->W);
         }
 
         virtual ~INMF() { clear(); }
@@ -364,7 +364,7 @@ namespace planc {
                     i.reset();
                 }
                 this->W.reset();
-                if (this->WT.get() != nullptr) this->WT.reset();
+                if (this->WT != nullptr) this->WT.reset();
                 this->tempE.reset();
             }
             this->cleared = true;
@@ -427,7 +427,7 @@ namespace planc {
             if (spanEnd > n - 1) spanEnd = n - 1;
             arma::mat dense_span = Eptr->cols(spanStart, spanEnd);
             arma::sp_mat sparse_span(dense_span);
-            (*out).cols(spanStart, spanEnd) = sparse_span;
+            out->cols(spanStart, spanEnd) = sparse_span;
         }
         // Get raw pointer before transferring ownership
         // arma::sp_mat* rawPtr = out.get();

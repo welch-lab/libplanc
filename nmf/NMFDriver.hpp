@@ -28,15 +28,15 @@ namespace planc {
     public:
         virtual ~NMFDriver() = default;
 
-        const arma::mat& getLlf() const {
+        [[nodiscard]] const arma::mat& getLlf() const {
             return LLF;
         }
 
-        const arma::mat& getRlf() const {
+        [[nodiscard]] const arma::mat& getRlf() const {
             return RLF;
         }
 
-        const double& getobjErr() const {
+        [[nodiscard]] const double& getobjErr() const {
             return objErr;
         }
 
@@ -48,7 +48,7 @@ namespace planc {
         arma::mat RLF{};
 
     public:
-        T getA() const {
+        [[nodiscard]] T getA() const {
             return A;
         }
 
@@ -71,12 +71,12 @@ namespace planc {
         int m_initseed{};
 
         // Variables for creating random matrix
-        static const int kW_seed_idx = 1210873;
-        static const int kprimeoffset = 17;
-        static const int kalpha = 1;
-        static const int kbeta = 0;
-        static const int kalphaSp = 5;
-        static const int kbetaSp = 10;
+        static constexpr int kW_seed_idx = 1210873;
+        static constexpr int kprimeoffset = 17;
+        static constexpr int kalpha = 1;
+        static constexpr int kbeta = 0;
+        static constexpr int kalphaSp = 5;
+        static constexpr int kbetaSp = 10;
 
         template<class NMFTYPE>
         void CallNMF();
@@ -298,7 +298,7 @@ namespace planc {
         }
 
     public:
-        explicit NMFDriver(params pc) {
+        explicit NMFDriver(const params&pc) {
             this->parseParams(pc);
         }
 

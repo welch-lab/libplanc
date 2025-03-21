@@ -179,7 +179,7 @@ public:
         this->cleared = false;
     }
 
-    ~NNLS() = default;
+    virtual ~NNLS() = default;
 
     virtual int solveNNLS() = 0;
 

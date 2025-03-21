@@ -71,7 +71,7 @@ namespace planc {
      * param[in] regularization as a vector
      * param[out] Gram matrix
      */
-    void applyReg(const arma::fvec&reg, arma::mat* AtA) {
+    void applyReg(const arma::fvec&reg, arma::mat* AtA) const {
       // Frobenius norm regularization
       if (reg(0) > 0) {
         arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
@@ -94,7 +94,7 @@ namespace planc {
      * param[in] regularization as a vector
      * param[out] Gram matrix
      */
-    void removeReg(const arma::fvec&reg, arma::mat* AtA) {
+    void removeReg(const arma::fvec&reg, arma::mat* AtA) const {
       // Frobenius norm regularization
       if (reg(0) > 0) {
         arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
@@ -118,7 +118,7 @@ namespace planc {
      * (WtW+sym_regI)H = WtA + sym_regWt
      * In the following function, lhs is WtW, rhs is WtA and fac is Wt
      */
-    void applySymmetricReg(double sym_reg, arma::mat* lhs, arma::mat* fac, arma::mat* rhs) {
+    void applySymmetricReg(double sym_reg, arma::mat* lhs, const arma::mat* fac, arma::mat* rhs) const {
       if (sym_reg > 0) {
         arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
         (*lhs) = (*lhs) + (sym_reg * identity);
@@ -135,7 +135,7 @@ namespace planc {
      * This function removes the regularization for error and objective
      * calculations.
      */
-    void removeSymmetricReg(double sym_reg, arma::mat* lhs, arma::mat* fac, arma::mat* rhs) {
+    void removeSymmetricReg(double sym_reg, arma::mat* lhs, const arma::mat* fac, arma::mat* rhs) const {
       if (sym_reg > 0) {
         arma::mat identity = arma::eye<arma::mat>(this->k, this->k);
         (*lhs) = (*lhs) - (sym_reg * identity);
@@ -501,7 +501,7 @@ namespace planc {
     /// Sets the relative error tolerance for NMF algorithms
     void tolerance(const double tol) { this->m_tolerance = tol; }
     // Returns the relative error tolerance for NMF algorithms
-    double tolerance() { return this->m_tolerance; }
+    [[nodiscard]] double tolerance() const { return this->m_tolerance; }
     /// Sets the regularization on left low rank factor W
     void regW(const arma::fvec&iregW) { this->m_regW = iregW; }
     /// Sets the regularization on right low rank H
@@ -513,7 +513,7 @@ namespace planc {
     /// Set the Symmetric regularization parameter
     void symm_reg(const double&i_symm_reg) { this->m_symm_reg = i_symm_reg; }
     /// Returns the Symmetric regularization parameter
-    double symm_reg() { return this->m_symm_reg; }
+    [[nodiscard]] double symm_reg() const { return this->m_symm_reg; }
     /// Set the update algorithm
     void updalgo(algotype dat) { this->m_updalgo = dat; }
 
@@ -521,7 +521,7 @@ namespace planc {
     [[nodiscard]] unsigned int num_iterations() const { return m_num_iterations; }
 
     /// Returns the last objective error calculated
-    double objErr() { return this->objective_err; }
+    [[nodiscard]] double objErr() const { return this->objective_err; }
 
     virtual ~NMF() { clear(); }
     /// Clear the memory for input matrix A, right low rank factor W

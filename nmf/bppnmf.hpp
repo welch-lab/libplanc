@@ -67,7 +67,7 @@ namespace planc {
                     }
                     std::unique_ptr<BPPNNLS<arma::mat, arma::vec>> subProblem(new BPPNNLS<arma::mat, arma::vec>(
                         giventGiven,
-                        (arma::mat)giventInput.cols(spanStart, spanEnd), true));
+                        static_cast<arma::mat>(giventInput.cols(spanStart, spanEnd)), true));
 
 #pragma omp critical
                     {
@@ -89,8 +89,8 @@ namespace planc {
 #endif
                 }
 #pragma omp for schedule(dynamic)
-                for (int i = 0; i < subproblems.size(); i++) {
-                    subproblems[i]->solveNNLS();
+                for (const auto & subproblem : subproblems) {
+                    subproblem->solveNNLS();
 
 
 #ifdef _VERBOSE
@@ -103,7 +103,7 @@ namespace planc {
             }
 #pragma omp for schedule(dynamic)
             for (int i = 0; i < subproblems.size(); i++) {
-                (*othermat).rows(indices[i].first, indices[i].second) = subproblems[i]->getSolutionMatrix().t();
+                othermat->rows(indices[i].first, indices[i].second) = subproblems[i]->getSolutionMatrix().t();
             }
 
 #if defined(_VERBOSE) || defined(COLLECTSTATS)
@@ -193,7 +193,7 @@ namespace planc {
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
                     for (int i = 0; i < this->n; i++) {
                         auto subProblemforH =
-                                BPPNNLS<arma::mat, arma::vec>(WtW, (arma::vec)WtA.col(i), true);
+                                BPPNNLS<arma::mat, arma::vec>(WtW, static_cast<arma::vec>(WtA.col(i)), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "H(" << i << "/" << this->n << ")";
@@ -235,7 +235,7 @@ namespace planc {
 #pragma omp parallel for schedule(dynamic) default(none) num_threads(this->ncores)
                     for (int i = 0; i < this->m; i++) {
                         auto subProblemforW =
-                                BPPNNLS<arma::mat, arma::vec>(HtH, (arma::vec)HtAt.col(i), true);
+                                BPPNNLS<arma::mat, arma::vec>(HtH, static_cast<arma::vec>(HtAt.col(i)), true);
 #ifdef _VERBOSE
           INFO << "Initialized subproblem and calling solveNNLS for "
                << "W(" << i << "/" << this->m << ")";
@@ -300,7 +300,7 @@ namespace planc {
             return this->H;
         }
 
-        ~BPPNMF() { this->At.clear(); }
+        ~BPPNMF() override { this->At.clear(); }
     }; // class BPPNMF
 
     //template<>

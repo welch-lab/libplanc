@@ -90,10 +90,10 @@ void makeSparse(const double sparsity, T (*X)) {
 }
 
 void randNMF(arma::uword m, arma::uword n, arma::uword k, double sparsity,
-             arma::mat* A);
+             const arma::mat* A);
 
 void randNMF(arma::uword m, arma::uword n, arma::uword k, double sparsity,
-             arma::sp_mat* A);
+             const arma::sp_mat* A);
 
 template<class T>
 void printVector(std::vector<T>&x);

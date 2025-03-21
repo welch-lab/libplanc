@@ -81,7 +81,7 @@ namespace planc {
             allocateMatrices();
         }
 
-        void computeNMF() {
+        void computeNMF() override {
             unsigned int currentIteration = 0;
             this->At = this->A.t();
 #ifdef _VERBOSE
@@ -197,6 +197,6 @@ namespace planc {
             }
         }
 
-        ~AOADMMNMF() = default;
+        ~AOADMMNMF() override = default;
     };
 } // namespace planc

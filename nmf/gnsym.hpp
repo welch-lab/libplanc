@@ -262,6 +262,6 @@ namespace planc {
       }
     }
 
-    ~GNSYMNMF() = default;
+    ~GNSYMNMF() override = default;
   };
 } // namespace planc

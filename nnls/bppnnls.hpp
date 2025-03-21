@@ -13,7 +13,7 @@ public:
     BPPNNLS(MATTYPE input, MATTYPE RHS, bool prodSent = false) : NNLS<MATTYPE, VECTYPE>(input, RHS, prodSent) {
     }
 
-    int solveNNLS() {
+    int solveNNLS() override {
         int rcIterations = 0;
         if (this->k == 1) {
             rcIterations = solveNNLSOneRHS();
