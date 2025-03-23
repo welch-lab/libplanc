@@ -13,6 +13,7 @@ namespace planc {
 
         params() {
             // common to all algorithms.
+            this->nCores = 0;
             this->m_lucalgo = ANLSBPP;
             this->m_input_normalization = NONE;
             this->m_compute_error = false;
@@ -65,11 +66,20 @@ namespace planc {
             this->m_cpc = 0;
         }
 
+        void set_n_cores(const int n_cores) {
+            nCores = n_cores;
+        }
+
+        [[nodiscard]] int n_cores() const {
+            return nCores;
+        }
+
         // common to all algorithms.
         algotype m_lucalgo{};
         normtype m_input_normalization{};
         bool m_compute_error{};
         int m_num_it{};
+        int nCores{};
         int m_num_k_blocks{};
         bool m_dim_tree{};
         bool m_adj_rand{};

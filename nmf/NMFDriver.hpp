@@ -69,6 +69,7 @@ namespace planc {
         normtype m_input_normalization{};
         int m_max_luciters{};
         int m_initseed{};
+        int nCores{};
 
         // Variables for creating random matrix
         static constexpr int kW_seed_idx = 1210873;
@@ -85,7 +86,7 @@ namespace planc {
             this->m_nmfalgo = pc.getMLucalgo();
             this->m_input_normalization = pc.getMInputNormalization();
             this->m_k = pc.getMK();
-
+            this->nCores = pc.n_cores();
             this->m_sparsity = pc.getMSparsity();
             this->m_num_it = pc.getMNumIt();
             this->m_regW = pc.getMRegW();
@@ -362,7 +363,7 @@ namespace planc {
             }
         }
 
-        NMFTYPE nmfAlgorithm(A, W, H);
+        NMFTYPE nmfAlgorithm(A, W, H, nCores);
         nmfAlgorithm.num_iterations(this->m_num_it);
         nmfAlgorithm.symm_reg(this->m_symm_reg);
         nmfAlgorithm.updalgo(this->m_nmfalgo);
@@ -423,7 +424,7 @@ namespace planc {
             }
         }
 
-        NMFTYPE nmfAlgorithm(A, W, H);
+        NMFTYPE nmfAlgorithm(A, W, H, nCores);
         nmfAlgorithm.num_iterations(this->m_num_it);
         nmfAlgorithm.symm_reg(this->m_symm_reg);
         nmfAlgorithm.updalgo(this->m_nmfalgo);

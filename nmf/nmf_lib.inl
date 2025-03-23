@@ -15,6 +15,7 @@ namespace planc {
         options.setMK(k);
         options.setMNumIt(niter);
         options.setMLucalgo(algo);
+        options.set_n_cores(nCores);
         EmbeddedNMFDriver nmfRunner(options);
         nmfRunner.callNMF();
         nmfOutput<eT> outlist{};
@@ -36,6 +37,7 @@ namespace planc {
         options.setMLucalgo(algo);
         options.setMSymmReg(lambda);
         options.setMSymmFlag(1);
+        options.set_n_cores(nCores);
         // if (k >= m) {
         //     Rcpp::stop("`k` must be less than `nrow(x)`");
         // }
