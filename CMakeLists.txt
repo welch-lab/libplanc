@@ -287,6 +287,10 @@ else ()
     endif ()
 endif ()
 
+if(APPLE)
+    include_directories("${BLAS_LIBRARIES}/Frameworks/vecLib.framework/Headers")
+endif()
+
 if (NOT APPLE AND NOT USE_MKL AND NOT USING_OPENBLAS)
     set(CBLAS_H_DIR CACHE PATH "Directory containing cblas.h")
     if (CBLAS_H_DIR)
