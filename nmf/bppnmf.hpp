@@ -89,8 +89,9 @@ namespace planc {
 #endif
                 }
 #pragma omp for schedule(dynamic)
-                for (const auto & subproblem : subproblems) {
-                    subproblem->solveNNLS();
+                for (int i = 0; i < subproblems.size(); i++) {
+                    subproblems[i]->solveNNLS();
+
 
 
 #ifdef _VERBOSE
