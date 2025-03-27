@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.21...3.29 FATAL_ERROR)
 #Copyright 2016 Ramakrishnan Kannan
 include(GenerateExportHeader)
 include(FetchContent)
+include(GNUInstallDirs)
 #include(${PROJECT_SOURCE_DIR}/common/cmake_aux/NMFLIB_FindARMA.cmake)
 
 # the settings below will be automatically configured by the rest of this script
@@ -18,6 +19,8 @@ target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CX
 target_include_directories(nmflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nmflib PUBLIC utils hw_detect detect_blas)
 generate_export_header(nmflib)
+set(nmf_headers nmf_lib.hpp ../common/data.hpp ../common/config.h ../common/detect_blas.h ${CMAKE_CURRENT_BINARY_DIR}/nmflib_export.h)
+set(nnls_headers ../nnls/nnls_lib.hpp)
 if(BUILD_RCPP)
     if(WIN32)
         add_custom_command(TARGET nmflib POST_BUILD
@@ -38,7 +41,10 @@ if(BUILD_RCPP)
     endif()
 endif()
 # target_link_libraries(${DENSE_OR_SPARSE}_inmf ${NMFLIB_LIBS})
-#install(TARGETS  plancnmf nmflib
-#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+install(TARGETS nmflib
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         )
+install(FILES ${nmf_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nmf)
+install(FILES ${nnls_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nnls)
