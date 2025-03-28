@@ -8,6 +8,7 @@
 #include <string>
 #include "plancopts.h"
 #include "parsecommandline.h"
+#include "parseutils.hpp"
 #include "utils.h"
 
 namespace planc {

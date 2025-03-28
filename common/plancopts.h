@@ -5,6 +5,7 @@
 #ifndef PLANC_PLANCOPTS_H
 #define PLANC_PLANCOPTS_H
 
+#include "parseutils.hpp"
 #include "utils.h"
 
 namespace planc {

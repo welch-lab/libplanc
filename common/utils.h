@@ -19,13 +19,8 @@ enum algotype {
     NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG
 };
 
-extern std::unordered_map<std::string, algotype> algomap;
-extern std::unordered_map<std::string, algotype> symmap;
-
 
 enum normtype { NONE, L2NORM, MAXNORM };
-
-extern std::unordered_map<std::string, normtype> normmap;
 
 
 enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };

@@ -11,7 +11,7 @@ include(GNUInstallDirs)
 #add_library(dense_nmf OBJECT NMFDriver.cpp)
 add_library(nmflib
         nmf_lib.cpp bppnmf.cpp ../nnls/nnls_lib.cpp
-        ../common/utils.cc ../common/data.cpp)
+        ../common/parseutils.cpp ../common/data.cpp)
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
 # target_compile_features(${DENSE_OR_SPARSE}_inmf PRIVATE cxx_std_17)
 # add_compile_options(-O0)

@@ -3,11 +3,13 @@
 //
 #include "nmf_lib.inl"
 #define X(T) \
+template int planc::nmflib<T, double>::runNMF(const planc::params& opts); \
 template planc::nmfOutput<double> planc::nmflib<T, double>::nmf(const T&x, const arma::uword&k, const arma::uword&niter, const std::string&algo, const int&nCores, const arma::Mat<double>&Winit,const arma::Mat<double>&Hinit); \
 template planc::nmfOutput<double> planc::nmflib<T, double>::symNMF(const T&x, const arma::uword&k, const arma::uword&niter, const double& lambda, const std::string&algo, const int&nCores, const arma::Mat<double>&Hinit);
 #include "nmf_types.inc"
 #undef X
 #define X(T) \
+template planc::nmflib<T, double>::nmflib(); \
 template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(std::vector<std::shared_ptr<T>> objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const int &nCores); \
 template planc::inmfOutput<double> planc::nmflib<T, double>::bppinmf(std::vector<std::shared_ptr<T>> objectlist, const arma::uword &k, const double &lambda, const arma::uword &niter, const bool &verbose, const std::vector<arma::mat> &HinitList, const std::vector<arma::mat> &VinitList, const arma::mat &Winit, const int &nCores); \
 template std::vector<std::shared_ptr<T>> planc::nmflib<T, double>::initMemSharedPtr(std::vector<T> objectList); \

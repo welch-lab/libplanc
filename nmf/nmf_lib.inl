@@ -238,4 +238,11 @@ namespace planc {
         }
         return resolvedH;
     }
+
+    template<typename T, typename eT>
+    int nmflib<T, eT>::runNMF(const params& opts) {
+        NMFDriver<T> myNMF(opts);
+        myNMF.callNMF();
+        return 0;
+    }
 }

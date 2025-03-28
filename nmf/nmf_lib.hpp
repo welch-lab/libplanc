@@ -7,6 +7,7 @@
 #include <memory>
 #include "nmflib_export.h"
 #include "config.h"
+#include "plancopts.h"
 #include <data.hpp>
 
 extern "C" {
@@ -134,11 +135,7 @@ namespace planc {
                                                         std::vector<std::shared_ptr<T>> matPtrVecNew,
                                                         const arma::uword&k, const int&nCores, const double&lambda);
 
-        // static int runNMF(params opts) {
-        //     NMFDriver<T> myNMF(opts);
-        //     myNMF.callNMF();
-        //     return 0;
-        // }
+        static int runNMF(const params& opts);
         // static int runINMF(params opts) {
         //     NMFDriver<T> myNMF(opts);
         //     myNMF.callNMF();
