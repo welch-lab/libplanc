@@ -126,6 +126,7 @@ environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
 environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
+before-all = ["uv cache clean"]
 before-test = ["python -m ensurepip", "python -m pip install pytest scipy-openblas32", 'python -c "import scipy_openblas32; print(scipy_openblas32.get_pkg_config())" > /usr/lib64/pkgconfig/scipy-openblas.pc',
 "python -m pip install -U pip", "python -m pip install scipy"]
 
