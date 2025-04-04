@@ -243,7 +243,7 @@ else ()
     add_library(progressWrapper OBJECT ${PROJECT_SOURCE_DIR}/common/progressWrapper.cpp)
     target_link_libraries(progressWrapper PUBLIC indicators::indicators)
     target_include_directories(utils PUBLIC ${ARMADILLO_INCLUDE_DIRS})
-    target_link_libraries(utils PUBLIC progressWrapper ${CBLAS_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+    target_link_libraries(utils PUBLIC progressWrapper $<$<BOOL:${CBLAS_LIBRARIES}>:${CBLAS_LIBRARIES}>  ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif ()
 
 if (MSVC)
