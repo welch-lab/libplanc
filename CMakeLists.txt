@@ -451,6 +451,14 @@ elseif (SKBUILD)
     target_link_libraries(nmflib PUBLIC progressWrapper)
     install(TARGETS pyplanc LIBRARY DESTINATION .)
     install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../")
+else()
+    install(TARGETS nmflib
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+    install(FILES ${nmf_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nmf)
+    install(FILES ${nnls_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nnls)
 endif()
 if (BUILD_EXECUTABLE)
     add_executable(plancnmf nmf/nmf_cmd.cpp)
