@@ -8,9 +8,9 @@
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <nanobind/stl/shared_ptr.h>
 #include "dense_casters.h"
 #include "sparse_casters.h"
+#include "pointer_helpers.hpp"
 
 
 namespace nb = nanobind;
@@ -56,12 +56,12 @@ NB_MODULE(pyplanc, m) {
     #include "nmf_types.inc"
 #undef X
 #define X(T) \
-    m.def("bppinmf", nb::overload_cast<std::vector<std::shared_ptr<T>>, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2); \
-    m.def("bppinmf", nb::overload_cast<std::vector<std::shared_ptr<T>>, const arma::uword&, const double&, const arma::uword&, const bool&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const int&>(&planc::nmflib<T>::bppinmf), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "HinitList"_a, "VinitList"_a, "&Winit"_a,"ncores"_a=2); \
-    m.def("uinmf", &planc::nmflib<T>::uinmf, "A function that calls uinmf with the given arguments", "objectList"_a, "unsharedList"_a, "whichUnshared"_a, "k"_a=20, "nCores"_a=2, "lambda"_a=5, "niter"_a=30, "verbose"_a=false); \
-    m.def("oinmf", nb::overload_cast<std::vector<std::shared_ptr<T>>, const arma::uword&, const int&, const double&, const arma::uword&, const arma::uword&, const arma::uword&, const arma::uword&, const bool&>(&planc::nmflib<T>::oinmf), "A function that calls oinmf with the given arguments", "objectList"_a, "k"_a, "nCores"_a=2, "lambda"_a=5, "maxEpoch"_a=5, "minibatchSize"_a=5000, "maxHALSIter"_a=1, "permuteChunkSize"_a=1000, "verbose"_a=false); \
-    m.def("oinmf", nb::overload_cast<std::vector<std::shared_ptr<T>>, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, std::vector<std::shared_ptr<T>>, const arma::uword&, const int&, const double&, const arma::uword&, const arma::uword&, const arma::uword&, const arma::uword&, const bool&>(&planc::nmflib<T>::oinmf), "A function that calls oinmf with the given arguments", "objectList"_a, "Hinit"_a, "Vinit"_a, "Winit"_a, "Ainit"_a, "Binit"_a, "objectListNew"_a, "k"_a, "nCores"_a=2, "lambda"_a=5, "maxEpoch"_a=5, "minibatchSize"_a=5000, "maxHALSIter"_a=1, "permuteChunkSize"_a=1000, "verbose"_a=false); \
-    m.def("oinmf_project", &planc::nmflib<T>::oinmf_project, "A function that calls oinmf_project with the given arguments", "objectList"_a, "Winit"_a, "objectListNew"_a, "k"_a, "nCores"_a = 2, "lambda"_a=5);
+    m.def("bppinmf", nb::overload_cast<std::vector<T>, const arma::uword&, const double&, const arma::uword&, const bool&, const int&>(&planc::bppinmf_py<T>), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "ncores"_a=2); \
+    m.def("bppinmf", nb::overload_cast<std::vector<T>, const arma::uword&, const double&, const arma::uword&, const bool&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const int&>(&planc::bppinmf_py<T>), "A function that calls bppinmf with the given arguments", "objectList"_a, "k"_a, "lambda"_a=0.0, "niter"_a=30, "verbose"_a=false, "HinitList"_a, "VinitList"_a, "&Winit"_a,"ncores"_a=2); \
+    m.def("uinmf", &planc::uinmf_py<T>, "A function that calls uinmf with the given arguments", "objectList"_a, "unsharedList"_a, "whichUnshared"_a, "k"_a=20, "nCores"_a=2, "lambda"_a=5, "niter"_a=30, "verbose"_a=false); \
+    m.def("oinmf", nb::overload_cast<std::vector<T>, const arma::uword&, const int&, const double&, const arma::uword&, const arma::uword&, const arma::uword&, const arma::uword&, const bool&>(&planc::oinmf_py<T>), "A function that calls oinmf with the given arguments", "objectList"_a, "k"_a, "nCores"_a=2, "lambda"_a=5, "maxEpoch"_a=5, "minibatchSize"_a=5000, "maxHALSIter"_a=1, "permuteChunkSize"_a=1000, "verbose"_a=false); \
+    m.def("oinmf", nb::overload_cast<std::vector<T>, const std::vector<arma::mat>&, const std::vector<arma::mat>&, const arma::mat&, const std::vector<arma::mat>&, const std::vector<arma::mat>&, std::vector<T>, const arma::uword&, const int&, const double&, const arma::uword&, const arma::uword&, const arma::uword&, const arma::uword&, const bool&>(&planc::oinmf_py<T>), "A function that calls oinmf with the given arguments", "objectList"_a, "Hinit"_a, "Vinit"_a, "Winit"_a, "Ainit"_a, "Binit"_a, "objectListNew"_a, "k"_a, "nCores"_a=2, "lambda"_a=5, "maxEpoch"_a=5, "minibatchSize"_a=5000, "maxHALSIter"_a=1, "permuteChunkSize"_a=1000, "verbose"_a=false); \
+    m.def("oinmf_project", &planc::oinmf_project_py<T>, "A function that calls oinmf_project with the given arguments", "objectList"_a, "Winit"_a, "objectListNew"_a, "k"_a, "nCores"_a = 2, "lambda"_a=5);
     #include "inmf_types.inc"
 #undef X
 }
