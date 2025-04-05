@@ -45,6 +45,9 @@ NB_MODULE(pyplanc, m) {
     nb::class_<planc::uinmfOutput<double>>(m, "uinmfOutput").def_rw("W", &planc::uinmfOutput<double>::outW).def_rw("HList", &planc::uinmfOutput<double>::outHList).def_rw("VList", &planc::uinmfOutput<double>::outVList).def_rw("objErr", &planc::uinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("UList", &planc::uinmfOutput<double>::outUList);
     nb::class_<planc::oinmfOutput<double>>(m, "oinmfOutput").def_rw("W", &planc::oinmfOutput<double>::outW).def_rw("HList", &planc::oinmfOutput<double>::outHList).def_rw("VList", &planc::oinmfOutput<double>::outVList).def_rw("objErr", &planc::oinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("AList", &planc::oinmfOutput<double>::outAList).def_rw("BList", &planc::oinmfOutput<double>::outBList);
 
+    nb::class_<planc::H5Mat>(m, "H5Mat").def(nb::init<std::string, std::string>());
+    nb::class_<planc::H5SpMat>(m, "H5SpMat").def(nb::init<std::string, std::string, std::string, std::string, arma::uword, arma::uword>());
+
 
 #define X(T) \
     m.def("nmf", &planc::nmflib<T>::nmf, "A function that calls NMF with the given arguments", "x"_a, "k"_a, "niter"_a=30, "algo"_a="anlsbpp", "ncores"_a=2, nb::kw_only(), "Winit"_a = arma::mat(), "Hinit"_a = arma::mat()); \
