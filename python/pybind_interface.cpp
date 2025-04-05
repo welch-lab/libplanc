@@ -8,6 +8,7 @@
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/shared_ptr.h>
 #include "dense_casters.h"
 #include "sparse_casters.h"
 
