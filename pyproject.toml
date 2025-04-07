@@ -79,7 +79,7 @@ testpaths = [
 ]
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-build-verbosity = "1"
+build-verbosity = 1
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*", "*pp311*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip", "python -m pip install pytest"]
@@ -94,7 +94,7 @@ before-test = ["python -m ensurepip", "python -m pip install pytest", "python -m
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
+VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 FC="gfortran-13"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
@@ -153,5 +153,5 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
+VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 
