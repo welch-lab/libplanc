@@ -35,7 +35,11 @@ set(TEMP_CMAKE_FIND_APPBUNDLE ${CMAKE_FIND_APPBUNDLE})
 set(CMAKE_FIND_APPBUNDLE "NEVER")
 
 # Find R.
-find_program(R_EXECUTABLE R DOC "R executable." PATHS ${R_RHOME} /usr/local/ PATH_SUFFIXES bin)
+find_program(R_EXECUTABLE PATHS ${R_RHOME} PATH_SUFFIXES bin)
+if(NOT R_EXECUTABLE)
+  unset(R_EXECUTABLE CACHE)
+  find_program(R_EXECUTABLE R DOC "R executable." PATHS /usr/local/ PATH_SUFFIXES bin)
+endif()
 
 if(R_EXECUTABLE)
     # Get the R version.
