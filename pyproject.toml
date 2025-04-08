@@ -46,17 +46,27 @@ test = [
   "pyyaml >=6.0"
 ]
 dev = [
-    "ruff"
+    "ruff",
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.9", "nanobind>=2.0", "numpy>=2.0"]
+requires = ["scikit-build-core>=0.9", "nanobind>=2.6", "numpy>=2.0"]
 build-backend = "scikit_build_core.build"
 
 [tool]
 rye = { dev-dependencies = [
-    "cibuildwheel>=2.23.1",
+    "cibuildwheel>=2.23.2",
 ] }
+
+[tool.uv.sources]
+
+nanobind = {index = "personal"}
+
+
+[[tool.uv.index]]
+name = "personal"
+url = "https://pypi.robbinsa.me/simple/"
+explicit = true
 
 [tool.scikit-build]
 minimum-version = "0.9"
@@ -80,7 +90,7 @@ testpaths = [
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 build-verbosity = 1
-skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*", "*pp311*"]
+skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip", "python -m pip install pytest"]
 
@@ -126,8 +136,7 @@ environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
 environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
-before-test = ["python -m ensurepip", "python -m pip cache purge", "python -m pip install pytest scipy-openblas32", 'python -c "import scipy_openblas32; print(scipy_openblas32.get_pkg_config())" > /usr/lib64/pkgconfig/scipy-openblas.pc',
-"python -m pip install -U pip", "python -m pip install scipy"]
+before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary",]
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
@@ -154,4 +163,3 @@ repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\bu
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
-
