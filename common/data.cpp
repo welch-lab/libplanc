@@ -386,7 +386,7 @@ namespace planc {
         // not thread safe
         H5SpMatImpl(const std::string&filename, const std::string&iPath, const std::string&pPath,
                     const std::string&xPath, const arma::uword n_rows, const arma::uword n_cols) : File(
-            filename, ReadWrite) {
+            filename, ReadOnly) {
             this->filename = filename;
             this->iPath = iPath;
             this->pPath = pPath;
