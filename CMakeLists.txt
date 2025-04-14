@@ -56,6 +56,7 @@ endif ()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
     execute_process(COMMAND clang -v ERROR_VARIABLE CLANGID)
+    if(CLANGID)
     string(REGEX MATCH "\\(.*\\)" CLANGPARSE ${CLANGID})
     if (CLANGPARSE MATCHES "\\(CLANG\\: AOCC.*")
         set(BLA_VENDOR AOCL_mt)
@@ -63,6 +64,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
                 -fremap-arrays -fnt-store=aggressive -mrecip=all -optimize-strided-mem-cost
                 -fenable-aggressive-gather -favoid-fpe-causing-opt)
     endif ()
+  endif ()
 endif ()
 
 set(MKL_DIR "${PROJECT_SOURCE_DIR}/cmake")
