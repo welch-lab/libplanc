@@ -82,6 +82,7 @@ execute_process(COMMAND sed -e "s/^LIBR = //" -e "t" -e "d" "${R_MAKECONF}"
                 OUTPUT_VARIABLE LIBR_STRING
                 ERROR_VARIABLE  LIBR_STRING
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(LIBR_STRING)
 string(REGEX MATCHALL "\\$\\([A-Za-z0-9_]*\\)" MAKECONF_REPLACE ${LIBR_STRING})
 foreach(VAR IN LISTS MAKECONF_REPLACE)
     string(SUBSTRING ${VAR} 2 -1 VARCLEAN)
@@ -101,6 +102,13 @@ foreach(VAR IN LISTS MAKECONF_REPLACE)
         string(REPLACE "${VAR}" "" LIBR_STRING "${LIBR_STRING}")
     endif()
 endforeach()
+else()
+execute_process(COMMAND ${RSCRIPT_EXECUTABLE} --vanilla "-e" ".Platform$r_arch)"
+                OUTPUT_VARIABLE R_ARCH
+                ERROR_VARIABLE  R_ARCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(LIBR_STRING -L${R_RHOME}/lib${R_ARCH} -lR)
+endif()
     # Some cleanup in location of R.
     string(REGEX MATCHALL "\".*\"" _R_INCLUDE_location "${_R_INCLUDE_location}")
     string(REGEX REPLACE "\"" "" _R_INCLUDE_location "${_R_INCLUDE_location}")
