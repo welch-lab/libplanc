@@ -103,11 +103,11 @@ foreach(VAR IN LISTS MAKECONF_REPLACE)
     endif()
 endforeach()
 else()
-execute_process(COMMAND ${RSCRIPT_EXECUTABLE} --vanilla "-e" ".Platform$r_arch)"
+execute_process(COMMAND ${RSCRIPT_EXECUTABLE} --vanilla "-e" ".Platform$r_arch"
                 OUTPUT_VARIABLE R_ARCH
                 ERROR_VARIABLE  R_ARCH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(LIBR_STRING -L${R_RHOME}/lib${R_ARCH} -lR)
+set(LIBR_STRING "-L${R_RHOME}/lib${R_ARCH} -lR")
 endif()
     # Some cleanup in location of R.
     string(REGEX MATCHALL "\".*\"" _R_INCLUDE_location "${_R_INCLUDE_location}")
