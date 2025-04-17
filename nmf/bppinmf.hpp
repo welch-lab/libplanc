@@ -85,7 +85,7 @@ namespace planc {
         void solveV_i(const unsigned int i, const int&ncores) {
             arma::mat* WTptr = this->WT.get();
             arma::mat giventInput(this->k, this->INMF_CHUNK_SIZE);
-            arma::mat* Hptr = this->Hi[i].get();\
+            arma::mat* Hptr = this->Hi[i].get();
             giventGiven = Hptr->t() * (*Hptr);
             giventGiven *= 1 + this->lambda;
             arma::mat* Vptr = this->Vi[i].get();
