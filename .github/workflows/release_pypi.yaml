@@ -1,8 +1,9 @@
 name: Build and Upload to pypi
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - py-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
