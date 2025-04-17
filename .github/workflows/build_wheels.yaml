@@ -1,6 +1,9 @@
 name: Build
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    tags-ignore:
+          - "py-*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
