@@ -90,7 +90,7 @@ testpaths = [
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 build-verbosity = 1
-skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
+skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*", "pp311-macosx*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip", "python -m pip install pytest"]
 
