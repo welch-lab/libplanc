@@ -330,7 +330,7 @@ add_library(hw_detect OBJECT ${PROJECT_SOURCE_DIR}/common/hw_detect.c)
 find_package(HWLOC)
 
 if (HWLOC_FOUND)
-    target_link_libraries(hw_detect PUBLIC "$<$<BOOL:pkgcfg_lib_HWLOC_hwloc>:${pkgcfg_lib_HWLOC_hwloc}>" "$<$<BOOL:HWLOC_LDFLAGS>:${HWLOC_LDFLAGS}>")
+    target_link_libraries(hw_detect PUBLIC "$<IF:$<BOOL:pkgcfg_lib_HWLOC_hwloc>,${pkgcfg_lib_HWLOC_hwloc},${HWLOC_LDFLAGS}>")
     target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
 elseif (MSVC)
     FetchContent_Declare(hwloc
