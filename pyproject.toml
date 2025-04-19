@@ -52,18 +52,13 @@ dev = [
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.9", "nanobind>=2.6", "numpy>=2.0"]
+requires = ["scikit-build-core>=0.9", "nanobind>=2.7", "numpy>=2.0"]
 build-backend = "scikit_build_core.build"
 
 [tool]
 rye = { dev-dependencies = [
     "cibuildwheel>=2.23.2",
 ] }
-
-[tool.uv.sources]
-
-nanobind = {index = "personal"}
-
 
 [[tool.uv.index]]
 name = "personal"
@@ -92,7 +87,7 @@ testpaths = [
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 build-verbosity = 1
-skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*", "pp311-macosx*"]
+skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip"  , "python -m pip install pytest"]
 
