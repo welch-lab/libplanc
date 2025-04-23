@@ -107,6 +107,8 @@ execute_process(COMMAND ${RSCRIPT_EXECUTABLE} --vanilla "-e" ".Platform$r_arch"
                 OUTPUT_VARIABLE R_ARCH
                 ERROR_VARIABLE  R_ARCH
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
+string(REGEX MATCHALL "\".*\"" R_ARCH "${R_ARCH}")
+string(REGEX REPLACE "\"" "" R_ARCH "${R_ARCH}")
 set(LIBR_STRING "-L${R_RHOME}/lib${R_ARCH} -lR")
 endif()
     # Some cleanup in location of R.
