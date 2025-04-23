@@ -69,20 +69,6 @@ namespace planc {
             this->Ei = inputEi;
             this->k = inputk;
             this->m = this->Ei[0].get()->n_rows;
-            try {
-                if (this->k > this->m) {
-                    throw std::invalid_argument("k must be <= m");
-                }
-            }
-            catch (std::exception&ex) {
-#ifdef USING_R
-                std::string ex_str = ex.what();
-                Rcpp::stop(ex_str);
-
-#else
-                throw ex;
-#endif
-            }
             this->cleared = false;
             this->INMF_CHUNK_SIZE = chunk_size_dense<typename T::elem_type>(k);
             this->nMax = 0;

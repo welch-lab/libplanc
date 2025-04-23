@@ -213,10 +213,38 @@ namespace planc {
 
     public:
         BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda) : INMF<T>(Ei, k, lambda, false) {
+            try {
+                if (this->k > this->m) {
+                    throw std::invalid_argument("k must be <= m");
+                }
+            }
+            catch (std::exception&ex) {
+#ifdef USING_R
+                std::string ex_str = ex.what();
+                Rcpp::stop(ex_str);
+
+#else
+                throw ex;
+#endif
+            }
         }
 
         BPPINMF(std::vector<std::shared_ptr<T>>&Ei, arma::uword k, double lambda, std::vector<arma::mat> HinitList,
                 std::vector<arma::mat> VinitList, arma::mat Winit) : INMF<T>(Ei, k, lambda, VinitList, Winit, false) {
+            try {
+                if (this->k > this->m) {
+                    throw std::invalid_argument("k must be <= m");
+                }
+            }
+            catch (std::exception&ex) {
+#ifdef USING_R
+                std::string ex_str = ex.what();
+                Rcpp::stop(ex_str);
+
+#else
+                throw ex;
+#endif
+            }
             this->setH(HinitList);
         }
 
