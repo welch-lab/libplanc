@@ -466,6 +466,8 @@ else()
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+    set(nmf_headers nmf/nmf_lib.hpp common/data.hpp common/config.h common/detect_blas.h ${CMAKE_CURRENT_BINARY_DIR}/nmf/nmflib_export.h)
+    set(nnls_headers nnls/nnls_lib.hpp)
     install(FILES ${nmf_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nmf)
     install(FILES ${nnls_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nnls)
 endif()

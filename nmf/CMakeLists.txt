@@ -19,8 +19,6 @@ target_include_directories(nmflib PUBLIC ${PLANC_COMMON} ${NNLS_SRC} ${OpenMP_CX
 target_include_directories(nmflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(nmflib PUBLIC utils hw_detect detect_blas)
 generate_export_header(nmflib)
-set(nmf_headers nmf_lib.hpp ../common/data.hpp ../common/config.h ../common/detect_blas.h ${CMAKE_CURRENT_BINARY_DIR}/nmflib_export.h)
-set(nnls_headers ../nnls/nnls_lib.hpp)
 if(BUILD_RCPP)
     if(WIN32)
         add_custom_command(TARGET nmflib POST_BUILD
