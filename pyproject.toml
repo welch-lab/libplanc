@@ -90,6 +90,7 @@ build-verbosity = 1
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip"  , "python -m pip install pytest"]
+environment-pass = ["VCPKG_BINARY_SOURCES", "VCPKG_FEATURE_FLAGS"]
 
 [tool.cibuildwheel.macos]
 before-all = ["pipx install uv",
@@ -101,13 +102,11 @@ before-test = ["python -m ensurepip", "python -m pip install pytest", "python -m
 [tool.cibuildwheel.macos.environment]
 MACOSX_DEPLOYMENT_TARGET = "10.15"
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 FC="gfortran-13"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
 environment.MACOSX_DEPLOYMENT_TARGET="11"
 environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
 environment.FC="gfortran-13"
 
 [tool.cibuildwheel.linux]
@@ -123,16 +122,12 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/v
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
-environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 [[tool.cibuildwheel.overrides]]
 select = "pp*-manylinux*"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
-environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary",]
 
 [[tool.cibuildwheel.overrides]]
@@ -143,8 +138,6 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
     "./vcpkg/vcpkg install"]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite;files,/host/tmp/vcpkg-binary/,readwrite"
-environment-pass = ["VCPKG_BINARY_SOURCES", "ACTIONS_CACHE_URL", "ACTIONS_RUNTIME_TOKEN"]
 
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
@@ -159,4 +152,3 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
-VCPKG_BINARY_SOURCES = "clear;x-gha,readwrite"
