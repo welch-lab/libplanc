@@ -90,7 +90,7 @@ build-verbosity = 1
 skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip"  , "python -m pip install pytest"]
-environment-pass = ["VCPKG_BINARY_SOURCES", "VCPKG_FEATURE_FLAGS"]
+environment-pass = ["VCPKG_BINARY_SOURCES", "VCPKG_FEATURE_FLAGS", "VCPKG_HOST_PATH"]
 
 [tool.cibuildwheel.macos]
 before-all = ["pipx install uv",
@@ -128,6 +128,7 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/v
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
+environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
 before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary",]
 
 [[tool.cibuildwheel.overrides]]
@@ -138,6 +139,7 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
     "./vcpkg/vcpkg install"]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
+environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
 
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"

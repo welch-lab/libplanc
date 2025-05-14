@@ -31,6 +31,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.23.2
         env:
           VCPKG_FEATURE_FLAGS: "binarycaching" # Possibly redundant, but explicitly sets the binary caching feature flag
+          VCPKG_HOST_PATH: ${{ steps.vcpkg-cache.outputs.path }}
           VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
         #    ...
         # with:
