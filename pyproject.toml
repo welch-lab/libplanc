@@ -19,6 +19,7 @@ dependencies = [
     "numpy>=1.23.5, <2.3",
     "threadpoolctl>=3.4.0, <4.0",
     "scipy>=1.12.0",
+    "progressbar2>=4.5.0",
 ]
 
 classifiers = [
@@ -154,3 +155,8 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+[dependency-groups]
+dev = [
+    "nanobind>=2.7.0",
+]
