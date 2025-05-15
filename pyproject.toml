@@ -53,7 +53,7 @@ dev = [
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.9", "nanobind>=2.7", "numpy>=2.0"]
+requires = ["scikit-build-core>=0.10", "nanobind>=2.7", "numpy>=2.0"]
 build-backend = "scikit_build_core.build"
 
 [tool]
@@ -67,7 +67,7 @@ url = "https://pypi.robbinsa.me/simple/"
 explicit = true
 
 [tool.scikit-build]
-minimum-version = "0.9"
+minimum-version = "build-system.requires"
 build-dir = "build/{wheel_tag}"
 wheel.py-api = "cp312"
 sdist.exclude = [
@@ -75,7 +75,7 @@ sdist.exclude = [
 ]
 
 [tool.scikit-build.cmake]
-version = ">=3.21"
+version = "CMakeLists.txt"
 #[tool.scikit-build.cmake.define]
 #CMAKE_TOOLCHAIN_FILE = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
