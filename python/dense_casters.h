@@ -74,23 +74,20 @@ struct type_caster<T, enable_if_t<is_arma_dense_v<T> &&
     using NDArrayCaster = make_caster<NDArray>;
 
     NB_TYPE_CASTER(T, NDArrayCaster::Name)
-
+    //modified by @r1cheu on github for zero copy
     bool from_python(handle src, uint8_t flags, cleanup_list *cleanup) noexcept {
-        // We're in any case making a copy, so non-writable inputs area also okay
-        using NDArrayConst = array_for_arma_t<T, const typename T::elem_type>;
-        make_caster<NDArrayConst> caster;
-        if (!caster.from_python(src, flags, cleanup))
+
+        make_caster<NDArray> caster;
+        if (!caster.from_python(src, flags & ~static_cast<uint8_t>(accepts_none),
+                                cleanup))
             return false;
 
-        const NDArrayConst &array = caster.value;
-        if constexpr (ndim_v<T> == 1)
-            value.set_size(array.shape(0));
-        else
-            value.set_size(array.shape(0), array.shape(1));
-
-        // The layout is contiguous & compatible thanks to array_for_arma_t<T>
-        memcpy(value.memptr(), array.data(), array.size() * sizeof(eT));
-
+        NDArray &t = caster.value;
+        if constexpr (ndim_v<T> == 1) {
+            value = T(t.data(), t.shape(0), false, true);
+        } else {
+            value = T(t.data(), t.shape(0), t.shape(1), false, true);
+        }
         return true;
     }
 
