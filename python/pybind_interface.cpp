@@ -42,8 +42,8 @@ NB_MODULE(pyplanc, m) {
     nb::class_<planc::uinmfOutput<double>>(m, "uinmfOutput").def_rw("W", &planc::uinmfOutput<double>::outW).def_rw("HList", &planc::uinmfOutput<double>::outHList).def_rw("VList", &planc::uinmfOutput<double>::outVList).def_rw("objErr", &planc::uinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("UList", &planc::uinmfOutput<double>::outUList);
     nb::class_<planc::oinmfOutput<double>>(m, "oinmfOutput").def_rw("W", &planc::oinmfOutput<double>::outW).def_rw("HList", &planc::oinmfOutput<double>::outHList).def_rw("VList", &planc::oinmfOutput<double>::outVList).def_rw("objErr", &planc::oinmfOutput<double>::objErr,  nb::rv_policy::move).def_rw("AList", &planc::oinmfOutput<double>::outAList).def_rw("BList", &planc::oinmfOutput<double>::outBList);
 
-    nb::class_<planc::H5Mat>(m, "H5Mat").def(nb::init<std::string, std::string>());
-    nb::class_<planc::H5SpMat>(m, "H5SpMat").def(nb::init<std::string, std::string, std::string, std::string, arma::uword, arma::uword>());
+    nb::class_<planc::H5Mat>(m, "H5Mat", "A wrapper for dense H5 matrix usage with pyplanc.").def(nb::init<std::string, std::string>(), "filePath"_a, "groupPath"_a);
+    nb::class_<planc::H5SpMat>(m, "H5SpMat", "A wrapper for sparse H5 matrix usage with pyplanc.").def(nb::init<std::string, std::string, std::string, std::string, arma::uword, arma::uword>(), "filePath"_a, "indexGroupPath"_a, "indPtrGroupPath"_a, "dataGroupPath"_a, "ncol"_a, "nrow"_a);
 
 
 #define X(T) \
