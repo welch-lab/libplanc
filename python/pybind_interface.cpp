@@ -2,13 +2,9 @@
 // Created by andrew on 6/19/2024.
 //
 
-#include "config.h"
-#include <nmf_lib.hpp>
-#include <nanobind/nanobind.h>
-#include <nanobind/ndarray.h>
+
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include "dense_casters.h"
 #include "sparse_casters.h"
 #include "pointer_helpers.hpp"
 

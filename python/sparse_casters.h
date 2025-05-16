@@ -39,7 +39,6 @@
  *
 */
 
-#include <nanobind/ndarray.h>
 #include "dense_casters.h"
 
 #include <memory>

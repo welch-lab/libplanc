@@ -5,7 +5,6 @@
 #ifndef POINTER_HELPERS_HPP
 #define POINTER_HELPERS_HPP
 
-#include "config.h"
 #include <nmf_lib.hpp>
 
 namespace planc {

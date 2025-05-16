@@ -5,14 +5,12 @@
 #ifndef PLANC_PROGRESSWRAPPER_H
 #define PLANC_PROGRESSWRAPPER_H
 
-#include <cstdint>
 #include <nanobind/nanobind.h>
 
 
 namespace nb = nanobind;
 
 class Progress {
-private:
     nanobind::object wrappedbar;
     nanobind::callable wrappedbartick;
     int i_;
