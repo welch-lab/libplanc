@@ -6,7 +6,6 @@
 #define PLANC_PLANCOPTS_H
 
 #include "parseutils.hpp"
-#include "utils.h"
 
 namespace planc {
     struct params {

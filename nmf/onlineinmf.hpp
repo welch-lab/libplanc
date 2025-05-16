@@ -2,8 +2,6 @@
 
 #ifdef _OPENMP
 #include <omp.h>
-
-#include <memory>
 #endif
 #include "bppnnls.hpp"
 #include "inmf.hpp"

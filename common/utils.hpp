@@ -5,10 +5,6 @@
 #include <stack>
 #include "utils.h"
 
-extern "C" {
-#include "hw_detect.h"
-}
-
 static uint64_t powersof10[16] = {
     1,
     10,
