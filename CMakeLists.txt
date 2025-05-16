@@ -90,10 +90,23 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
 endif ()
 
 find_package(MKL CONFIG)
+if(MKL_DIR)
+    set(CMAKE_REQUIRED_LIBRARIES MKL::MKL)
+    set(CMAKE_REQUIRED_INCLUDES "${MKL_INCLUDE}")
+    set(test_mkl_link "
+#include <mkl_cblas.h>
+int main() {
+return 0;
+}
+")
+    check_cxx_source_runs("${test_mkl_link}" MKL_LINKS)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+    unset(CMAKE_REQUIRED_INCLUDES)
+endif()
 find_package(BLAS)
 find_package(LAPACK)
 find_package(OpenBLAS CONFIG)
-if (MKL_DIR AND BLA_VENDOR MATCHES "All")
+if (MKL_DIR AND BLA_VENDOR MATCHES "All" AND MKL_LINKS)
     message(STATUS "found MKL")
     set(USING_MKL)
     set(BLAS_LIBRARIES MKL::MKL)
