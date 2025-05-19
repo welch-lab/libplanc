@@ -1,6 +1,7 @@
 #pragma once
 /*Copyright 2016 Ramakrishnan Kannan*/
 
+#include "utils.hpp"
 #include "nnls.hpp"
 #include "SortBooleanMatrix.hpp"
 
