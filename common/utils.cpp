@@ -103,18 +103,6 @@ std::vector<std::vector<size_t>> cartesian_product(
     return s;
 }
 
-void cblas_sgemm(const arma::mat&A, const arma::mat&B, double* C) {
-    const arma::uword m = A.n_rows;
-    const arma::uword n = B.n_cols;
-    const arma::uword k = A.n_cols;
-    constexpr double alpha = 1.0;
-    constexpr double beta = 0.0;
-    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, static_cast<int32_t>(m), static_cast<int32_t>(n),
-                static_cast<int32_t>(k), alpha,
-                A.memptr(), static_cast<int32_t>(m), B.memptr(), static_cast<int32_t>(k), beta, C,
-                static_cast<int32_t>(m));
-}
-
 void gen_discard(const arma::uword row_start, const arma::uword nrows, const arma::uword k,
                  arma::mat&X, const bool trans, const int mseed) {
     for (unsigned int j = 0; j < k; ++j) {

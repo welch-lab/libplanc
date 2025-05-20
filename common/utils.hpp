@@ -104,13 +104,6 @@ template<class INPUTTYPE, class LRTYPE>
 double computeObjectiveError(const INPUTTYPE&A, const LRTYPE&W,
                              const LRTYPE&H);
 
-/*
- * This is an sgemm wrapper for armadillo matrices
- * Something is going crazy with armadillo
- */
-
-void cblas_sgemm(const arma::mat&A, const arma::mat&B, double* C);
-
 /**
  * Generates the same low rank matrix. Matrix columns are seeded to
  * easily create different row slices of the matrix. The lowrank matrix

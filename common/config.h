@@ -5,7 +5,7 @@
 #endif //_OPENMP
 
 #ifdef MKL_FOUND
-#include <mkl_cblas.h>
+#include <mkl_types.h>
 #define ARMA_DONT_USE_FORTRAN_HIDDEN_ARGS
 #define ARMA_USE_MKL_TYPES
 #else
@@ -14,7 +14,7 @@
 #elif defined(HAVE_OPENBLAS_CBLAS_H)
 #include "openblas/cblas.h"
 #else
-#include "cblas.h"
+//#include "cblas.h"
 #endif
 #endif
 
