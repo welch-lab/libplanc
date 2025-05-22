@@ -405,7 +405,7 @@ message(STATUS "NMF_SOURCE_DIR =  ${NMF_SOURCE_DIR}")
 message(STATUS "NMFLIB_COMMON =  ${PLANC_COMMON}")
 
 add_subdirectory(nmf)
-target_link_libraries(nmflib PRIVATE "$<$<BOOL:${USING_MKL}>:MKL::MKL>" "$<$<BOOL:${USING_OPENBLAS}>:OpenBLAS::OpenBLAS>" "$<$<BOOL:${USING_BLAS}>:BLAS::BLAS>" "$<$<BOOL:${USING_BLAS}>:LAPACK::LAPACK>"
+target_link_libraries(nmflib PUBLIC "$<$<BOOL:${USING_MKL}>:MKL::MKL>" "$<$<BOOL:${USING_OPENBLAS}>:OpenBLAS::OpenBLAS>" "$<$<BOOL:${USING_BLAS}>:BLAS::BLAS>" "$<$<BOOL:${USING_BLAS}>:LAPACK::LAPACK>"
         "$<IF:$<BOOL:pkgcfg_lib_HWLOC_hwloc>,${pkgcfg_lib_HWLOC_hwloc},${HWLOC_LDFLAGS}>" "$<$<BOOL:${HWLOC_FRAMEWORKS}>:${HWLOC_FRAMEWORKS}>"
         "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win332::dl>" "$<IF:$<BOOL:HDF5_TARGETc>,hdf5::hdf5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
 
@@ -428,7 +428,7 @@ if (BUILD_RCPP)
     set(EXTRA_LD_ARGS "")
     endif ()
     else ()
-        get_target_property(EXTRA_LD_ARGS nmflib STATIC_LIBRARY_OPTIONS)
+        get_target_property(EXTRA_LD_ARGS nmflib LIBRARY_OPTIONS)
     list(JOIN EXTRA_LD_ARGS " " EXTRA_LD_ARGS)
     endif ()
     install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../")
