@@ -82,13 +82,10 @@ namespace planc {
             arma::mat out(this->n_rows, other.n_cols);
             arma::uword numChunks = this->n_rows / this->x_chunksize;
             if (numChunks * this->x_chunksize < this->n_rows) numChunks++;
-            std::cout << "numChunks: " << numChunks << std::endl;
             for (arma::uword j = 0; j < numChunks; ++j) {
                 arma::uword spanStart = j * this->x_chunksize;
-                std::cout << "spanstart: " << spanStart << std::endl;
                 arma::uword spanEnd = (j + 1) * this->x_chunksize - 1;
                 if (spanEnd > this->n_rows - 1) spanEnd = this->n_rows - 1;
-                std::cout << "spanend: " << spanEnd << std::endl;
                 out.rows(spanStart, spanEnd) = thisT.cols(spanStart, spanEnd).t() * other;
                 // this is hacky and inefficient and should probably just be replaced with implementing rows() for SpMat
             }
