@@ -8,14 +8,14 @@
 #include <mkl_types.h>
 #define ARMA_DONT_USE_FORTRAN_HIDDEN_ARGS
 #define ARMA_USE_MKL_TYPES
-#else
-#if defined(HAVE_FLEXIBLAS_CBLAS_H)
-#include "flexiblas/cblas.h"
-#elif defined(HAVE_OPENBLAS_CBLAS_H)
-#include "openblas/cblas.h"
-#else
+//#else
+//#if defined(HAVE_FLEXIBLAS_CBLAS_H)
+//#include "flexiblas/cblas.h"
+//#elif defined(HAVE_OPENBLAS_CBLAS_H)
+//#include "openblas/cblas.h"
+//#else
 //#include "cblas.h"
-#endif
+//#endif
 #endif
 
 #ifndef ARMA_64BIT_WORD
