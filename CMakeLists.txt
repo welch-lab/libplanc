@@ -380,7 +380,6 @@ else ()
     endif ()
     ExternalProject_Get_Property(hwloc SOURCE_DIR BINARY_DIR)
     set(HWLOC_LDFLAGS "${BINARY_DIR}/hwloc/.libs/libhwloc_embedded.a")
-    message(${HWLOC_LDFLAGS})
     target_include_directories(hw_detect PRIVATE "${BINARY_DIR}/include" "${SOURCE_DIR}/include")
     add_custom_command(TARGET hwloc POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove_directory ${SOURCE_DIR}/utils/lstopo
@@ -406,6 +405,7 @@ message(STATUS "NMF_SOURCE_DIR =  ${NMF_SOURCE_DIR}")
 message(STATUS "NMFLIB_COMMON =  ${PLANC_COMMON}")
 
 add_subdirectory(nmf)
+message("${HWLOC_LDFLAGS} ${pkgcfg_lib_HWLOC_hwloc}")
 target_link_libraries(nmflib PUBLIC "$<$<BOOL:${USING_MKL}>:MKL::MKL>" "$<$<BOOL:${USING_OPENBLAS}>:${OpenBLAS_LIBRARIES}>" "$<$<BOOL:${USING_BLAS}>:BLAS::BLAS>" "$<$<BOOL:${USING_BLAS}>:LAPACK::LAPACK>"
         "$<IF:$<BOOL:pkgcfg_lib_HWLOC_hwloc>,${pkgcfg_lib_HWLOC_hwloc},${HWLOC_LDFLAGS}>" "$<$<BOOL:${HWLOC_FRAMEWORKS}>:${HWLOC_FRAMEWORKS}>"
         "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win332::dl>" "$<IF:$<BOOL:HDF5_TARGETc>,hdf5::hdf5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
@@ -433,7 +433,9 @@ if (BUILD_RCPP)
             set(BLAS_LIBRARIES '-framework Accelerate')
             unset(LAPACK_LIBRARIES)
         endif()
+        message("${HWLOC_LDFLAGS} ${pkgcfg_lib_HWLOC_hwloc}")
         set(EXTRA_LD_ARGS ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} "$<IF:$<BOOL:pkgcfg_lib_HWLOC_hwloc>,${pkgcfg_lib_HWLOC_hwloc},${HWLOC_LDFLAGS}>" "$<$<BOOL:${HWLOC_FRAMEWORKS}>:${HWLOC_FRAMEWORKS}>" ${HDF5_LIBRARIES} ${R_LDFLAGS} ${RCPP_FLIBS})
+        message("${EXTRA_LD_ARGS}")
     list(JOIN EXTRA_LD_ARGS " " EXTRA_LD_ARGS)
     endif ()
     install(TARGETS nmflib RUNTIME DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" ARCHIVE DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../" LIBRARY DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../")
