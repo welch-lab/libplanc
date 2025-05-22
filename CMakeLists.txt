@@ -379,12 +379,13 @@ else ()
         )
     endif ()
     ExternalProject_Get_Property(hwloc SOURCE_DIR BINARY_DIR)
+    set(HWLOC_LDFLAGS "${BINARY_DIR}/hwloc/.libs/libhwloc_embedded.a")
+    message(${HWLOC_LDFLAGS})
     target_include_directories(hw_detect PRIVATE "${BINARY_DIR}/include" "${SOURCE_DIR}/include")
     add_custom_command(TARGET hwloc POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove_directory ${SOURCE_DIR}/utils/lstopo
             VERBATIM)
     add_dependencies(hw_detect hwloc)
-    set(HWLOC_LDFLAGS "${BINARY_DIR}/hwloc/.libs/libhwloc_embedded.a")
 endif ()
 
 add_library(detect_blas OBJECT ${PROJECT_SOURCE_DIR}/common/detect_blas.c)
