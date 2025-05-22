@@ -136,7 +136,7 @@ FetchContent_Declare(
 )
 FetchContent_Populate(HighFive)
 FetchContent_GetProperties(HighFive SOURCE_DIR HighFive_SOURCE_DIR)
-find_package(HDF5 REQUIRED COMPONENTS c)
+find_package(HDF5 REQUIRED COMPONENTS C)
 set(HDF5_LIBRARIES hdf5::hdf5)
 set(CMAKE_REQUIRED_LIBRARIES hdf5::hdf5)
 set(HighFive_Includes "${HighFive_SOURCE_DIR}/include" "${HDF5_INCLUDE_DIRS}")
