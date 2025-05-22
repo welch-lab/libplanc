@@ -27,7 +27,9 @@ enum helptype { NMF, DISTNMF, NTF, DISTNTF, JOINTNMF, DISTJOINTNMF, HIERNMF };
 
 
 #include <cmath>
+#ifndef USING_R
 #include <iostream>
+#endif
 #include <vector>
 
 template<typename T>
