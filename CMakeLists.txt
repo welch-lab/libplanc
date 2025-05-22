@@ -409,7 +409,7 @@ add_subdirectory(nmf)
 message("${HWLOC_LDFLAGS} ${pkgcfg_lib_HWLOC_hwloc}")
 target_link_libraries(nmflib PUBLIC "$<$<BOOL:${USING_MKL}>:MKL::MKL>" "$<$<BOOL:${USING_OPENBLAS}>:${OpenBLAS_LIBRARIES}>" "$<$<BOOL:${USING_BLAS}>:BLAS::BLAS>" "$<$<BOOL:${USING_BLAS}>:LAPACK::LAPACK>"
         "$<IF:$<BOOL:pkgcfg_lib_HWLOC_hwloc>,${pkgcfg_lib_HWLOC_hwloc},${HWLOC_LDFLAGS}>" "$<$<BOOL:${HWLOC_FRAMEWORKS}>:${HWLOC_FRAMEWORKS}>"
-        "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win332::dl>" "$<IF:$<BOOL:HDF5_TARGETc>,hdf5::hdf5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
+        "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win332::dl>" "$<IF:$<BOOL:HDF5_TARGETc>,HDF5::HDF5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
 
 if (BUILD_RCPP)
     get_directory_property(CMAKE_DEFINES COMPILE_DEFINITIONS)
