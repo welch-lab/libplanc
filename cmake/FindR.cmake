@@ -112,6 +112,17 @@ endif()
     set(R_INCLUDE_DIR ${_R_INCLUDE_location})
     set(R_LDFLAGS ${LIBR_STRING})
 
+# find OpenMP Flags by way of makeconf
+execute_process(COMMAND sed -e "s/^SHLIB_OPENMP_CXXFLAGS = //" -e "t" -e "d" "${R_MAKECONF}"
+        OUTPUT_VARIABLE R_OPENMP_STRING
+        ERROR_VARIABLE  R_OPENMP_STRING
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(R_OPENMP_STRING)
+    set(R_OPENMP_CXXFLAGS ${R_OPENMP_STRING})
+else()
+    set(R_OPENMP_CXXFLAGS "")
+endif()
+
 mark_as_advanced(RSCRIPT_EXECUTABLE R_EXECUTABLE)
 set(_REQUIRED_R_VARIABLES R_EXECUTABLE RSCRIPT_EXECUTABLE R_INCLUDE_DIR)
 
