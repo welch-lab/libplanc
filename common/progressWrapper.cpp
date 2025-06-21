@@ -8,6 +8,7 @@
 
 
 Progress::Progress(unsigned long max, bool display_progress) {
+#ifndef NO_INDICATORS
     using namespace indicators;
     wrappedBar = std::make_unique<BlockProgressBar>(
             option::MaxProgress{max},
@@ -15,8 +16,10 @@ Progress::Progress(unsigned long max, bool display_progress) {
             option::ShowElapsedTime{display_progress},
             option::ShowRemainingTime{display_progress},
             option::ShowPercentage{display_progress});
-    }
-
+#endif
+}
     void Progress::increment() const {
+#ifndef NO_INDICATORS
         wrappedBar->tick();
-    }
+#endif
+        }
