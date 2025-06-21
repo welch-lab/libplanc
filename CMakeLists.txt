@@ -482,7 +482,7 @@ if (BUILD_EXECUTABLE)
     target_link_libraries(plancnmf PRIVATE nmflib argparse::argparse $<$<BOOL:${MINGW}>:detect_blas>)
     target_include_directories(plancnmf PRIVATE ${PLANC_COMMON} ${CMAKE_CURRENT_BINARY_DIR})
     install(TARGETS plancnmf RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-else ()
+elseif (NOT(BUILD_RCPP))
     target_compile_definitions(progressWrapper PRIVATE NO_INDICATORS)
     target_link_libraries(nmflib PUBLIC progressWrapper)
 
