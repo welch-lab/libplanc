@@ -86,9 +86,10 @@ testpaths = [
     "python/tests",
 ]
 [tool.cibuildwheel]
+enable = ["cpython-freethreading", "pypy"]
 build-frontend = "build[uv]"
 build-verbosity = 1
-skip = ["*-win32", "*-manylinux*_i686", "*-musllinux*_i686", "pp*-win_*"]
+skip = ["*-win32",  "pp*-win_*"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip"  , "python -m pip install pytest"]
 environment-pass = ["VCPKG_BINARY_SOURCES", "VCPKG_FEATURE_FLAGS", "VCPKG_HOST_PATH"]
@@ -117,8 +118,6 @@ repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {de
 #manylinux-pypy_x86_64-image = "manylinux_2_28"
 #manylinux-aarch64-image = "manylinux_2_28"
 #manylinux-pypy_aarch64-image = "manylinux_2_28"
-musllinux-x86_64-image = "musllinux_1_2"
-musllinux-aarch64-image = "musllinux_1_2"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.CC = "gcc"
 environment.CXX = "g++"

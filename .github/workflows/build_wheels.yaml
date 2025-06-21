@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [windows-latest, ubuntu-latest, macos-13, macos-14]
+        os: [windows-latest, ubuntu-latest, macos-13, macos-14, ubuntu-24.04-arm]
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.23.2
+        uses: pypa/cibuildwheel@v3.0
         env:
           VCPKG_FEATURE_FLAGS: "binarycaching" # Possibly redundant, but explicitly sets the binary caching feature flag
           VCPKG_HOST_PATH: ${{ steps.vcpkg-cache.outputs.path }}
