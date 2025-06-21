@@ -1,6 +1,8 @@
 #pragma once
 
 //#include "parsecommandline.hpp"
+#include <cassert>
+
 #include "plancopts.h"
 #include "aoadmm.hpp"
 #include "gnsym.hpp"
