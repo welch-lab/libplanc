@@ -412,7 +412,7 @@ message(STATUS "NMFLIB_COMMON =  ${PLANC_COMMON}")
 add_subdirectory(nmf)
 target_link_libraries(nmflib PUBLIC "$<$<BOOL:${USING_MKL}>:MKL::MKL>" "$<$<BOOL:${USING_OPENBLAS}>:${OpenBLAS_LIBRARIES}>" "$<$<BOOL:${USING_BLAS}>:BLAS::BLAS>" "$<$<BOOL:${USING_BLAS}>:LAPACK::LAPACK>"
         "$<$<BOOL:${HWLOC_FRAMEWORKS}>:${HWLOC_FRAMEWORKS}>"
-        "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win332::dl>" "$<IF:$<BOOL:HDF5_TARGETc>,HDF5::HDF5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
+        "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win32::dl>" "$<IF:$<BOOL:HDF5_TARGET>,HDF5::HDF5,${HDF5_LIBRARIES}>" ${R_LDFLAGS} ${RCPP_FLIBS})
 
 if (BUILD_RCPP)
     get_directory_property(CMAKE_DEFINES COMPILE_DEFINITIONS)
