@@ -214,19 +214,18 @@ elseif (SKBUILD)
             OPTIONAL_COMPONENTS Development.SABIModule)
     find_package(nanobind CONFIG REQUIRED)
     set(HEADER_ONLY CACHE INTERNAL BOOL ON)
-    find_package(armadillo)
+    find_package(Armadillo)
     if(NOT Armadillo_FOUND)
     FetchContent_Declare(
-            armadillo
-            URL https://phoenixnap.dl.sourceforge.net/project/arma/armadillo-14.0.1.tar.xz
-            URL_HASH SHA256=8346F1E7567BCB3A28DD770097208E78D33A5D41E0A71AF2A7E7FD997F17DB44
+            Armadillo
+            URL https://phoenixnap.dl.sourceforge.net/project/arma/armadillo-14.4.3.tar.xz
+            URL_HASH SHA256=c3aadd59bdb0ea4339b056f29972f92ee19fdc52f68eb78d32d2e4caf4d80c3a
     )
-    FetchContent_Populate(armadillo)
-    FetchContent_GetProperties(armadillo SOURCE_DIR armadillo_SOURCE_DIR)
+    FetchContent_MakeAvailable(Armadillo)
     endif()
     find_package(indicators CONFIG REQUIRED)
     add_library(progressWrapper OBJECT ${PROJECT_SOURCE_DIR}/common/progressWrapper.cpp)
-    target_include_directories(utils PUBLIC "${armadillo_SOURCE_DIR}/include")
+    target_include_directories(utils PUBLIC "${Armadillo_SOURCE_DIR}/include")
     target_link_libraries(utils PUBLIC progressWrapper)
 else ()
     find_package(Armadillo CONFIG REQUIRED)
