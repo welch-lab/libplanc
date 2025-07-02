@@ -131,8 +131,8 @@ if ((WIN32 OR APPLE) AND NOT DEFINED ENV{CONDA_BUILD})
 endif ()
 FetchContent_Declare(
         HighFive
-        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.0.0-beta3.tar.gz
-        URL_HASH SHA256=555acee773ae2cf49c987fcf77397f348d287d1ce74fd5871dfe0abd0b814af2
+        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.0.0.tar.gz
+        URL_HASH SHA256=cf9ad114b79bfa2c1deceefc6d4e710b882451ebaa81c063e2eb1de908e7c989
 )
 FetchContent_Populate(HighFive)
 FetchContent_GetProperties(HighFive SOURCE_DIR HighFive_SOURCE_DIR)
