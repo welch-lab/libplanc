@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21...3.29 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24...4.0 FATAL_ERROR)
 if (BUILD_RCPP)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "11" CACHE STRING "Target MacOS Version")
 elseif (SKBUILD)
@@ -129,13 +129,13 @@ if ((WIN32 OR APPLE) AND NOT DEFINED ENV{CONDA_BUILD})
     set(HDF5_USE_STATIC_LIBRARIES ON CACHE INTERNAL BOOL)
     set(HIGHFIVE_STATIC_HDF5 ON CACHE INTERNAL BOOL)
 endif ()
+set(HIGHFIVE_FIND_HDF5 Off)
 FetchContent_Declare(
         HighFive
         URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.0.0.tar.gz
         URL_HASH SHA256=cf9ad114b79bfa2c1deceefc6d4e710b882451ebaa81c063e2eb1de908e7c989
 )
-FetchContent_Populate(HighFive)
-FetchContent_GetProperties(HighFive SOURCE_DIR HighFive_SOURCE_DIR)
+FetchContent_MakeAvailable(HighFive)
 find_package(HDF5 REQUIRED COMPONENTS C)
 set(HDF5_TARGET 1)
 set(CMAKE_REQUIRED_LIBRARIES ${HDF5_LIBRARIES})
