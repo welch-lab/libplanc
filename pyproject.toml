@@ -16,7 +16,7 @@ maintainers = [
 ]
 
 dependencies = [
-    "numpy>=1.23.5, <2.3",
+    "numpy>=2.0, <3.0",
     "threadpoolctl>=3.4.0, <4.0",
     "scipy>=1.12.0",
     "progressbar2>=4.5.0",
@@ -53,7 +53,7 @@ dev = [
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.10", "nanobind>=2.7", "numpy>=2.0"]
+requires = ["scikit-build-core>=0.10", "nanobind>=2.7", "numpy>=2.0, <3.0"]
 build-backend = "scikit_build_core.build"
 
 [tool]
