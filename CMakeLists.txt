@@ -137,7 +137,7 @@ FetchContent_Declare(
 )
 if(BUILD_RCPP)
     find_r_module(HighFive)
-    if (R_HIGHIVE)
+    if (R_HIGHFIVE)
         set(HighFive_SOURCE_DIR "${R_HIGHFIVE}")
     else ()
         message(WARNING "missing CRAN HighFive")
