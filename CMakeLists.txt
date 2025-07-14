@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.24...4.0 FATAL_ERROR)
-if (BUILD_RCPP)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "11" CACHE STRING "Target MacOS Version")
-elseif (SKBUILD)
+if (SKBUILD)
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
     set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
 endif ()
