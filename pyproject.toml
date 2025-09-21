@@ -43,24 +43,32 @@ classifiers = [
 Homepage = "https://welch-lab.github.io"
 GitHub = "https://github.com/welch-lab/libplanc"
 
-[project.optional-dependencies]
+[dependency-groups]
+dev = [
+  "nanobind>=2.7.0",
+  {include-group = "lint"},
+  {include-group = "test"},
+]
+lint = [
+  "ruff",
+]
 test = [
   "pytest >=6.0",
   "pyyaml >=6.0"
 ]
-dev = [
-    "ruff",
+ci = [
+  "cibuildwheel >=3"
 ]
 
 [build-system]
 requires = ["scikit-build-core>=0.10", "nanobind>=2.7", "numpy>=2.0, <3.0"]
 build-backend = "scikit_build_core.build"
 
-[tool]
-rye = { dev-dependencies = [
-    "cibuildwheel>=2.23.2",
-] }
+[tool.uv]
+default-groups = ["dev"]
 
+[tool.uv.dependency-groups]
+ci =  {requires-python = ">=3.11"}
 [[tool.uv.index]]
 name = "personal"
 url = "https://pypi.robbinsa.me/simple/"
@@ -154,8 +162,3 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
-
-[dependency-groups]
-dev = [
-    "nanobind>=2.7.0",
-]
