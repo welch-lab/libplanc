@@ -23,6 +23,9 @@
     "features" : [ "simplethread" ],
     "version>=" : "0.3.28#1",
     "platform" : "!osx"
+  }, {
+    "name" : "lapack",
+    "platform" : "!osx"
   } ],
   "builtin-baseline" : "c4af3593e1f1aa9e14a560a09e45ea2cb0dfd74d"
 }
