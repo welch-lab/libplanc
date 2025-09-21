@@ -8,10 +8,6 @@
     "name" : "argparse",
     "version>=" : "3.2"
   }, {
-    "name" : "armadillo",
-    "version>=" : "14.2.2",
-    "platform" : "!osx"
-  }, {
     "name" : "hdf5"
   }, {
     "name" : "indicators",
