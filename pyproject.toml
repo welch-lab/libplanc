@@ -149,7 +149,8 @@ before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make ninja-build pkgconfig sudo pipx",
+before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make pkgconfig sudo pipx",
+    "pipx ensurepath",
     "pipx install ninja",
     "git clone https://github.com/microsoft/vcpkg.git",
     "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
