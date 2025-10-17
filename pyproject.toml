@@ -83,14 +83,15 @@ sdist.exclude = [
 ]
 wheel.install-dir = "pyplanc"
 
+[tool.scikit-build.cmake]
+version = "CMakeLists.txt"
+define.SKBUILD_FREETHREAD = "0"
+
 [[tool.scikit-build.overrides]]
 if.platform-system = "win32"
 if.abi-flags = "t"
-[tool.scikit-build.cmake.define]
-SKBUILD_FREETHREAD=1
+define.SKBUILD_FREETHREAD = "1"
 
-[tool.scikit-build.cmake]
-version = "CMakeLists.txt"
 #[tool.scikit-build.cmake.define]
 #CMAKE_TOOLCHAIN_FILE = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
