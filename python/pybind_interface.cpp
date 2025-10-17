@@ -34,7 +34,7 @@ namespace nb = nanobind;
     // }
 // } // state does not unset, TODO find way to do on import/unload
 
-NB_MODULE(pyplanc, m) {
+NB_MODULE(_lib, m) {
     m.doc() = "A python wrapper for planc-nmflib";
     using namespace nb::literals;
     nb::class_<planc::nmfOutput<double>>(m, "nmfOutput").def_rw("W", &planc::nmfOutput<double>::outW).def_rw("H", &planc::nmfOutput<double>::outH).def_rw("objErr", &planc::nmfOutput<double>::objErr,  nb::rv_policy::move);
