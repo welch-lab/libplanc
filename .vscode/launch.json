@@ -8,9 +8,9 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
+            "miDebuggerPath": "${RTOOLS45_HOME}/ucrt64/bin/gdb.exe",
             "program": "${workspaceFolder}/out/build/x64-debug/bench/planc_bench.exe",
-            "args": ["-i", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.mtx", "-j", "C:/users/andrew/source/nonnegfac-python/nonnegfac/frontal_250k.h5.dense.mtx"],
+            "args": ["-i", "${workspaceFolder}/bench/bench_in/frontal_50k.h5.mtx", "-j", "${workspaceFolder}/bench/bench_in/frontal_50k.h5.dense.mtx"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -26,14 +26,6 @@
                     "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
-                },
-                {
-                    "description": "source arma-prettyprint",
-                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_armadillo_printers.py"
-                },
-                {
-                    "description": "source stdcomplex-prettyprint",
-                    "text": "source C:/users/andrew/gdb_armadillo_helpers/gdb_helpers/gdb_std_complex_printer.py"
                 }
             ]
         }
