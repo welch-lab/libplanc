@@ -157,7 +157,7 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
-
+environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
 
