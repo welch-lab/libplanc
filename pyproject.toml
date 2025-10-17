@@ -168,6 +168,6 @@ environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 [tool.cibuildwheel.windows]
 before-all = ["pipx install uv"]
 before-build = "pip install delvewheel"
-repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build --namespace-pkg"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
