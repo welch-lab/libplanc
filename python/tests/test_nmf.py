@@ -5,7 +5,7 @@ from typing import NamedTuple
 import pytest
 import numpy as np
 import numpy.typing
-import pyplanc
+import pyplanc._lib as pyplanc
 import scipy.sparse
 
 class nmfparams(NamedTuple):
