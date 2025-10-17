@@ -61,7 +61,7 @@ ci = [
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.10", "nanobind>=2.7", "numpy>=2.0, <3.0"]
+requires = ["scikit-build-core>=0.11", "nanobind>=2.7", "numpy>=2.0, <3.0"]
 build-backend = "scikit_build_core.build"
 
 [tool.uv]
@@ -81,6 +81,13 @@ wheel.py-api = "cp312"
 sdist.exclude = [
     '\bench', '\.idea', '\.github', '\.vscode', '\utilities', '\formatter'
 ]
+wheel.install-dir = "pyplanc"
+
+[[tool.scikit-build.overrides]]
+if.platform-system = "win32"
+if.abi-flags = "t"
+[tool.scikit-build.cmake.define]
+SKBUILD_FREETHREAD=1
 
 [tool.scikit-build.cmake]
 version = "CMakeLists.txt"
