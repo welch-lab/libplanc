@@ -152,7 +152,8 @@ select = "*-musllinux*"
 before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make ninja-build pkgconfig sudo pipx",
     "pipx install ninja",
     "git clone https://github.com/microsoft/vcpkg.git",
-    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",]
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
+    "./vcpkg/vcpkg install"]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
@@ -175,6 +176,7 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buil
 select = "*-win_arm64"
 before-all = ["pipx install uv",
               "git clone https://github.com/microsoft/vcpkg.git",
-              ".\\vcpkg\\bootstrap-vcpkg.bat"]
-environment.VCPKG_INSTALLATION_ROOT = "%cd%/vcpkg"
-environment.VCPKG_BINARY_SOURCES = "clear;files,%cd%/vcpkg/,readwrite"
+              ".\\vcpkg\\bootstrap-vcpkg.bat",
+              ".\\vcpkg\\vcpkg.exe install"]
+environment.VCPKG_INSTALLATION_ROOT = "%cd%\\vcpkg"
+environment.VCPKG_BINARY_SOURCES = "clear;files,%cd%\\vcpkg\\,readwrite"
