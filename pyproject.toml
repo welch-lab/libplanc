@@ -175,8 +175,4 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buil
 [[tool.cibuildwheel.overrides]]
 select = "*-win_arm64"
 before-all = ["pipx install uv",
-              "git clone https://github.com/microsoft/vcpkg.git",
-              ".\\vcpkg\\bootstrap-vcpkg.bat",
-              ".\\vcpkg\\vcpkg.exe install"]
-environment.VCPKG_INSTALLATION_ROOT = "%cd%\\vcpkg"
-environment.VCPKG_BINARY_SOURCES = "clear;files,$env:VCPKG_HOST_PATH,readwrite"
+              "cd $VCPKG_INSTALLATION_ROOT && git fetch && C:/a/libplanc/libplanc"]
