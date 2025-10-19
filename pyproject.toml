@@ -152,8 +152,7 @@ select = "*-musllinux*"
 before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make ninja-build pkgconfig sudo pipx",
     "pipx install ninja",
     "git clone https://github.com/microsoft/vcpkg.git",
-    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
-    "./vcpkg/vcpkg install"]
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",]
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
 environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
@@ -171,3 +170,11 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build --namespace-pkg pyplanc"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-win_arm64"
+before-all = ["pipx install uv",
+              "git clone https://github.com/microsoft/vcpkg.git",
+              ".\\vcpkg\\bootstrap-vcpkg.bat"]
+environment.VCPKG_INSTALLATION_ROOT = "%cd%/vcpkg"
+environment.VCPKG_BINARY_SOURCES = "clear;files,%cd%/vcpkg/,readwrite"
