@@ -123,9 +123,8 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmak
 FC="gfortran-13"
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
+inherit.environment = "append"
 environment.MACOSX_DEPLOYMENT_TARGET="11"
-environment.SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.FC="gfortran-13"
 
 [tool.cibuildwheel.linux]
 before-all = ["yum install -y zip", "mkdir -p /host/tmp/vcpkg-binary"]
@@ -138,13 +137,11 @@ environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/v
 environment.CC = "gcc"
 environment.CXX = "g++"
 environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
+environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
 [[tool.cibuildwheel.overrides]]
 select = "pp*-manylinux*"
+inherit.environment = "append"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.CC = "gcc"
-environment.CXX = "g++"
-environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
 before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary",]
 
 [[tool.cibuildwheel.overrides]]
@@ -154,9 +151,9 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
     "git clone https://github.com/microsoft/vcpkg.git",
     "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
     "./vcpkg/vcpkg install"]
+inherit.environment = "append"
 environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
+environment.VCPKG_INSTALLATION_ROOT = "./vcpkg/"
 environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 
 #before-all = "apk add hwloc-dev armadillo-dev openblas-dev"
