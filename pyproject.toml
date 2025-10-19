@@ -175,4 +175,4 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buil
 [[tool.cibuildwheel.overrides]]
 select = "*-win_arm64"
 before-all = ["pipx install uv",
-              "cd $VCPKG_INSTALLATION_ROOT && git fetch && C:/a/libplanc/libplanc"]
+              "cd $VCPKG_INSTALLATION_ROOT && git fetch"]
