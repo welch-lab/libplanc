@@ -179,4 +179,4 @@ before-all = ["pipx install uv",
               ".\\vcpkg\\bootstrap-vcpkg.bat",
               ".\\vcpkg\\vcpkg.exe install"]
 environment.VCPKG_INSTALLATION_ROOT = "%cd%\\vcpkg"
-environment.VCPKG_BINARY_SOURCES = "clear;files,%cd%\\vcpkg\\,readwrite"
+environment.VCPKG_BINARY_SOURCES = "clear;files,$env:VCPKG_HOST_PATH,readwrite"
