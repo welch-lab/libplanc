@@ -191,6 +191,7 @@ SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buil
 select = "pp*-win_*"
 inherit.environment = "append"
 environment.CXXFLAGS = "/DHAVE_SNPRINTF"
+before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary"]
 
 [[tool.cibuildwheel.overrides]]
 select = "*-win_arm64"
