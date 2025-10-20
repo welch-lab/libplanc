@@ -105,7 +105,7 @@ testpaths = [
 enable = ["cpython-freethreading", "pypy"]
 build-frontend = "build[uv]"
 build-verbosity = 1
-skip = ["*-win32",  "pp*-win_*"]
+skip = ["*-win32"]
 test-command = "pytest -rq {project}/python/tests"
 before-test = ["python -m ensurepip"  , "python -m pip install pytest"]
 environment-pass = ["VCPKG_BINARY_SOURCES", "VCPKG_FEATURE_FLAGS", "VCPKG_HOST_PATH"]
@@ -186,6 +186,11 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build --namespace-pkg pyplanc"
 [tool.cibuildwheel.windows.environment]
 SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+[[tool.cibuildwheel.overrides]]
+select = "pp*-win_*"
+inherit.environment = "append"
+environment.CXXFLAGS = "/DHAVE_SNPRINTF"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-win_arm64"
