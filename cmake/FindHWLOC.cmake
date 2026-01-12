@@ -18,7 +18,7 @@
 #  HWLOC_FOUND           - True if headers and requested libraries were found
 #  HWLOC_INCLUDE_DIRS    - hwloc include directories
 #  HWLOC_LIBRARY_DIRS    - Link directories for hwloc libraries
-#  HWLOC_LDFLAGS       - hwloc component libraries to be linked
+#  HWLOC_hwloc_LIBRARY       - hwloc component libraries to be linked
 #
 # The user can give specific paths where to find the libraries adding cmake
 # options at configure (ex: cmake path/to/project -DHWLOC_DIR=path/to/hwloc):
@@ -28,7 +28,7 @@
 #
 # For CMakeLikst.txt, do:
 #   find_package(HWLOC)
-#   target_link_libraries(hw_detect PRIVATE "${HWLOC_LDFLAGS}")
+#   target_link_libraries(hw_detect PRIVATE "${HWLOC_hwloc_LIBRARY}")
 #   target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
 #
 # The module can also look for the following environment variables if paths
