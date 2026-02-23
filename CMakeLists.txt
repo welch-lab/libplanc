@@ -130,8 +130,8 @@ endif ()
 set(HIGHFIVE_FIND_HDF5 OFF)
 FetchContent_Declare(
         HighFive
-        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.0.0.tar.gz
-        URL_HASH SHA256=cf9ad114b79bfa2c1deceefc6d4e710b882451ebaa81c063e2eb1de908e7c989
+        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.2.0.tar.gz
+        URL_HASH SHA256=01ea2eed7dbce1cf5dfff59476cfa113a7822b641aecbd99c674592fe7a4e630
 )
 if(BUILD_RCPP)
     find_r_module(HighFive)
