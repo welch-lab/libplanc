@@ -226,8 +226,8 @@ elseif (SKBUILD)
     if(NOT Armadillo_FOUND)
     FetchContent_Declare(
             Armadillo
-            URL https://phoenixnap.dl.sourceforge.net/project/arma/armadillo-14.4.3.tar.xz
-            URL_HASH SHA256=c3aadd59bdb0ea4339b056f29972f92ee19fdc52f68eb78d32d2e4caf4d80c3a
+            URL https://cytranet-dal.dl.sourceforge.net/project/arma/armadillo-15.2.3.tar.xz
+            URL_HASH SHA256=0182d67d6949e4347a0bc62fc8c2793be7eb203c71f19edff93f8c45fd4a8190
     )
     FetchContent_MakeAvailable(Armadillo)
     endif()
