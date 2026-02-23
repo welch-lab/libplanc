@@ -333,8 +333,8 @@ if (HWLOC_FOUND)
     target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
 elseif (MSVC)
     FetchContent_Declare(hwloc
-            URL https://download.open-mpi.org/release/hwloc/v2.12/hwloc-2.12.1.tar.gz
-            URL_HASH SHA256=ffa02c3a308275a9339fbe92add054fac8e9a00cb8fe8c53340094012cb7c633
+            URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+            URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
             SOURCE_SUBDIR contrib/windows-cmake
     )
     set(HWLOC_ENABLE_TESTING INTERNAL BOOL OFF)
@@ -376,16 +376,16 @@ else ()
         file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/series" hwloc_patch_list)
         list(TRANSFORM hwloc_patch_list PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/")
         ExternalProject_Add(hwloc
-                URL https://download.open-mpi.org/release/hwloc/v2.12/hwloc-2.12.1.tar.gz
-                URL_HASH SHA256=ffa02c3a308275a9339fbe92add054fac8e9a00cb8fe8c53340094012cb7c633
+                URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+                URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
                 PATCH_COMMAND ${CMAKE_COMMAND} -E cat ${hwloc_patch_list} | ${PATCH} -p1 -l
                 BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
                 CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "LD=${HWLOC_LD}" "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
         )
     else ()
         ExternalProject_Add(hwloc
-                URL https://download.open-mpi.org/release/hwloc/v2.12/hwloc-2.12.1.tar.gz
-                URL_HASH SHA256=ffa02c3a308275a9339fbe92add054fac8e9a00cb8fe8c53340094012cb7c633
+                URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+                URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
                 BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
                 CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
         )
