@@ -384,8 +384,8 @@ else ()
         )
     else ()
         ExternalProject_Add(hwloc
-                URL https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.2.tar.gz
-                URL_HASH SHA256=866ac8ef07b350a6a2ba0c6826c37d78e8994dcbcd443bdd2b436350de19d540
+                URL https://download.open-mpi.org/release/hwloc/v2.12/hwloc-2.12.1.tar.gz
+                URL_HASH SHA256=ffa02c3a308275a9339fbe92add054fac8e9a00cb8fe8c53340094012cb7c633
                 BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
                 CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
         )
