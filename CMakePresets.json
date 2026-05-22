@@ -60,7 +60,7 @@
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
-            "toolchainFile": "$env{OOT}/scripts/buildsystems/vcpkg.cmake",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/g++",
@@ -92,7 +92,7 @@
             "generator": "Visual Studio 17 2022",
             "toolset": "ClangCL",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "toolchainFile": "$env{OOT}/scripts/buildsystems/vcpkg.cmake",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "architecture": {
                 "value": "x64",
                 "strategy": "external"
@@ -149,7 +149,7 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cmakeExecutable": "$env{RTOOLS45_HOME}/ucrt64/bin/cmake.exe",
-            "toolchainFile": "$env{OOT}/scripts/buildsystems/vcpkg.cmake",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "$env{RTOOLS45_HOME}/ucrt64/bin/gcc.exe",
                 "CMAKE_CXX_COMPILER": "$env{RTOOLS45_HOME}/ucrt64/bin/g++.exe",
