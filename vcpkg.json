@@ -1,31 +1,43 @@
 {
-  "$schema" : "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "dependencies" : [ {
-    "name" : "dlfcn-win32",
-    "version>=" : "1.4.1",
-    "platform" : "windows"
-  }, {
-    "name" : "argparse",
-    "version>=" : "3.2"
-  }, {
-    "name" : "hdf5"
-  }, {
-    "name" : "indicators",
-    "version>=" : "2.3"
-  }, {
-    "name" : "pkgconf",
-    "version>=" : "2.3.0"
-  }, {
-    "name" : "hwloc",
-    "version>=" : "2.11.2"
-  }, {
-    "name" : "openblas",
-    "features" : [ "simplethread" ],
-    "version>=" : "0.3.28#1",
-    "platform" : "!osx"
-  }, {
-    "name" : "lapack",
-    "platform" : "!osx"
-  } ],
-  "builtin-baseline" : "4334d8b4c8916018600212ab4dd4bbdc343065d1"
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    {
+      "name": "dlfcn-win32",
+      "version>=": "1.4.2",
+      "platform": "windows"
+    },
+    {
+      "name": "argparse",
+      "version>=": "3.2"
+    },
+    {
+      "name": "hdf5",
+      "version>=": "1.14.6"
+    },
+    {
+      "name": "indicators",
+      "version>=": "2.3"
+    },
+    {
+      "name": "pkgconf",
+      "version>=": "2.3.0"
+    },
+    {
+      "name": "hwloc",
+      "version>=": "2.11.2"
+    },
+    {
+      "name": "openblas",
+      "features": [
+        "simplethread"
+      ],
+      "version>=": "0.3.28#1",
+      "platform": "!osx"
+    },
+    {
+      "name": "lapack",
+      "platform": "!osx"
+    }
+  ],
+  "builtin-baseline": "1ea949145db9db7c9b254062f94acdaeed947767"
 }
