@@ -102,7 +102,7 @@ testpaths = [
     "python/tests",
 ]
 [tool.cibuildwheel]
-enable = ["cpython-freethreading", "pypy"]
+enable = ["pypy"]
 build-frontend = "build[uv]"
 build-verbosity = 1
 skip = ["*-win32"]
