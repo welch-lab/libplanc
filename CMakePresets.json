@@ -99,7 +99,8 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "SKBUILD": "2"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
