@@ -89,7 +89,7 @@
             "name": "windows-msvc-llvm-base",
             "displayName": "Windows MSVC-LLVM x64 Debug",
             "description": "Sets generator, compilers, x64 architecture, build and install directory, debug build type",
-            "generator": "Visual Studio 17 2022",
+            "generator": "Visual Studio 18 2026",
             "toolset": "ClangCL",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
