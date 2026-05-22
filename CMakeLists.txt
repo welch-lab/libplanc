@@ -130,8 +130,8 @@ endif ()
 set(HIGHFIVE_FIND_HDF5 OFF)
 FetchContent_Declare(
         HighFive
-        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.2.0.tar.gz
-        URL_HASH SHA256=01ea2eed7dbce1cf5dfff59476cfa113a7822b641aecbd99c674592fe7a4e630
+        URL https://github.com/highfive-devs/HighFive/archive/refs/tags/v3.3.0.tar.gz
+        URL_HASH SHA256=325cfbcf0c0296a6dd26f3b088801b7ebb8d6f109c0565c11d2d8c4af3253bff
 )
 if(BUILD_RCPP)
     find_r_module(HighFive)
@@ -229,8 +229,8 @@ elseif (SKBUILD)
     if(NOT Armadillo_FOUND)
     FetchContent_Declare(
             Armadillo
-            URL https://cytranet-dal.dl.sourceforge.net/project/arma/armadillo-15.2.3.tar.xz
-            URL_HASH SHA256=0182d67d6949e4347a0bc62fc8c2793be7eb203c71f19edff93f8c45fd4a8190
+            URL https://cytranet-dal.dl.sourceforge.net/project/arma/armadillo-15.2.6.tar.xz
+            URL_HASH SHA256=97cb8ef708541f632e861d005a462dd0367240f81ff96f8e63ebbdd75c8ce55f
     )
     FetchContent_MakeAvailable(Armadillo)
     endif()
