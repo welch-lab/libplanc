@@ -3,5 +3,8 @@
     "C_Cpp.errorSquiggles": "enabled",
     "editor.defaultFoldingRangeProvider": "charliermarsh.ruff",
     "editor.defaultFormatter": "charliermarsh.ruff",
-    "notebook.defaultFormatter": "charliermarsh.ruff"
+    "notebook.defaultFormatter": "charliermarsh.ruff",
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    }
 }
