@@ -220,6 +220,9 @@ if (BUILD_RCPP)
 elseif (SKBUILD)
     find_package(Python REQUIRED COMPONENTS Interpreter Development.Module
             OPTIONAL_COMPONENTS Development.SABIModule)
+    execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
     find_package(nanobind CONFIG REQUIRED)
     set(HEADER_ONLY CACHE INTERNAL BOOL ON)
     find_package(Armadillo)
