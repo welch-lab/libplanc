@@ -103,7 +103,7 @@ testpaths = [
 ]
 [tool.cibuildwheel]
 enable = ["pypy"]
-build-frontend = "build[uv]"
+build-frontend = "uv"
 build-verbosity = 1
 skip = ["*-win32"]
 test-command = "pytest -rq {project}/python/tests"
