@@ -126,21 +126,21 @@ inherit.environment = "append"
 environment.MACOSX_DEPLOYMENT_TARGET="11"
 
 [tool.cibuildwheel.linux]
-before-all = ["yum install -y zip", "mkdir -p /host/tmp/vcpkg-binary"]
+before-all = ["yum install -y zip",
+    "mkdir -p /host/tmp/vcpkg-binary",
+    "git clone https://github.com/microsoft/vcpkg.git",
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 repair-wheel-command = "LD_LIBRARY_PATH=/project/build/ auditwheel repair -w {dest_dir} {wheel}"
 #manylinux-x86_64-image = "manylinux_2_28"
 #manylinux-pypy_x86_64-image = "manylinux_2_28"
 #manylinux-aarch64-image = "manylinux_2_28"
 #manylinux-pypy_aarch64-image = "manylinux_2_28"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
+environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
+environment.VCPKG_INSTALLATION_ROOT = "./vcpkg/"
 environment.CC = "gcc"
 environment.CXX = "g++"
-environment.VCPKG_INSTALLATION_ROOT = "/host/usr/local/share/vcpkg/"
-environment.VCPKG_BINARY_SOURCES = "clear;files,/host/$VCPKG_HOST_PATH,readwrite"
 [[tool.cibuildwheel.overrides]]
 select = "pp*-manylinux*"
-inherit.environment = "append"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=/host/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary",]
 
 [[tool.cibuildwheel.overrides]]
@@ -151,11 +151,8 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
     "wget https://dl-cdn.alpinelinux.org/alpine/edge/community/x86_64/ninja-is-really-ninja-1.13.1-r0.apk",
     "apk add ./ninja-is-really-ninja-1.13.1-r0.apk",
     "git clone https://github.com/microsoft/vcpkg.git",
-    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
-    "./vcpkg/vcpkg install"]
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 inherit.environment = "append"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
-environment.VCPKG_INSTALLATION_ROOT = "./vcpkg/"
 environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 
 [[tool.cibuildwheel.overrides]]
@@ -166,10 +163,8 @@ before-all = ["apk add bash build-base cmake libtool zip unzip curl git g++ make
     "wget https://dl-cdn.alpinelinux.org/alpine/edge/community/aarch64/ninja-is-really-ninja-1.13.1-r0.apk",
     "apk add ./ninja-is-really-ninja-1.13.1-r0.apk",
     "git clone https://github.com/microsoft/vcpkg.git",
-    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh",
-    "./vcpkg/vcpkg install"]
+    "chmod +x ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/bootstrap-vcpkg.sh"]
 inherit.environment = "append"
-environment.SKBUILD_CMAKE_DEFINE = "CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 environment.VCPKG_INSTALLATION_ROOT = "./vcpkg/"
 environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 
@@ -180,11 +175,11 @@ environment.VCPKG_FORCE_SYSTEM_BINARIES = "1"
 #
 
 [tool.cibuildwheel.windows]
-before-all = ["pipx install uv"]
+before-all = ["git clone https://github.com/microsoft/vcpkg.git", 'vcpkg\\bootstrap-vcpkg.bat']
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path .\\build --namespace-pkg pyplanc"
 [tool.cibuildwheel.windows.environment]
-SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+SKBUILD_CMAKE_DEFINE="CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 [[tool.cibuildwheel.overrides]]
 select = "pp*-win_*"
@@ -192,6 +187,3 @@ inherit.environment = "append"
 environment.CXXFLAGS = "/DHAVE_SNPRINTF"
 before-test = ["python -m ensurepip", "python -m pip install -U pip", "python -m pip install pytest scipy --extra-index-url https://pypi.robbinsa.me/simple/ --prefer-binary"]
 
-[[tool.cibuildwheel.overrides]]
-select = "*-win_arm64"
-before-all = ["cd $VCPKG_INSTALLATION_ROOT && git fetch"]
