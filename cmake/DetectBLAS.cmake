@@ -1,0 +1,33 @@
+macro(DetectBLAS)
+    find_package(MKL CONFIG)
+    if (MKL_DIR)
+        set(CMAKE_REQUIRED_LIBRARIES MKL::MKL)
+        set(CMAKE_REQUIRED_INCLUDES "${MKL_INCLUDE}")
+        set(test_mkl_link "
+#include <mkl_cblas.h>
+int main() {
+return 0;
+}
+")
+        check_cxx_source_runs("${test_mkl_link}" MKL_LINKS)
+        unset(CMAKE_REQUIRED_LIBRARIES)
+        unset(CMAKE_REQUIRED_INCLUDES)
+    endif ()
+    find_package(BLAS QUIET)
+    find_package(LAPACK QUIET)
+    find_package(OpenBLAS CONFIG)
+    if (MKL_DIR AND MKL_LINKS AND NOT BLA_VENDOR MATCHES "Generic")
+        message(STATUS "found MKL")
+        set(USING_MKL 1)
+        unset(LAPACK_LIBRARIES)
+        set(CBLAS_H_DIR "${MKL_INCLUDE}")
+        list(APPEND GENERAL_DEFINES "MKL_FOUND")
+    elseif ((BUILD_RCPP AND WIN32))
+        find_package(OpenBLAS CONFIG REQUIRED)
+        set(USING_OPENBLAS 1)
+    else ()
+        find_package(BLAS REQUIRED)
+        find_package(LAPACK REQUIRED)
+        set(USING_BLAS 1)
+    endif ()
+endmacro()

@@ -371,3 +371,77 @@ if (HWLOC_FOUND)
 
     set(CMAKE_REQUIRED_INCLUDES ${HWLOC_SAVE_CMAKE_REQUIRED_INCLUDES})
 endif ()
+
+
+macro(HandleHWLOC)
+    if (HWLOC_FOUND)
+        if (pkgcfg_lib_HWLOC_hwloc)
+            target_link_libraries(hw_detect PUBLIC ${pkgcfg_lib_HWLOC_hwloc})
+        else ()
+            target_link_libraries(hw_detect PUBLIC ${HWLOC_hwloc_LIBRARY})
+        endif ()
+        target_include_directories(hw_detect PRIVATE "${HWLOC_INCLUDE_DIRS}")
+    elseif (MSVC)
+        FetchContent_Declare(hwloc
+                URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+                URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
+                SOURCE_SUBDIR contrib/windows-cmake
+        )
+        set(HWLOC_ENABLE_TESTING INTERNAL BOOL OFF)
+        set(HWLOC_SKIP_LSTOPO INTERNAL BOOL ON)
+        set(HWLOC_SKIP_TOOLS INTERNAL BOOL ON)
+        FetchContent_MakeAvailable(hwloc)
+        target_link_libraries(hw_detect PUBLIC hwloc)
+    else ()
+        set(cmd "sh")
+        list(APPEND cmd ../hwloc/configure --with-pic --prefix=${hwloc_SOURCE_DIR}/out/ --disable-picky --enable-shared=no --enable-static=yes)
+        list(APPEND cmd --disable-cairo --disable-libxml2 --disable-io --disable-plugin-dlopen --disable-plugin-ltdl --enable-embedded-mode)
+        if (WIN32)
+            if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES ARM64)
+                list(APPEND cmd --build=aarch64-w64-mingw32)
+                set(HWLOC_LD ld.lld)
+            else ()
+                list(APPEND cmd --build=x86_64-w64-mingw32)
+                set(HWLOC_LD ld)
+            endif ()
+        elseif (PASSTHROUGH_CONFIGURE_ARGS)
+            list(APPEND cmd ${PASSTHROUGH_CONFIGURE_ARGS})
+        endif ()
+        if (BUILD_RCPP)
+
+            find_program(PATCH
+                    NAMES patch
+                    HINTS ${GIT_DIR}
+                    PATH_SUFFIXES usr/bin
+            )
+            file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/series" hwloc_patch_list)
+            list(TRANSFORM hwloc_patch_list PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/../../tools/patches/")
+            ExternalProject_Add(hwloc
+                    URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+                    URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
+                    PATCH_COMMAND ${CMAKE_COMMAND} -E cat ${hwloc_patch_list} | ${PATCH} -p1 -l
+                    BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
+                    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "LD=${HWLOC_LD}" "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=11>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
+            )
+        else ()
+            ExternalProject_Add(hwloc
+                    URL https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.gz
+                    URL_HASH SHA256=1514a5253f0a5c23bc006d3bdd30a6f6125c9a8dc9b5fa4984913d1fff45315d
+                    BUILD_BYPRODUCTS <BINARY_DIR>/hwloc/.libs/libhwloc_embedded.a
+                    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "CFLAGS=-DNDEBUG $ENV{CFLAGS} $<$<BOOL:${APPLE}>:-mmacosx-version-min=10.14>" ${cmd} && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/aclocal.m4 && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/Makefile.in && ${CMAKE_COMMAND} -E touch_nocreate ../hwloc/configure && ${CMAKE_COMMAND} -E touch_nocreate config.status
+            )
+        endif ()
+        ExternalProject_Get_Property(hwloc SOURCE_DIR BINARY_DIR)
+        set(HWLOC_hwloc_LIBRARY "${BINARY_DIR}/hwloc/.libs/libhwloc_embedded.a")
+        unset(pkgcfg_lib_HWLOC_hwloc)
+        target_include_directories(hw_detect PRIVATE "${BINARY_DIR}/include" "${SOURCE_DIR}/include")
+        add_custom_command(TARGET hwloc POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove_directory ${SOURCE_DIR}/utils/lstopo
+                VERBATIM)
+        add_dependencies(hw_detect hwloc)
+        target_link_libraries(hw_detect PRIVATE "${BINARY_DIR}/hwloc/.libs/libhwloc_embedded.a")
+    endif ()
+    if (APPLE)
+        set(HWLOC_FRAMEWORKS "-framework Foundation" "-framework IOKit" "-framework OpenCL")
+    endif ()
+endmacro()
