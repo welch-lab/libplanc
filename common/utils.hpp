@@ -3,6 +3,7 @@
 // utility functions
 
 #include <stack>
+#include <memory>
 #include "utils.h"
 
 static uint64_t powersof10[16] = {
