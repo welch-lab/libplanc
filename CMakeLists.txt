@@ -249,3 +249,24 @@ else()
     install(FILES ${nmf_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nmf)
     install(FILES ${nnls_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nnls)
 endif()
+if(BUILD_BENCH)
+    include(FetchContent)
+    FetchContent_Declare(
+            fast_matrix_market
+            GIT_REPOSITORY https://github.com/alugowski/fast_matrix_market
+            GIT_TAG main
+            GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(fast_matrix_market)
+    add_executable(planc_bench bench/planc_bench.cpp)
+    target_sources(planc_bench PUBLIC FILE_SET bench TYPE HEADERS BASE_DIRS bench
+            FILES bench/planc_bench.hpp)
+    set_target_properties(planc_bench PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS ON)
+    target_link_libraries(planc_bench nmflib fast_matrix_market::fast_matrix_market)
+
+    install(TARGETS planc_bench
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+
+endif()
