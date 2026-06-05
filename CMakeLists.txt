@@ -63,7 +63,7 @@ target_sources(nmflib PUBLIC FILE_SET nmf TYPE HEADERS BASE_DIRS nmf
         nmf/gnsym.hpp nmf/hals.hpp nmf/mu.hpp nmf/NMFDriver.hpp nmf/onlineinmf.hpp nmf/uinmf.hpp)
 set(NNLS_SRC ${PROJECT_SOURCE_DIR}/nnls)
 set(NMF_SOURCE_DIR ${PROJECT_SOURCE_DIR}/nmf)
-
+option(BUILD_EXECUTABLE OFF)
 if (BUILD_EXECUTABLE)
     add_executable(plancnmf nmf/nmf_cmd.cpp)
     find_package(argparse REQUIRED)
@@ -249,6 +249,7 @@ else()
     install(FILES ${nmf_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nmf)
     install(FILES ${nnls_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libplanc/nnls)
 endif()
+option(BUILD_BENCH OPTION OFF)
 if(BUILD_BENCH)
     include(FetchContent)
     FetchContent_Declare(
