@@ -1,17 +1,13 @@
-#include <stdio.h>
-#include <string>
 #include "planc_bench.hpp"
-#include "bppnnls.hpp"
-#include <fast_matrix_market/fast_matrix_market.hpp>
+#include <cstdio>
 #include <iostream>
-#include <vector>
-#include "nmf.hpp"
 #include <omp.h>
 #include <string>
-#include <algorithm>
-#include <cstddef>
 #include <vector>
+#include <fast_matrix_market/fast_matrix_market.hpp>
 #include "bm.hpp"
+#include "bppnnls.hpp"
+#include "nmf.hpp"
 
 
 namespace planc {
