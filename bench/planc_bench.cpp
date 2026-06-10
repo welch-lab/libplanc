@@ -50,6 +50,7 @@ namespace planc {
         B.reshape(headerB.nrows, headerB.ncols);
         arma::mat A(Bmem);
         double t2 = toc();
+        params.setMK(B.n_rows);
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
             << "(" << t2 << " s)" << std::endl;
         return std::make_pair(A, B);
@@ -68,10 +69,10 @@ namespace planc {
                 this->pairvar = loadBenchDense(params);
             }
         }
-        nnlsOutput runBench(std::variant<nnlslib<arma::sp_mat>, nnlslib<arma::mat>> libstate) {
+        arma::mat runBench(std::variant<nnlslib<arma::sp_mat>, nnlslib<arma::mat>> libstate) {
             auto unpackvar = std::visit([](auto &&arg) -> std::variant<arma::sp_mat, arma::mat> {return arg.first;}, this->pairvar);
             arma::mat unpackstat = std::visit([](auto &&arg) -> arma::mat {return arg.second;}, this->pairvar);
-            auto functor = [this, unpackstat, unpackvar](auto& arg) -> nnlsOutput {return arg.runbppnnls(unpackstat, unpackvar, this->instanceParams.n_cores());};
+            auto functor = [this, unpackstat, unpackvar](auto& arg) -> arma::mat {return arg.runbppnnls(unpackstat, unpackvar, this->instanceParams.n_cores());};
             return std::visit(functor, libstate);
         }
 
@@ -123,14 +124,6 @@ namespace planc {
                                                                           }
                                                                       },
                                                                       100 /* iterations */);
-
-            for (const auto& record : mySession.records)
-            {
-                auto name = record.name;
-                auto mean = record.mean();
-                auto variance = record.variance();
-                auto standard_deviation = record.standard_deviation();
-            }
             mySession.to_csv("outbench.csv");
             fflush(stdout);
         }
