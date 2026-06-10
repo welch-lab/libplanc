@@ -117,7 +117,7 @@ namespace planc {
             }
         }
 
-        normtype getMInputNormalization() const {
+        [[nodiscard]] normtype getMInputNormalization() const {
             return m_input_normalization;
         }
 
@@ -129,11 +129,11 @@ namespace planc {
             m_symm_flag = msymmflag;
         }
 
-        int getMSymmFlag() const {
+        [[nodiscard]] int getMSymmFlag() const {
             return m_symm_flag;
         }
 
-        bool isMComputeError() const {
+        [[nodiscard]] bool isMComputeError() const {
             return m_compute_error;
         }
 
@@ -149,7 +149,7 @@ namespace planc {
             m_num_it = mNumIt;
         }
 
-        int getMNumKBlocks() const {
+        [[nodiscard]] int getMNumKBlocks() const {
             return m_num_k_blocks;
         }
 
@@ -157,7 +157,7 @@ namespace planc {
             m_num_k_blocks = mNumKBlocks;
         }
 
-        bool isMDimTree() const {
+        [[nodiscard]] bool isMDimTree() const {
             return m_dim_tree;
         }
 
@@ -189,7 +189,7 @@ namespace planc {
             m_outputfile_name = mOutputfileName;
         }
 
-        const std::string& getMSfileName() const {
+        [[nodiscard]] const std::string& getMSfileName() const {
             return m_Sfile_name;
         }
 
@@ -197,7 +197,7 @@ namespace planc {
             m_Sfile_name = mSfileName;
         }
 
-        virtual const std::string& getMHInitFileName() const {
+        [[nodiscard]] virtual const std::string& getMHInitFileName() const {
             return m_h_init_file_name;
         }
 
@@ -205,7 +205,7 @@ namespace planc {
             m_h_init_file_name = mHInitFileName;
         }
 
-        virtual const std::string& getMWInitFileName() const {
+        [[nodiscard]] virtual const std::string& getMWInitFileName() const {
             return M_W_init_file_name;
         }
 
@@ -221,7 +221,7 @@ namespace planc {
             m_k = mK;
         }
 
-        arma::uword getMGlobalm() const {
+        [[nodiscard]] arma::uword getMGlobalm() const {
             return m_globalm;
         }
 
@@ -229,7 +229,7 @@ namespace planc {
             m_globalm = mGlobalm;
         }
 
-        arma::uword getMGlobaln() const {
+        [[nodiscard]] arma::uword getMGlobaln() const {
             return m_globaln;
         }
 
@@ -237,7 +237,7 @@ namespace planc {
             m_globaln = mGlobaln;
         }
 
-        int getMInitseed() const {
+        [[nodiscard]] int getMInitseed() const {
             return m_initseed;
         }
 
@@ -245,7 +245,7 @@ namespace planc {
             m_initseed = mInitseed;
         }
 
-        const arma::fvec& getMRegW() const {
+        [[nodiscard]] const arma::fvec& getMRegW() const {
             return m_regW;
         }
 
@@ -253,7 +253,7 @@ namespace planc {
             m_regW = mRegW;
         }
 
-        const arma::fvec& getMRegH() const {
+        [[nodiscard]] const arma::fvec& getMRegH() const {
             return m_regH;
         }
 
@@ -261,7 +261,7 @@ namespace planc {
             m_regH = mRegH;
         }
 
-        float getMSparsity() const {
+        [[nodiscard]] float getMSparsity() const {
             return m_sparsity;
         }
 
@@ -269,7 +269,7 @@ namespace planc {
             m_sparsity = mSparsity;
         }
 
-        int getMPr() const {
+        [[nodiscard]] int getMPr() const {
             return m_pr;
         }
 
@@ -277,7 +277,7 @@ namespace planc {
             m_pr = mPr;
         }
 
-        int getMPc() const {
+        [[nodiscard]] int getMPc() const {
             return m_pc;
         }
 
@@ -293,7 +293,7 @@ namespace planc {
             m_symm_reg = mSymmReg;
         }
 
-        double getMTolerance() const {
+        [[nodiscard]] double getMTolerance() const {
             return m_tolerance;
         }
 
@@ -301,7 +301,7 @@ namespace planc {
             m_tolerance = mTolerance;
         }
 
-        int getMNumModes() const {
+        [[nodiscard]] int getMNumModes() const {
             return m_num_modes;
         }
 
@@ -309,7 +309,7 @@ namespace planc {
             m_num_modes = mNumModes;
         }
 
-        const arma::uvec& getMDimensions() const {
+        [[nodiscard]] const arma::uvec& getMDimensions() const {
             return m_dimensions;
         }
 
@@ -317,7 +317,7 @@ namespace planc {
             m_dimensions = mDimensions;
         }
 
-        const arma::uvec& getMProcGrids() const {
+        [[nodiscard]] const arma::uvec& getMProcGrids() const {
             return m_proc_grids;
         }
 
@@ -325,7 +325,7 @@ namespace planc {
             m_proc_grids = mProcGrids;
         }
 
-        const arma::fvec& getMRegularizers() const {
+        [[nodiscard]] const arma::fvec& getMRegularizers() const {
             return m_regularizers;
         }
 
@@ -333,7 +333,7 @@ namespace planc {
             m_regularizers = mRegularizers;
         }
 
-        int getMMaxLuciters() const {
+        [[nodiscard]] int getMMaxLuciters() const {
             return m_max_luciters;
         }
 
@@ -341,7 +341,7 @@ namespace planc {
             m_max_luciters = mMaxLuciters;
         }
 
-        int getMNumNodes() const {
+        [[nodiscard]] int getMNumNodes() const {
             return m_num_nodes;
         }
 
@@ -349,7 +349,7 @@ namespace planc {
             m_num_nodes = mNumNodes;
         }
 
-        double getAlpha() const {
+        [[nodiscard]] double getAlpha() const {
             return alpha;
         }
 
@@ -357,7 +357,7 @@ namespace planc {
             params::alpha = alpha;
         }
 
-        double getBeta() const {
+        [[nodiscard]] double getBeta() const {
             return beta;
         }
 
@@ -365,7 +365,7 @@ namespace planc {
             params::beta = beta;
         }
 
-        int getFeatType() const {
+        [[nodiscard]] int getFeatType() const {
             return feat_type;
         }
 
@@ -373,7 +373,7 @@ namespace planc {
             feat_type = featType;
         }
 
-        int getConnType() const {
+        [[nodiscard]] int getConnType() const {
             return conn_type;
         }
 
@@ -381,7 +381,7 @@ namespace planc {
             conn_type = connType;
         }
 
-        double getMGamma() const {
+        [[nodiscard]] double getMGamma() const {
             return m_gamma;
         }
 
@@ -389,7 +389,7 @@ namespace planc {
             m_gamma = mGamma;
         }
 
-        int getMUnpartitioned() const {
+        [[nodiscard]] int getMUnpartitioned() const {
             return m_unpartitioned;
         }
 
@@ -397,7 +397,7 @@ namespace planc {
             m_unpartitioned = mUnpartitioned;
         }
 
-        const arma::uvec& getMConnGrids() const {
+        [[nodiscard]] const arma::uvec& getMConnGrids() const {
             return m_conn_grids;
         }
 
@@ -405,7 +405,7 @@ namespace planc {
             m_conn_grids = mConnGrids;
         }
 
-        int getMCpr() const {
+        [[nodiscard]] int getMCpr() const {
             return m_cpr;
         }
 
@@ -413,7 +413,7 @@ namespace planc {
             m_cpr = mCpr;
         }
 
-        int getMCpc() const {
+        [[nodiscard]] int getMCpc() const {
             return m_cpc;
         }
 

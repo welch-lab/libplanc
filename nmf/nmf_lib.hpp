@@ -33,7 +33,7 @@ namespace planc {
 
         arma::Mat<eT> outW;
         arma::Mat<eT> outH;
-        double objErr;
+        double objErr{};
     };
 
     template<typename eT>
@@ -45,7 +45,7 @@ namespace planc {
         arma::Mat<eT> outW;
         std::vector<arma::Mat<eT>> outHList;
         std::vector<arma::Mat<eT>> outVList;
-        double objErr;
+        double objErr{};
     };
 
     template<typename eT>

@@ -4,18 +4,17 @@
 #include <argparse/argparse.hpp>
 #include <armadillo>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include "plancopts.h"
 #include "parsecommandline.h"
 
 namespace planc {
-class ParseCommandLine : argparse::ArgumentParser {
+class ParseCommandLine : public argparse::ArgumentParser {
  protected:
     params* clStruct = new params;
     bool parsed = false;
 
-    void parseDimArray() {
+    void parseDimArray() const {
         // debug_hook();
         if (clStruct->m_num_modes == 0) {
             for (int i = 0; i < this->clStruct->m_dimensions.size(); ++i) {
@@ -28,13 +27,11 @@ class ParseCommandLine : argparse::ArgumentParser {
         }
     }
  public:
-  /**
-   * Constructor that takes the number of arguments and the
-   * command line parameters.
-   * @param[in] argc - number of arguments
-   * @param[in] **argv - command line parameters.
+    ~ParseCommandLine() = default;
+    /**
+   * Argparse constructor.
    */
-  ParseCommandLine() : argparse::ArgumentParser("planc") {
+  ParseCommandLine() : ArgumentParser("planc") {
       this->add_argument("-h", "--help")
             .flag();
       // call print_usage
@@ -198,7 +195,7 @@ class ParseCommandLine : argparse::ArgumentParser {
 
   /// print the configuration received through the command line paramters
 
-  void printConfig(int opt = 0) {
+  void printConfig(int opt = 0) const {
     switch (opt) {
       case JOINTNMF:
         INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
@@ -259,7 +256,7 @@ class ParseCommandLine : argparse::ArgumentParser {
     }
   }
 
-  void print_usage(int opt = 0) {
+  static void print_usage(int opt = 0) {
     switch (opt) {
       case JOINTNMF:
         INFO << std::endl;
@@ -491,105 +488,105 @@ class ParseCommandLine : argparse::ArgumentParser {
     }
   }
   /// returns the low rank. Passed as parameter --lowrank or -k
-  arma::uword lowrankk() { return clStruct->m_k; }
+  arma::uword lowrankk() const { return clStruct->m_k; }
   /// return global rows. Passed as parameter -d
-  arma::uword globalm() { return clStruct->m_globalm; }
+  arma::uword globalm() const { return clStruct->m_globalm; }
   //// returns the global columns. Passed as parameter -d
-  arma::uword globaln() { return clStruct->m_globaln; }
+  arma::uword globaln() const { return clStruct->m_globaln; }
   /**
    * L2 regularization as the first parameter and L1 as second
    * for left lowrank factor W. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
    */
-  arma::fvec regW() { return clStruct->m_regW; }
+  arma::fvec regW() const { return clStruct->m_regW; }
   /**
    * L2 regularization as the first parameter and L1 as second
    * for right lowrank factor H. Passed as parameter --regularizer
    * with pair of values in double quotes for W and H "l2W l1W l2H l1H"
    */
-  arma::fvec regH() { return clStruct->m_regH; }
+  arma::fvec regH() const { return clStruct->m_regH; }
   /// Returns the NMF algorithm to run. Passed as parameter --algo or -a
-  algotype lucalgo() { return clStruct->m_lucalgo; }
+  algotype lucalgo() const { return clStruct->m_lucalgo; }
   /**
    *  Returns the process grid configuration.
    * Passed as parameter --processors or -p
    */
 
-  arma::uvec processor_grids() { return clStruct->m_proc_grids; }
+  arma::uvec processor_grids() const { return clStruct->m_proc_grids; }
   /**
    * Returns the vector regularizers for all the modes.
    * It will 2 times the mode values. The first entry is
    * L2 regularization and second value is L1 for every mode.
    * Passed as parameter --regularizers "L2 L1" for every mode.
    */
-  arma::fvec regularizers() { return clStruct->m_regularizers; }
+  arma::fvec regularizers() const { return clStruct->m_regularizers; }
   /**
    *  Returns vector of dimensions for every mode.
    * Passed as parameter -d or --dimensions
    */
-  arma::uvec dimensions() { return clStruct->m_dimensions; }
-  int num_k_blocks() { return clStruct->m_num_k_blocks; }
+  arma::uvec dimensions() const { return clStruct->m_dimensions; }
+  int num_k_blocks() const { return clStruct->m_num_k_blocks; }
   /// Returns number of iterations. passed as -t or --iter
-  int iterations() { return clStruct->m_num_it; }
+  int iterations() const { return clStruct->m_num_it; }
   /// Returns error tolerance for stopping NMF iterations. Passed as -l or --tolerance
-  double tolerance() { return clStruct->m_tolerance; }
+  double tolerance() const { return clStruct->m_tolerance; }
   /// Returns number of nodes to compute in a H2NMF tree. Passed as -n or --nodes
-  int nodes() { return clStruct->m_num_nodes; }
+  int nodes() const { return clStruct->m_num_nodes; }
   /// Input parameter for generating sparse matrix. Passed as -s or --sparsity
-  float sparsity() { return clStruct->m_sparsity; }
+  float sparsity() const { return clStruct->m_sparsity; }
   /// Returns input file name. Passed as -i or --input
   std::string input_file_name() { return clStruct->m_Afile_name; }
   /// Returns connection file name. Passed as -c or --connection_matrix
-  std::string conn_file_name() { return clStruct->m_Sfile_name; }
+  std::string conn_file_name() const { return clStruct->m_Sfile_name; }
   /**
    * Returns output file name. Passed as -o or --output.
    * Every mode will appended as _mode.
    */
-  std::string output_file_name() { return clStruct->m_outputfile_name; }
+  std::string output_file_name() const { return clStruct->m_outputfile_name; }
   /**
    * Returns the number of processor rows.
    * Used for distributed NMF. The first parameter of -p.
    */
-  int pr() { return clStruct->m_pr; }
+  int pr() const { return clStruct->m_pr; }
     /**
    * Returns the number of processor columns.
    * Used for distributed NMF. The second parameter of -p.
    */
-  int pc() { return clStruct->m_pc; }
+  int pc() const { return clStruct->m_pc; }
   /// Getter functions for the second grid (JointNMF)
-  int cpr() { return clStruct->m_cpr; }
-  int cpc() { return clStruct->m_cpc; }
+  int cpr() const { return clStruct->m_cpr; }
+  int cpc() const { return clStruct->m_cpc; }
   /// Returns number of modes in tensors. For matrix it is two.
-  int num_modes() { return clStruct->m_num_modes; }
+  int num_modes() const { return clStruct->m_num_modes; }
   /**
    * Enable dimension tree or not. By default we use dimension trees
    * for more than three modes. Passed as parameter --dimtree 1
    */
-  bool dim_tree() { return clStruct->m_dim_tree; }
+  bool dim_tree() const { return clStruct->m_dim_tree; }
   /**
    * Enable adjusting random matrix creationg by using a pointwise
    * non-linear function. X(i,j) = ceil(alpha*X(i,j) + beta)
    */
-  bool adj_rand() { return clStruct->m_adj_rand; }
+  bool adj_rand() const { return clStruct->m_adj_rand; }
   /// Returns whether to compute error not. Passed as parameter -e or --error
-  bool compute_error() { return clStruct->m_compute_error; }
+  bool compute_error() const { return clStruct->m_compute_error; }
   /// To column normalize the input matrix.
-  normtype input_normalization() { return clStruct->m_input_normalization; }
+  normtype input_normalization() const { return clStruct->m_input_normalization; }
   /// Returns the value of the symmetric regularizer
-  double symm_reg() { return clStruct->m_symm_reg; }
+  double symm_reg() const { return clStruct->m_symm_reg; }
   /// return the maximum number of CG iterations to take
-  int max_luciters() { return clStruct->m_max_luciters; }
+  int max_luciters() const { return clStruct->m_max_luciters; }
   /// Initialisation seed for starting point of W, H matrices
-  int initseed() { return clStruct->m_initseed; }
+  int initseed() const { return clStruct->m_initseed; }
   // JointNMF parameters
-  double joint_alpha() { return clStruct->alpha; }
+  double joint_alpha() const { return clStruct->alpha; }
   // JointNMF parameters
-  double joint_beta() { return clStruct->beta; }
+  double joint_beta() const { return clStruct->beta; }
   // PGD momentum parameters
-  double gamma() { return clStruct->m_gamma; }
-  double unpartitioned() { return clStruct->m_unpartitioned; }
-  bool feat_typesity() { return clStruct->feat_type; }
-  bool conn_typesity() { return clStruct->conn_type; }
+  double gamma() const { return clStruct->m_gamma; }
+  double unpartitioned() const { return clStruct->m_unpartitioned; }
+  bool feat_typesity() const { return clStruct->feat_type; }
+  bool conn_typesity() const { return clStruct->conn_type; }
 
   params getPlancParams(int l_argv, const char * const *l_argc) {
       if (!this->parsed) {
