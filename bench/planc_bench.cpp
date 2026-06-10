@@ -62,10 +62,10 @@ namespace planc {
     public:
         planc_bench(const params& params, const argparse::ArgumentParser&type_args) {
             this->instanceParams = params;
-            if (type_args.get<bool>("sparse")) {
+            if (type_args.get<std::string>("type") == "sparse") {
                 this->pairvar = loadBenchSparse(params);
             }
-            else if (type_args.get<bool>("dense")) {
+            else if (type_args.get<std::string>("type") == "dense") {
                 this->pairvar = loadBenchDense(params);
             }
         }
@@ -92,14 +92,14 @@ namespace planc {
     {
         try
         {   argparse::ArgumentParser type_args;
-            type_args.add_argument("sparse");
-            type_args.add_argument("dense");
+            type_args.add_argument("type")
+            .choices("dense", "sparse");
             auto secondary_args = type_args.parse_known_args(argc, argv);
             std::variant<planc::nnlslib<arma::sp_mat>, planc::nnlslib<arma::mat>> libstate{};
-            if (type_args.get<bool>("sparse")) {
+            if (type_args.get<std::string>("type") == "sparse") {
                 libstate = planc::nnlslib<arma::sp_mat>();
             }
-            else if (type_args.get<bool>("dense")) {
+            else if (type_args.get<std::string>("type") == "dense") {
                 libstate = planc::nnlslib<arma::mat>();
             }
             planc::BenchParseCommandLine bpc;
