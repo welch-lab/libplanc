@@ -163,8 +163,11 @@ class ParseCommandLine : public BaseParser {
               .default_value(1)
               .scan<'i', int>()
               .help("numkblocks");
+      this->add_argument("type").choices("dense", "sparse")
+      .required();
   }
     void initClStruct() const override {
+      clStruct->m_type = matrixmap.at(this->get("type"));
       clStruct->m_lucalgo = algomap[this->get("-a")];
       clStruct->m_input_normalization = normmap[this->get("--input_normalization")];
       clStruct->feat_type = this->get("--mat_type")[0];

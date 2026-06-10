@@ -33,3 +33,5 @@ std::unordered_map<std::string, algotype> symmap{
         {"gnsym", GNSYM}
     };
 std::unordered_map<std::string, normtype> normmap{{"NONE", NONE}, {"L2NORM", L2NORM}, {"MAXNORM", MAXNORM}};
+
+std::unordered_map<std::string, matrixtype> matrixmap{{"dense", DENSE}, {"sparse", SPARSE}};

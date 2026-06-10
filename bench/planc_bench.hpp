@@ -46,14 +46,19 @@ namespace planc {
                                 .help("output");
                         this->add_argument("-n", "--cores")
                                 .default_value(1)
+                                .scan<'i', int>()
                                 .help("number of parallel cores");
+                        this->add_argument("type").choices("dense", "sparse")
+                        .required();
                 }
                 void initClStruct() const override {
+                        clStruct->m_type = matrixmap.at(this->get("type"));
                         clStruct->m_compute_error = this->get<bool>("-e");
                         clStruct->m_num_it = this->get<int>("-t");
                         clStruct->m_k = this->get<int>("-k");
                         clStruct->m_Afile_name = this->get("-i");
                         clStruct->m_outputfile_name = this->get("-o");
+                        clStruct->set_n_cores(this->get<int>("-n"));
                         //clStruct->m_initseed = this->get<int>("--seed");
                 }
                 //void printConfig() const override {};

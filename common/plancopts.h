@@ -11,7 +11,7 @@ namespace planc {
     struct params {
         virtual ~params() = default;
 
-        params() {
+        params() : m_type() {
             // common to all algorithms.
             this->nCores = 0;
             this->m_lucalgo = ANLSBPP;
@@ -459,6 +459,15 @@ namespace planc {
         arma::uvec m_conn_grids;
         int m_cpr{};
         int m_cpc{};
+        matrixtype m_type;
+
+        [[nodiscard]] matrixtype get_m_type() const {
+            return m_type;
+        }
+
+        void set_m_type(const matrixtype& mtype) {
+            this->m_type = mtype;
+        }
     };
 
     template<typename T>

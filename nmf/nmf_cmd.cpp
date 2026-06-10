@@ -5,17 +5,13 @@
 int main(int argc, char *argv[]) {
 //  try {
 
-    argparse::ArgumentParser type_args;
-    type_args.add_argument("type")
-    .choices("dense", "sparse");
-    auto secondary_args = type_args.parse_known_args(argc, argv);
-    planc::ParseCommandLine dnd;
+    planc::ParseCommandLine args;
     std::variant<planc::nmflib<arma::sp_mat>, planc::nmflib<arma::mat>> libstate{};
-    planc::params params = dnd.getPlancParams(secondary_args);
-    if (type_args.get<std::string>("type") == "sparse") {
+    planc::params params = args.getPlancParams({argv, argv + argc});
+    if (params.m_type == SPARSE) {
         libstate = planc::nmflib<arma::sp_mat>();
     }
-    else if (type_args.get<std::string>("type") == "dense") {
+    else if (params.m_type == DENSE) {
         libstate = planc::nmflib<arma::mat>();
     }
     auto functor = [params](auto& arg) -> int {return arg.runNMF(params);};

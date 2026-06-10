@@ -14,6 +14,8 @@ extern "C" {
 // #define _VERBOSE 1
 // #endif
 
+enum matrixtype {DENSE, SPARSE};
+
 enum algotype {
     MU, HALS, ANLSBPP, NAIVEANLSBPP, AOADMM,
     NESTEROV, CPALS, GNSYM, R2, PGD, PGNCG

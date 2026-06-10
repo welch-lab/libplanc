@@ -60,12 +60,12 @@ namespace planc {
         std::variant<std::pair<arma::sp_mat, arma::mat>, std::pair<arma::mat, arma::mat>> pairvar;
         params instanceParams;
     public:
-        planc_bench(const params& params, const argparse::ArgumentParser&type_args) {
+        planc_bench(const params& params) {
             this->instanceParams = params;
-            if (type_args.get<std::string>("type") == "sparse") {
+            if (this->instanceParams.m_type == SPARSE) {
                 this->pairvar = loadBenchSparse(params);
             }
-            else if (type_args.get<std::string>("type") == "dense") {
+            else if (this->instanceParams.m_type == DENSE) {
                 this->pairvar = loadBenchDense(params);
             }
         }
@@ -91,19 +91,17 @@ namespace planc {
     int main(int argc, char *argv[])
     {
         try
-        {   argparse::ArgumentParser type_args;
-            type_args.add_argument("type")
-            .choices("dense", "sparse");
-            auto secondary_args = type_args.parse_known_args(argc, argv);
+        {
+            planc::BenchParseCommandLine args;
             std::variant<planc::nnlslib<arma::sp_mat>, planc::nnlslib<arma::mat>> libstate{};
-            if (type_args.get<std::string>("type") == "sparse") {
+            planc::params initialparams = args.getPlancParams({argv, argv + argc});
+            if (initialparams.m_type == SPARSE) {
                 libstate = planc::nnlslib<arma::sp_mat>();
             }
-            else if (type_args.get<std::string>("type") == "dense") {
+            else if (initialparams.m_type == DENSE) {
                 libstate = planc::nnlslib<arma::mat>();
             }
             planc::BenchParseCommandLine bpc;
-            const planc::params initialparams = bpc.getPlancParams(secondary_args);
             std::vector<planc::planc_bench> pbvec;
             for(std::string prefix : planc::prefixes) {
                 planc::params paramCopy = initialparams;
@@ -111,7 +109,7 @@ namespace planc {
                 std::string dense = prefix + ".h5.dense.mtx";
                 paramCopy.setMAfileName(sparse);
                 paramCopy.setMBFileName(dense);
-                planc::planc_bench dnd(paramCopy, type_args);
+                planc::planc_bench dnd(paramCopy);
                 pbvec.push_back(dnd);
             }
             const bm::session<float> mySession = bm::run<float, std::milli>([&pbvec, libstate](auto&recorder) {
