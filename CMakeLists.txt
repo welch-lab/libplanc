@@ -259,7 +259,7 @@ if(BUILD_BENCH)
             GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(fast_matrix_market)
-    add_executable(planc_bench bench/planc_bench.cpp)
+    add_executable(planc_bench bench/planc_bench.cpp common/utils.cpp)
     target_sources(planc_bench PUBLIC FILE_SET bench TYPE HEADERS BASE_DIRS bench
             FILES bench/planc_bench.hpp)
     set_target_properties(planc_bench PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS ON)

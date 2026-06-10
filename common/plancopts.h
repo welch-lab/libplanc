@@ -86,6 +86,7 @@ namespace planc {
 
         // file names
         std::string m_Afile_name; // X (features) matrix for jointnmf
+        std::string m_Bfile_name;
         std::string m_outputfile_name;
         std::string m_Sfile_name; // S (connection) matrix for jointnmf
         std::string m_h_init_file_name;
@@ -181,7 +182,15 @@ namespace planc {
             m_Afile_name = mAfileName;
         }
 
-        virtual const std::string& getMOutputfileName() const {
+        [[nodiscard]] virtual const std::string& getMBfileName() const {
+            return m_Bfile_name;
+        }
+
+        void setMBFileName(const std::string&m_bfile_name) {
+            m_Bfile_name = m_bfile_name;
+        }
+
+        [[nodiscard]] virtual const std::string& getMOutputfileName() const {
             return m_outputfile_name;
         }
 

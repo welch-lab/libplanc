@@ -5,7 +5,8 @@
 #ifndef NNLS_LIB_H
 #define NNLS_LIB_H
 
-#include "../nmf/nmf_lib.hpp"
+#include <nmf_lib.hpp>
+#include <variant>
 
 namespace planc {
 
@@ -20,7 +21,9 @@ public:
     ~nnlslib() = default;
 
 
-    static arma::mat runbppnnls(const arma::mat &C, const T &B, const int &ncores);
+        static arma::mat runbppnnls(const arma::mat &C, const T &B, const int &ncores);
+
+        static arma::mat runbppnnls(const arma::mat &C, const std::variant<arma::sp_mat, arma::mat> &B, const int &ncores);
 
     static arma::mat bppnnls_prod(const arma::mat &CtC, const arma::mat &CtB, const int& nCores = 2);
 

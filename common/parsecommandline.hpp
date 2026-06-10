@@ -118,10 +118,10 @@ class ParseCommandLine : public argparse::ArgumentParser {
       this->add_argument("-o", "--output")
               .default_value("")
               .help("output");
-      //this->add_argument("-j", "--input2")
-      //        .default_value("")
-      //        .help("input 2");
-      //clStruct->m_Bfile_name = this->get("-j");
+      this->add_argument("-j", "--input2")
+              .default_value("")
+              .help("input 2");
+      clStruct->m_Bfile_name = this->get("-j");
       this->add_argument("--seed")
               .default_value(193957)
               .scan<'i', int>()
@@ -146,7 +146,10 @@ class ParseCommandLine : public argparse::ArgumentParser {
               .scan<'i', int>()
               .help("numkblocks");
   }
-  void initClStruct() {
+
+    explicit ParseCommandLine(const char* str) : ArgumentParser(str) {}
+
+    void initClStruct() const {
       clStruct->m_lucalgo = algomap[this->get("-a")];
       clStruct->m_input_normalization = normmap[this->get("--input_normalization")];
       clStruct->feat_type = this->get("--mat_type")[0];
@@ -535,7 +538,9 @@ class ParseCommandLine : public argparse::ArgumentParser {
   /// Input parameter for generating sparse matrix. Passed as -s or --sparsity
   float sparsity() const { return clStruct->m_sparsity; }
   /// Returns input file name. Passed as -i or --input
-  std::string input_file_name() { return clStruct->m_Afile_name; }
+  std::string input_file_name() const { return clStruct->m_Afile_name; }
+  std::string input_file_name_2() const { return clStruct->m_Bfile_name; }
+
   /// Returns connection file name. Passed as -c or --connection_matrix
   std::string conn_file_name() const { return clStruct->m_Sfile_name; }
   /**

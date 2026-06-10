@@ -1,79 +1,21 @@
 #include "planc_bench.hpp"
 #include <cstdio>
 #include <iostream>
-#include <omp.h>
 #include <string>
 #include <vector>
+#include <utility>
 #include <fast_matrix_market/fast_matrix_market.hpp>
 #include "bm.hpp"
-#include "bppnnls.hpp"
-#include "nmf.hpp"
+#include "nnls_lib.hpp"
+#include "utils.hpp"
 
 
 namespace planc {
-
-class planc_bench
-{
-private:
-    /* data */
-    int p_argc;
-    char **p_argv;
-    int m_k;
-    arma::uword m_m, m_n;
-    int m_num_it;
-    int m_num_nodes;
-    std::string m_Afile_name;
-    std::string m_Bfile_name;
-    std::string m_outputfile_name;
-    bool m_compute_error;
-    int m_num_k_blocks;
-    float m_sparsity;
-    PAIRMAT loadedPair;
-    arma::mat outmat;
-    arma::mat* outmatptr;
-    template<class NNLSTYPE>
-    void callNNLS() {
-        double tben;
-        #ifdef BUILD_SPARSE
-        arma::sp_mat A = std::get<0>(loadedPair);
-        #else // ifdef BUILD_SPARSE
-        arma::mat A = std::get<0>(loadedPair);
-        #endif
-        arma::mat B = std::get<1>(loadedPair);
-        unsigned int numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
-        double start = omp_get_wtime();
-        #pragma omp parallel for schedule(auto)
-        for (unsigned int i = 0; i < numChunks; i++)
-        {
-            unsigned int spanStart = i * ONE_THREAD_MATRIX_SIZE;
-            unsigned int spanEnd = (i + 1) * ONE_THREAD_MATRIX_SIZE - 1;
-            if (spanEnd > m_n - 1)
-            {
-                spanEnd = m_n - 1;
-            }
-            // double start = omp_get_wtime();
-            BPPNNLS<arma::mat, arma::vec> solveProblem(B.t(), (arma::mat)A.cols(spanStart, spanEnd));
-            solveProblem.solveNNLS();
-            // double end = omp_get_wtime();
-            // titer = end - start;
-            //#ifdef _VERBOSE
-            // INFO << " start=" << spanStart
-            //     << ", end=" << spanEnd
-            //     << ", tid=" << omp_get_thread_num() << " cpu=" << sched_getcpu() << std::endl;
-            //     // << " time taken=" << titer << std::endl;
-            //#endif
-            (*outmatptr).rows(spanStart, spanEnd) = solveProblem.getSolutionMatrix().t();
-        };
-        double end = omp_get_wtime();
-        tben = end - start;
-        INFO << " total nnls runtime=" << tben << std::endl;
-    }
-    void loadNNLS() {
-        #ifdef BUILD_SPARSE
+    std::pair<arma::sp_mat, arma::mat> loadBenchSparse(params params) {
         double t2;
         tic();
         fast_matrix_market::matrix_market_header headerA;
-        std::ifstream ifsA(this->m_Afile_name);
+        std::ifstream ifsA(params.getMAfileName());
         std::vector<arma::uword> rowA;
         std::vector<arma::uword> colA;
         std::vector<double> valueA;
@@ -83,12 +25,9 @@ private:
         arma::umat ucoo = join_rows(urowa, ucola).t();
         arma::Col uvala(valueA);
         arma::sp_mat A(ucoo, uvala, headerA.nrows, headerA.ncols);
-        #else
-        arma::mat A;
-        #endif
         // Read data matrices
         fast_matrix_market::matrix_market_header headerB;
-        std::ifstream ifs(this->m_Bfile_name);
+        std::ifstream ifs(params.getMBfileName());
         std::vector<double> Bmem;
         fast_matrix_market::read_matrix_market_array(ifs, headerB, Bmem);
         arma::mat B(Bmem);
@@ -96,90 +35,108 @@ private:
         t2 = toc();
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
             << "(" << t2 << " s)" << std::endl;
-        this->loadedPair = std::make_pair(A, B);
-        this->m_n = B.n_cols;
-        this->m_m = A.n_cols;
-        this->m_k = B.n_rows;
-        this->outmat = arma::randu<arma::mat>(this->m_m, this->m_k);
-    };
-        void nnlsParseCommandLine()
-        {
-            NnlsParseCommandLine npc(p_argc, p_argv);
-            npc.parseplancopts();
-            this->m_k = npc.lowrankk();
-            this->m_Afile_name = npc.input_file_name();
-            this->m_Bfile_name = npc.input_file_name_2();
-            this->m_num_it = npc.iterations();
-            this->m_compute_error = npc.compute_error();
-#ifdef BUILD_SPARSE
-            loadNNLS();
-#else // ifdef BUILD_SPARSE
-            callNNLS<BPPNNLS<arma::mat, arma::mat>>();
-#endif
-        }
+        params.setMK(B.n_rows);
+        return std::make_pair(A, B);
+    }
 
+    std::pair<arma::mat, arma::mat> loadBenchDense(params params) {
+        tic();
+        // Read data matrices
+        fast_matrix_market::matrix_market_header headerB;
+        std::ifstream ifs(params.m_Bfile_name);
+        std::vector<double> Bmem;
+        fast_matrix_market::read_matrix_market_array(ifs, headerB, Bmem);
+        arma::mat B(Bmem);
+        B.reshape(headerB.nrows, headerB.ncols);
+        arma::mat A(Bmem);
+        double t2 = toc();
+        INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
+            << "(" << t2 << " s)" << std::endl;
+        return std::make_pair(A, B);
+    }
+
+    class planc_bench {
+        std::variant<std::pair<arma::sp_mat, arma::mat>, std::pair<arma::mat, arma::mat>> pairvar;
+        params instanceParams;
     public:
-        void call_NNLS() {
-            callNNLS<BPPNNLS<arma::sp_mat, arma::mat>>();
+        planc_bench(const params& params, const argparse::ArgumentParser&type_args) {
+            this->instanceParams = params;
+            if (type_args.get<bool>("sparse")) {
+                this->pairvar = loadBenchSparse(params);
+            }
+            else if (type_args.get<bool>("dense")) {
+                this->pairvar = loadBenchDense(params);
+            }
         }
-        planc_bench(int argc, char **argv)
-        {
-            this->p_argc = argc;
-            this->p_argv = argv;
-            this->nnlsParseCommandLine();
+        nnlsOutput runBench(std::variant<nnlslib<arma::sp_mat>, nnlslib<arma::mat>> libstate) {
+            auto unpackvar = std::visit([](auto &&arg) -> std::variant<arma::sp_mat, arma::mat> {return arg.first;}, this->pairvar);
+            arma::mat unpackstat = std::visit([](auto &&arg) -> arma::mat {return arg.second;}, this->pairvar);
+            auto functor = [this, unpackstat, unpackvar](auto& arg) -> nnlsOutput {return arg.runbppnnls(unpackstat, unpackvar, this->instanceParams.n_cores());};
+            return std::visit(functor, libstate);
         }
-        planc_bench(std::string input_file, std::string input_file2) {
-            this->m_Afile_name = input_file;
-            this->m_Bfile_name = input_file2;
-            this->loadNNLS();
-        }
+
+    };
+
+    const char* prefixes[5] =
+    {
+        "frontal_10k",
+        "frontal_50k",
+        "frontal_100k",
+        "frontal_200k",
+        "frontal_250k",
     };
 }
 
-const char* prefixes[5] =
-{
-    "frontal_10k",
-    "frontal_50k",
-    "frontal_100k",
-    "frontal_200k",
-    "frontal_250k",
-};
-
-int main(int argc, char *argv[])
-{
-   try
+    int main(int argc, char *argv[])
     {
-        std::vector<class planc::planc_bench> pbvec;
-        for(std::string prefix : prefixes){
-            std::string sparse = prefix + ".h5.mtx";
-            std::string dense = prefix + ".h5.dense.mtx";
-            planc::planc_bench dnd(sparse, dense);
-            pbvec.push_back(dnd);
-        }
-        bm::session<float> mySession;
-        mySession = bm::run<float, std::milli>([&pbvec](auto &recorder)
-            {
-            for (int i = 0; i < 5; i++)
-            {
-                planc::planc_bench *locpbptr = &pbvec[i];
-                recorder.record(prefixes[i], [&locpbptr]
-                                {locpbptr->call_NNLS();});
-            }},
-                                               100 /* iterations */);
+        try
+        {   argparse::ArgumentParser type_args;
+            type_args.add_argument("sparse");
+            type_args.add_argument("dense");
+            auto secondary_args = type_args.parse_known_args(argc, argv);
+            std::variant<planc::nnlslib<arma::sp_mat>, planc::nnlslib<arma::mat>> libstate{};
+            if (type_args.get<bool>("sparse")) {
+                libstate = planc::nnlslib<arma::sp_mat>();
+            }
+            else if (type_args.get<bool>("dense")) {
+                libstate = planc::nnlslib<arma::mat>();
+            }
+            planc::BenchParseCommandLine bpc;
+            const planc::params initialparams = bpc.getPlancParams(secondary_args.size(),
+                reinterpret_cast<const char* const*>(reinterpret_cast<char*>(secondary_args.data())));
+            std::vector<planc::planc_bench> pbvec;
+            for(std::string prefix : planc::prefixes) {
+                planc::params paramCopy = initialparams;
+                std::string sparse = prefix + ".h5.mtx";
+                std::string dense = prefix + ".h5.dense.mtx";
+                paramCopy.setMAfileName(sparse);
+                paramCopy.setMBFileName(dense);
+                planc::planc_bench dnd(paramCopy, type_args);
+                pbvec.push_back(dnd);
+            }
+            const bm::session<float> mySession = bm::run<float, std::milli>([&pbvec, libstate](auto&recorder) {
+                                                                          for (int i = 0; i < 5; i++) {
+                                                                              planc::planc_bench* locpbptr = &pbvec[i];
+                                                                              recorder.record(planc::prefixes[i], [&locpbptr, libstate] {
+                                                                                  locpbptr->runBench(libstate);
+                                                                              });
+                                                                          }
+                                                                      },
+                                                                      100 /* iterations */);
 
-        for (const auto& record : mySession.records)
+            for (const auto& record : mySession.records)
+            {
+                auto name = record.name;
+                auto mean = record.mean();
+                auto variance = record.variance();
+                auto standard_deviation = record.standard_deviation();
+            }
+            mySession.to_csv("outbench.csv");
+            fflush(stdout);
+        }
+        catch (const std::exception &e)
         {
-            auto name = record.name;
-            auto mean = record.mean();
-            auto variance = record.variance();
-            auto standard_deviation = record.standard_deviation();
-        }
-        mySession.to_csv("outbench.csv");
-        fflush(stdout);
+            INFO << "Exception with stack trace " << std::endl;
+            INFO << e.what();
+        } return 1;
     }
-    catch (const std::exception &e)
-    {
-        INFO << "Exception with stack trace " << std::endl;
-        INFO << e.what();
-    }
-}

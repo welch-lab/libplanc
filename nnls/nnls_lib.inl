@@ -5,13 +5,17 @@
 #include "bppnnls.hpp"
 
 template<typename T, typename eT>
+arma::mat planc::nnlslib<T, eT>::runbppnnls(const arma::mat &C, const std::variant<arma::sp_mat, arma::mat> &B, const int &ncores) {
+    return std::visit([C, ncores](auto&&arg)->arma::mat{return runbppnnls(C, arg, ncores);}, B);
+}
+
+template<typename T, typename eT>
 arma::mat planc::nnlslib<T, eT>::runbppnnls(const arma::mat &C, const T &B, const int& ncores) {
     arma::uword m_n = B.n_cols;
     arma::uword m_k = C.n_cols;
     arma::mat CtC = C.t() * C;
     arma::mat outmat = arma::zeros<arma::mat>(m_k, m_n);
-    arma::mat *outmatptr;
-    outmatptr = &outmat;
+    arma::mat* outmatptr = &outmat;
     arma::uword ONE_THREAD_MATRIX_SIZE = chunk_size_dense<double>(m_k);
     unsigned int numChunks = m_n / ONE_THREAD_MATRIX_SIZE;
     if (numChunks*ONE_THREAD_MATRIX_SIZE < m_n) numChunks++;
