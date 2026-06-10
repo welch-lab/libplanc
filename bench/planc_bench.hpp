@@ -13,12 +13,11 @@ namespace planc {
                 std::vector<VT> vals;
         };
 
-        class BenchParseCommandLine: public ParseCommandLine
+        class BenchParseCommandLine: public BaseParser
         {
         public:
-                ~BenchParseCommandLine() = default;
 
-                BenchParseCommandLine() : ParseCommandLine("planc_bench")
+                BenchParseCommandLine() : BaseParser("planc_bench")
                 {
                         this->add_argument("-h", "--help")
                                 .flag();
@@ -49,5 +48,14 @@ namespace planc {
                                 .default_value(1)
                                 .help("number of parallel cores");
                 }
+                void initClStruct() const override {
+                        clStruct->m_compute_error = this->get<bool>("-e");
+                        clStruct->m_num_it = this->get<int>("-t");
+                        clStruct->m_k = this->get<int>("-k");
+                        clStruct->m_Afile_name = this->get("-i");
+                        clStruct->m_outputfile_name = this->get("-o");
+                        //clStruct->m_initseed = this->get<int>("--seed");
+                }
+                //void printConfig() const override {};
         };
 }

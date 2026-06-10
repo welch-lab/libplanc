@@ -103,8 +103,7 @@ namespace planc {
                 libstate = planc::nnlslib<arma::mat>();
             }
             planc::BenchParseCommandLine bpc;
-            const planc::params initialparams = bpc.getPlancParams(secondary_args.size(),
-                reinterpret_cast<const char* const*>(reinterpret_cast<char*>(secondary_args.data())));
+            const planc::params initialparams = bpc.getPlancParams(secondary_args);
             std::vector<planc::planc_bench> pbvec;
             for(std::string prefix : planc::prefixes) {
                 planc::params paramCopy = initialparams;

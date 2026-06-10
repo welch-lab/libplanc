@@ -11,8 +11,7 @@ int main(int argc, char *argv[]) {
     auto secondary_args = type_args.parse_known_args(argc, argv);
     planc::ParseCommandLine dnd;
     std::variant<planc::nmflib<arma::sp_mat>, planc::nmflib<arma::mat>> libstate{};
-    planc::params params = dnd.getPlancParams(secondary_args.size(),
-        reinterpret_cast<const char* const*>(reinterpret_cast<char*>(secondary_args.data())));
+    planc::params params = dnd.getPlancParams(secondary_args);
     if (type_args.get<std::string>("type") == "sparse") {
         libstate = planc::nmflib<arma::sp_mat>();
     }

@@ -9,8 +9,9 @@
 #include "parsecommandline.h"
 
 namespace planc {
-class ParseCommandLine : public argparse::ArgumentParser {
- protected:
+
+class BaseParser : public argparse::ArgumentParser {
+protected:
     params* clStruct = new params;
     bool parsed = false;
 
@@ -26,12 +27,29 @@ class ParseCommandLine : public argparse::ArgumentParser {
             }
         }
     }
+public:
+    virtual ~BaseParser() = default;
+
+    explicit BaseParser(const char* str) : ArgumentParser(str) {}
+    virtual void initClStruct() const {}
+//    virtual void printConfig() const {}
+    params getPlancParams(std::vector<std::string> l_argc) {
+        if (!this->parsed) {
+            this->parse_args(l_argc);
+            this->initClStruct();
+            this->parsed = true;
+        }
+        //this->printConfig();
+        return *clStruct;
+    }
+};
+class ParseCommandLine : public BaseParser {
+
  public:
-    ~ParseCommandLine() = default;
     /**
    * Argparse constructor.
    */
-  ParseCommandLine() : ArgumentParser("planc") {
+  ParseCommandLine() : BaseParser("planc") {
       this->add_argument("-h", "--help")
             .flag();
       // call print_usage
@@ -146,10 +164,7 @@ class ParseCommandLine : public argparse::ArgumentParser {
               .scan<'i', int>()
               .help("numkblocks");
   }
-
-    explicit ParseCommandLine(const char* str) : ArgumentParser(str) {}
-
-    void initClStruct() const {
+    void initClStruct() const override {
       clStruct->m_lucalgo = algomap[this->get("-a")];
       clStruct->m_input_normalization = normmap[this->get("--input_normalization")];
       clStruct->feat_type = this->get("--mat_type")[0];
@@ -198,66 +213,66 @@ class ParseCommandLine : public argparse::ArgumentParser {
 
   /// print the configuration received through the command line paramters
 
-  void printConfig(int opt = 0) const {
-    switch (opt) {
-      case JOINTNMF:
-        INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
-             << "::c::" << clStruct->m_Sfile_name
-             << "::o::" << clStruct->m_outputfile_name
-             << "::m::" << clStruct->m_globalm << "::n::" << clStruct->m_globaln
-             << "::t::" << clStruct->m_num_it
-             << "::error::" << clStruct->m_compute_error
-             << "::tol::" << clStruct->m_tolerance
-             << "::regW::" << clStruct->m_regW << "::regH::" << clStruct->m_regH
-             << "::sparsity::" << clStruct->m_sparsity
-             << "::input normalization::" << clStruct->m_input_normalization
-             << "::num_k_blocks::" << clStruct->m_num_k_blocks
-             << "::adj_rand::" << clStruct->m_adj_rand
-             << "::initseed::" << clStruct->m_initseed
-             << "::alpha::" << clStruct->alpha << "::beta::" << clStruct->beta
-             << std::endl;
-        break;
-      case DISTJOINTNMF:
-        INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
-             << "::c::" << clStruct->m_Sfile_name
-             << "::o::" << clStruct->m_outputfile_name
-             << "::m::" << clStruct->m_globalm << "::n::" << clStruct->m_globaln
-             << "::t::" << clStruct->m_num_it
-             << "::error::" << clStruct->m_compute_error
-             << "::tol::" << clStruct->m_tolerance
-             << "::regW::" << clStruct->m_regW << "::regH::" << clStruct->m_regH
-             << "::sparsity::" << clStruct->m_sparsity
-             << "::input normalization::" << clStruct->m_input_normalization
-             << "::num_k_blocks::" << clStruct->m_num_k_blocks
-             << "::adj_rand::" << clStruct->m_adj_rand
-             << "::initseed::" << clStruct->m_initseed
-             << "::alpha::" << clStruct->alpha << "::beta::" << clStruct->beta
-             << "::pr::" << clStruct->m_pr << "::pc::" << clStruct->m_pc
-             << "::cpr::" << clStruct->m_cpr << "::cpc::" << clStruct->m_cpc
-             << std::endl;
-        break;
-      default:
-        INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
-                  << "::k::" << clStruct->m_k << "::m::" << clStruct->m_globalm
-                  << "::n::" << clStruct->m_globaln << "::t::" << clStruct->m_num_it
-                  << "::pr::" << clStruct->m_pr << "::pc::" << clStruct->m_pc
-                  << "::error::" << clStruct->m_compute_error  << "::tol::" << clStruct->m_tolerance
-                  << "::regW::"
-                  << "l2::" << clStruct->m_regW(0) << "::l1::" << clStruct->m_regW(1)
-                  << "::regH::"
-                  << "l2::" << clStruct->m_regH(0) << "::l1::" << clStruct->m_regH(1)
-                  << "::num_k_blocks::" << clStruct->m_num_k_blocks
-                  << "::dimensions::" << clStruct->m_dimensions
-                  << "::procs::" << clStruct->m_proc_grids
-                  << "::regularizers::" << clStruct->m_regularizers
-                  << "::input normalization::" << clStruct->m_input_normalization
-                  << "::symm_reg::" << clStruct->m_symm_reg
-                  << "::luciters::" << clStruct->m_max_luciters
-                  << "::adj_rand::" << clStruct->m_adj_rand
-                  << "::initseed::" << clStruct->m_initseed
-                  << "::dimtree::" << clStruct->m_dim_tree << std::endl;
-    }
-  }
+  //void printConfig(int opt = 0) const {
+  //  switch (opt) {
+  //    case JOINTNMF:
+  //      INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
+  //           << "::c::" << clStruct->m_Sfile_name
+  //           << "::o::" << clStruct->m_outputfile_name
+  //           << "::m::" << clStruct->m_globalm << "::n::" << clStruct->m_globaln
+  //           << "::t::" << clStruct->m_num_it
+  //           << "::error::" << clStruct->m_compute_error
+  //           << "::tol::" << clStruct->m_tolerance
+  //           << "::regW::" << clStruct->m_regW << "::regH::" << clStruct->m_regH
+  //           << "::sparsity::" << clStruct->m_sparsity
+  //           << "::input normalization::" << clStruct->m_input_normalization
+  //           << "::num_k_blocks::" << clStruct->m_num_k_blocks
+  //           << "::adj_rand::" << clStruct->m_adj_rand
+  //           << "::initseed::" << clStruct->m_initseed
+  //           << "::alpha::" << clStruct->alpha << "::beta::" << clStruct->beta
+  //           << std::endl;
+  //      break;
+  //    case DISTJOINTNMF:
+  //      INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
+  //           << "::c::" << clStruct->m_Sfile_name
+  //           << "::o::" << clStruct->m_outputfile_name
+  //           << "::m::" << clStruct->m_globalm << "::n::" << clStruct->m_globaln
+  //           << "::t::" << clStruct->m_num_it
+  //           << "::error::" << clStruct->m_compute_error
+  //           << "::tol::" << clStruct->m_tolerance
+  //           << "::regW::" << clStruct->m_regW << "::regH::" << clStruct->m_regH
+  //           << "::sparsity::" << clStruct->m_sparsity
+  //           << "::input normalization::" << clStruct->m_input_normalization
+  //           << "::num_k_blocks::" << clStruct->m_num_k_blocks
+  //           << "::adj_rand::" << clStruct->m_adj_rand
+  //           << "::initseed::" << clStruct->m_initseed
+  //           << "::alpha::" << clStruct->alpha << "::beta::" << clStruct->beta
+  //           << "::pr::" << clStruct->m_pr << "::pc::" << clStruct->m_pc
+  //           << "::cpr::" << clStruct->m_cpr << "::cpc::" << clStruct->m_cpc
+  //           << std::endl;
+  //      break;
+  //    default:
+  //      INFO << "a::" << clStruct->m_lucalgo << "::i::" << clStruct->m_Afile_name
+  //                << "::k::" << clStruct->m_k << "::m::" << clStruct->m_globalm
+  //                << "::n::" << clStruct->m_globaln << "::t::" << clStruct->m_num_it
+  //                << "::pr::" << clStruct->m_pr << "::pc::" << clStruct->m_pc
+  //                << "::error::" << clStruct->m_compute_error  << "::tol::" << clStruct->m_tolerance
+  //                << "::regW::"
+  //                << "l2::" << clStruct->m_regW(0) << "::l1::" << clStruct->m_regW(1)
+  //                << "::regH::"
+  //                << "l2::" << clStruct->m_regH(0) << "::l1::" << clStruct->m_regH(1)
+  //                << "::num_k_blocks::" << clStruct->m_num_k_blocks
+  //                << "::dimensions::" << clStruct->m_dimensions
+  //                << "::procs::" << clStruct->m_proc_grids
+  //                << "::regularizers::" << clStruct->m_regularizers
+  //                << "::input normalization::" << clStruct->m_input_normalization
+  //                << "::symm_reg::" << clStruct->m_symm_reg
+  //                << "::luciters::" << clStruct->m_max_luciters
+  //                << "::adj_rand::" << clStruct->m_adj_rand
+  //                << "::initseed::" << clStruct->m_initseed
+  //                << "::dimtree::" << clStruct->m_dim_tree << std::endl;
+  //  }
+  //}
 
   static void print_usage(int opt = 0) {
     switch (opt) {
@@ -592,16 +607,6 @@ class ParseCommandLine : public argparse::ArgumentParser {
   double unpartitioned() const { return clStruct->m_unpartitioned; }
   bool feat_typesity() const { return clStruct->feat_type; }
   bool conn_typesity() const { return clStruct->conn_type; }
-
-  params getPlancParams(int l_argv, const char * const *l_argc) {
-      if (!this->parsed) {
-          this->parse_args(l_argv, l_argc);
-          this->initClStruct();
-          this->parsed = true;
-      }
-      this->printConfig();
-      return *clStruct;
-  }
 
 };  // ParseCommandLine
 }  // namespace planc
