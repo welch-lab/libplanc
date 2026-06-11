@@ -36,7 +36,7 @@ namespace planc {
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
             << "(" << t2 << " s)" << std::endl;
         params.setMK(B.n_rows);
-        return std::make_pair(A, B);
+        return std::make_pair(A, B.t());
     }
 
     std::pair<arma::mat, arma::mat> loadBenchDense(params params) {
