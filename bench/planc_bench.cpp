@@ -48,12 +48,23 @@ namespace planc {
         fast_matrix_market::read_matrix_market_array(ifs, headerB, Bmem);
         arma::mat B(Bmem);
         B.reshape(headerB.nrows, headerB.ncols);
-        arma::mat A(Bmem);
+        fast_matrix_market::matrix_market_header headerA;
+        std::ifstream ifsA(params.getMAfileName());
+        std::vector<arma::uword> rowA;
+        std::vector<arma::uword> colA;
+        std::vector<double> valueA;
+        fast_matrix_market::read_matrix_market_triplet(ifsA, headerA, rowA, colA, valueA);
+        arma::uvec urowa(rowA);
+        arma::uvec ucola(colA);
+        arma::umat ucoo = join_rows(urowa, ucola).t();
+        arma::Col uvala(valueA);
+        arma::sp_mat Asp(ucoo, uvala, headerA.nrows, headerA.ncols);
+        auto A = static_cast<arma::mat>(Asp);
         double t2 = toc();
         params.setMK(B.n_rows);
         INFO << "Successfully loaded input matrices " << PRINTMATINFO(A) << PRINTMATINFO(B)
             << "(" << t2 << " s)" << std::endl;
-        return std::make_pair(A, B);
+        return std::make_pair(A, B.t());
     }
 
     class planc_bench {
