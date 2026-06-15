@@ -12,7 +12,9 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_COMPILER": "g++",
-                "CMAKE_C_COMPILER": "gcc"
+                "CMAKE_C_COMPILER": "gcc",
+                "Armadillo_DIR": "/home/andrew/vcpkg/installed/x64-linux/share/Armadillo",
+                "BUILD_BENCH": "1"
             },
             "condition": {
                 "type": "equals",
