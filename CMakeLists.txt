@@ -99,7 +99,7 @@ else ()
     target_sources(nmflib PRIVATE ${PROJECT_SOURCE_DIR}/common/progressWrapper.cpp)
     target_sources(nmflib PUBLIC FILE_SET progresswrapper TYPE HEADERS FILES ${PROJECT_SOURCE_DIR}/common/progressWrapper.h)
     target_include_directories(nmflib PUBLIC ${ARMADILLO_INCLUDE_DIRS})
-    if(BUILD_EXECUTABLE)
+    if(BUILD_EXECUTABLE OR BUILD_BENCH)
         target_link_libraries(nmflib PUBLIC indicators::indicators)
     else()
         target_compile_definitions(nmflib PRIVATE NO_INDICATORS)
@@ -263,7 +263,8 @@ if(BUILD_BENCH)
     target_sources(planc_bench PUBLIC FILE_SET bench TYPE HEADERS BASE_DIRS bench
             FILES bench/planc_bench.hpp)
     set_target_properties(planc_bench PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS ON)
-    target_link_libraries(planc_bench nmflib fast_matrix_market::fast_matrix_market)
+    find_package(argparse REQUIRED)
+    target_link_libraries(planc_bench nmflib fast_matrix_market::fast_matrix_market argparse::argparse)
 
     install(TARGETS planc_bench
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
