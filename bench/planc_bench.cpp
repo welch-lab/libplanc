@@ -131,7 +131,7 @@ namespace planc {
                                                                               });
                                                                           }
                                                                       },
-                                                                      100 /* iterations */);
+                                                                      10 /* iterations */);
             mySession.to_csv("outbench.csv");
             fflush(stdout);
         }
@@ -139,5 +139,6 @@ namespace planc {
         {
             INFO << "Exception with stack trace " << std::endl;
             INFO << e.what();
-        } return 1;
+            return 1;
+        } return 0;
     }
