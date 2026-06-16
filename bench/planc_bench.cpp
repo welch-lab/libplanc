@@ -131,7 +131,7 @@ namespace planc {
                                                                               });
                                                                           }
                                                                       },
-                                                                      10 /* iterations */);
+                                                                      initialparams.m_num_it /* iterations */);
             mySession.to_csv("outbench.csv");
             fflush(stdout);
         }
