@@ -50,10 +50,10 @@ set(GENERAL_INCLUDE_DIRS "")
 set(GENERAL_DEFINES "")
 
 add_library(nmflib
-        nmf/nmf_lib.cpp nmf/bppnmf.cpp nnls/nnls_lib.cpp
+        nmf/nmf_lib.cpp nmf/bppnmf.cpp nnls/nnls_lib.cpp common/detect_blas.c
         common/parseutils.cpp common/data.cpp common/utils.cpp)
 target_sources(nmflib PUBLIC FILE_SET common TYPE HEADERS BASE_DIRS common
-        FILES common/config.h common/data.hpp common/inmf.hpp
+        FILES common/config.h common/data.hpp common/inmf.hpp common/detect_blas.h
               common/nmf.hpp common/parsecommandline.h common/parsecommandline.hpp
               common/parseutils.hpp common/plancopts.h common/utils.h common/utils.hpp)
 target_sources(nmflib PUBLIC FILE_SET nnls TYPE HEADERS BASE_DIRS nnls
@@ -132,12 +132,11 @@ find_package(HWLOC)
 
 HandleHWLOC()
 
-add_library(detect_blas OBJECT ${PROJECT_SOURCE_DIR}/common/detect_blas.c)
 check_include_file(dlfcn.h HAS_DLFCN)
 if (WIN32 AND NOT HAS_DLFCN)
     find_package(dlfcn-win32 CONFIG REQUIRED)
     set(DLFCN_LINK 1)
-    target_link_libraries(detect_blas PUBLIC "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win32::dl>")
+    target_link_libraries(nmflib PUBLIC "$<$<BOOL:${DLFCN_LINK}>:dlfcn-win32::dl>")
 endif ()
 
 
@@ -145,7 +144,7 @@ endif ()
 # add_executable(${DENSE_OR_SPARSE}_inmf inmf.cpp)
 target_include_directories(nmflib PUBLIC ${OpenMP_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(nmflib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(nmflib PUBLIC hw_detect detect_blas)
+target_link_libraries(nmflib PUBLIC hw_detect)
 generate_export_header(nmflib)
 if(BUILD_RCPP)
     if(WIN32)
