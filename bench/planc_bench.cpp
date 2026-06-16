@@ -132,7 +132,7 @@ namespace planc {
                                                                           }
                                                                       },
                                                                       initialparams.m_num_it /* iterations */);
-            mySession.to_csv("outbench.csv");
+            mySession.to_csv(initialparams.m_outputfile_name);
             fflush(stdout);
         }
         catch (const std::exception &e)
