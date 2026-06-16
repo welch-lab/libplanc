@@ -24,7 +24,7 @@ openblas_set_t get_openblas_set(const openblas_handle_t libloc) {
 
 bool is_openmp(void) {
 #ifdef _OPENMP
-    const int threads = omp_get_num_threads();
+    const int threads = omp_get_max_threads();
     if (threads == 1) return false;
     return true;
 #endif
