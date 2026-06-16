@@ -19,28 +19,10 @@ namespace planc {
 
                 BenchParseCommandLine() : BaseParser("planc_bench")
                 {
-                        this->add_argument("-h", "--help")
-                                .flag();
-                        this->add_argument("-e", "--error")
-                                .implicit_value(true)
-                                .default_value(false)
-                                .help("compute error");
-                        this->add_argument("-k", "--lowrankk")
-                                .default_value(20)
-                                .scan<'i', int>()
-                                .help("iterations");
                         this->add_argument("-t", "--iterations")
                                 .default_value(20)
                                 .scan<'i', int>()
                                 .help("iterations");
-                        this->add_argument("-i", "--input")
-                                .default_value("")
-                                .help("input 1")
-                                .required();
-                        this->add_argument("-j", "--input2")
-                                .default_value("")
-                                .help("input 2")
-                                .required();
                         this->add_argument("-o", "--output")
                                 .default_value("")
                                 .help("output");
@@ -53,10 +35,9 @@ namespace planc {
                 }
                 void initClStruct() const override {
                         clStruct->m_type = matrixmap.at(this->get("type"));
-                        clStruct->m_compute_error = this->get<bool>("-e");
                         clStruct->m_num_it = this->get<int>("-t");
-                        clStruct->m_k = this->get<int>("-k");
-                        clStruct->m_Afile_name = this->get("-i");
+                        //clStruct->m_k = this->get<int>("-k");
+                        //clStruct->m_Afile_name = this->get("-i");
                         clStruct->m_outputfile_name = this->get("-o");
                         clStruct->set_n_cores(this->get<int>("-n"));
                         //clStruct->m_initseed = this->get<int>("--seed");
