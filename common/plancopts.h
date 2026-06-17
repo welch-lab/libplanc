@@ -465,7 +465,7 @@ namespace planc {
             return m_type;
         }
 
-        void set_m_type(const matrixtype& mtype) {
+        void set_m_type(const matrixtype mtype) {
             this->m_type = mtype;
         }
     };
