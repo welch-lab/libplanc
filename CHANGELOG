@@ -1,0 +1,5 @@
+1.1.0
+- reworked parsing logic for nmfcmd
+- fixed planc_bench for refactor
+- nmflib 1.0.2 (small tweaks to enable these fixes)
+- NOTE: this is very likely to be broken for python/rcpp until i get around to debugging the build system

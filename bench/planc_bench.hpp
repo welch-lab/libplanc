@@ -17,7 +17,7 @@ namespace planc {
         {
         public:
 
-                BenchParseCommandLine() : BaseParser("planc_bench")
+                BenchParseCommandLine() : BaseParser("planc_bench", "1.1.0")
                 {
                         this->add_argument("-t", "--iterations")
                                 .default_value(20)

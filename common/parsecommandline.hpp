@@ -30,7 +30,7 @@ protected:
 public:
     virtual ~BaseParser() = default;
 
-    explicit BaseParser(const char* str) : ArgumentParser(str) {}
+    explicit BaseParser(const char* str, const char* ver) : ArgumentParser(str, ver) {}
     virtual void initClStruct() const {}
 //    virtual void printConfig() const {}
     params getPlancParams(std::vector<std::string> l_argc) {
@@ -49,7 +49,7 @@ class ParseCommandLine : public BaseParser {
     /**
    * Argparse constructor.
    */
-  ParseCommandLine() : BaseParser("planc") {
+  ParseCommandLine() : BaseParser("planc_nmflib", "1.0.2") {
       this->add_argument("-h", "--help")
             .flag();
       // call print_usage
